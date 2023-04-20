@@ -1,5 +1,5 @@
-import { ethers, Signer, Wallet } from "ethers";
-import { SarcoClientConfig } from "./types";
+import { ethers, Signer, Wallet } from 'ethers';
+import { SarcoClientConfig } from './types';
 
 /**
  * The SarcoClient class provides a high-level interface for interacting with the Sarcophagus V2 protocol.
@@ -24,12 +24,17 @@ export class SarcoClient {
     } else if (config.mnemonic) {
       this.signer = Wallet.fromMnemonic(config.mnemonic).connect(provider);
     } else {
-      throw new Error("A signer, private key, or mnemonic must be provided");
+      throw new Error('A signer, private key, or mnemonic must be provided');
     }
   }
 
+  /**
+   * A sample method that returns "Hello World".
+   *
+   * @returns The string "Hello World".
+   */
   helloWorld() {
-    return "Hello World";
+    return 'Hello World';
   }
 
   // SDK methods will go here
