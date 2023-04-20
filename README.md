@@ -8,11 +8,14 @@ The Sarcophagus V2 SDK is a TypeScript library designed to simplify the interact
 - Supports custom signer and provider configurations
 - Provides utility functions for common tasks
 
+## Documentation
+Read more about how to use the Sarcophagus V2 SDK [here](https://sarcophagus-org.github.io/sarcophagus-v2-sdk/index.html).
+
 ## Installation
 
 To install the SDK, run the following command in your project directory:
 
-```sh
+```
 npm install sarcophagus-v2-sdk
 ```
 
