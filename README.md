@@ -17,6 +17,7 @@ npm install sarcophagus-v2-sdk
 ```
 
 ## Usage
+
 Here's a basic example of using the Sarcophagus V2 SDK in a TypeScript or JavaScript project:
 
 ```typescript
@@ -51,9 +52,22 @@ A sample method that returns "Hello World".
 helloWorld(): string;
 ```
 
+## Local Development
+The SDK may be tested locally by cloning the SDK repository and linking it to your project. 
+```
+git clone git@github.com:sarcophagus-org/sarcophagus-v2-sdk.git
+cd sarcophagus-v2-sdk
+npm run build
+npm link 
+cd path/to/your/project
+npm link sarcophagus-v2-sdk
+```
+
+Then it may be imported as if it were added to the package.json.
+
 ## Contributing
 We welcome contributions to the SDK. If you'd like to contribute, please submit an issue or open a pull request.
 
 ## License
-This project is licensed under The Unlicense License.
+This project is licensed under The Unlicense license.
 
