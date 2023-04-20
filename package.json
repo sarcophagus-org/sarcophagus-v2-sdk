@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest",
     "build": "tsc",
-    "docs": "typedoc --out docs src/index.ts"
+    "docs": "typedoc --out docs --readme README.md src"
   },
   "dependencies": {
     "ethers": "^5.7.2"
