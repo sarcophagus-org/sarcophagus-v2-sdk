@@ -28,5 +28,9 @@ export class SarcoClient {
     }
   }
 
+  helloWorld() {
+    return "Hello World";
+  }
+
   // Your SDK methods will go here
 }
