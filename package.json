@@ -10,7 +10,8 @@
     "docs": "typedoc --out docs --readme README.md src"
   },
   "dependencies": {
-    "ethers": "^5.7.2"
+    "ethers": "^5.7.2",
+    "@sarcophagus-org/sarcophagus-v2-contracts": "^0.16.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.1",

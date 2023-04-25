@@ -1,8 +1,8 @@
-import { ethers } from "ethers";
-import { SarcoClient } from "../src";
+import { ethers } from 'ethers';
+import { SarcoClient } from '../src';
 
-// Create a real provider for testing (you can use any network)
-const testProvider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
+// Create a real provider for testing
+const testProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
 // Create a mock signer
 const mockSigner = {
@@ -12,27 +12,28 @@ const mockSigner = {
 } as unknown as ethers.providers.JsonRpcSigner;
 
 // Mock the provider's getSigner method
-jest.spyOn(testProvider, "getSigner").mockImplementation(() => mockSigner);
+jest.spyOn(testProvider, 'getSigner').mockImplementation(() => mockSigner);
 
 // Example test for the SarcophagusSDK
-describe("SarcophagusSDK", () => {
-  test("constructor should initialize with a signer", () => {
+describe('SarcophagusSDK', () => {
+  test.only('constructor should initialize with a signer', () => {
     const signer = new ethers.Wallet(
-      "0x0123456789012345678901234567890123456789012345678901234567890123"
+      '0x0123456789012345678901234567890123456789012345678901234567890123'
     );
-    const sdk = new SarcoClient({ signer });
-    expect(sdk).toBeDefined();
+    const sarco = new SarcoClient({ signer });
+    sarco.api.createSarcophagus();
+    expect(sarco).toBeDefined();
   });
 
-  test("constructor should initialize with a private key", () => {
-    const privateKey = "0x0123456789012345678901234567890123456789012345678901234567890123";
-    const sdk = new SarcoClient({ privateKey, provider: testProvider });
-    expect(sdk).toBeDefined();
+  test('constructor should initialize with a private key', () => {
+    const privateKey = '0x0123456789012345678901234567890123456789012345678901234567890123';
+    const sarco = new SarcoClient({ privateKey, provider: testProvider });
+    expect(sarco).toBeDefined();
   });
 
-  test("constructor should initialize with a mnemonic", () => {
-    const mnemonic = "test test test test test test test test test test test junk";
-    const sdk = new SarcoClient({ mnemonic, provider: testProvider });
-    expect(sdk).toBeDefined();
+  test('constructor should initialize with a mnemonic', () => {
+    const mnemonic = 'test test test test test test test test test test test junk';
+    const sarco = new SarcoClient({ mnemonic, provider: testProvider });
+    expect(sarco).toBeDefined();
   });
 });

@@ -1,4 +1,4 @@
-import { ethers, Signer, Wallet } from "ethers";
+import { ethers, Signer, Wallet } from 'ethers';
 
 /**
  * Configuration options for the SarcoClient class.
