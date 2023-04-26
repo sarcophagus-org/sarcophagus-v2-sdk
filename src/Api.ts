@@ -78,48 +78,29 @@ export function Api<T extends new (...args: any[]) => {}>(Base: T) {
             arweaveTxId: string,
             options: CreateSarcophagusOptions = {}
         ): Promise<ethers.providers.TransactionResponse> {
-            const contract = new ethers.Contract(
-                goerliDiamondAddress,
-                EmbalmerFacet__factory.abi,
-                this.signer
-            );
-
-            const methodName = 'createSarcophagus';
-            const args = [
-                sarcoId,
-                {
-                    name,
-                    maximumRewrapInterval,
-                    maximumResurrectionTime,
-                    recipientAddress,
-                    resurrectionTime,
-                    threshold,
-                    creationTime,
-                },
-                selectedArchaeologists,
-                arweaveTxId,
-            ];
-
-            const useSafeCall = options.ignoreSafeCall !== undefined ? options.ignoreSafeCall : true;
-
-            if (useSafeCall) {
-                try {
-                    // Check if the transaction will succeed using callStatic
-                    await contract.callStatic[methodName](...args);
-
-                    // Proceed with the actual transaction if callStatic succeeds
-                    const transactionResponse = await contract[methodName](...args);
-                    return transactionResponse;
-                } catch (err) {
-                    const error = err as Error;
-                    console.error(`Error during the safe contract call: ${error.message}`);
-                    throw error;
-                }
-            } else {
-                // If useSafeCall is set to false, directly call the contract method
-                const transactionResponse = await contract[methodName](...args);
-                return transactionResponse;
-            }
+            return this._methodCall({
+                contract: new ethers.Contract(
+                    goerliDiamondAddress,
+                    EmbalmerFacet__factory.abi,
+                    this.signer
+                ),
+                methodName: 'createSarcophagus',
+                inputArgs: [
+                    sarcoId,
+                    {
+                        name,
+                        maximumRewrapInterval,
+                        maximumResurrectionTime,
+                        recipientAddress,
+                        resurrectionTime,
+                        threshold,
+                        creationTime,
+                    },
+                    selectedArchaeologists,
+                    arweaveTxId,
+                ],
+                options
+            });
         }
 
         async rewrapSarcophagus(
