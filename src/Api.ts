@@ -122,5 +122,21 @@ export function Api<T extends new (...args: any[]) => {}>(Base: T) {
                 options
             });
         }
+
+        async burySarcophagus(
+            sarcoId: string,
+            options?: MethodCallOptions
+        ): Promise<ethers.providers.TransactionResponse> {
+            return this._methodCall({
+                contract: new ethers.Contract(
+                    goerliDiamondAddress,
+                    EmbalmerFacet__factory.abi,
+                    this.signer
+                ),
+                methodName: 'burySarcophagus',
+                inputArgs: [sarcoId],
+                options
+            });
+        }
     };
 } 
