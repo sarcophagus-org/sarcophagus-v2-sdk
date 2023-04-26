@@ -19,7 +19,6 @@ export async function safeContractCall(
     const transactionResponse = await method(...args, options);
     return transactionResponse;
   } catch (error) {
-    console.error(`Error during the safe contract call: ${error.message}`);
     throw error;
   }
 }
