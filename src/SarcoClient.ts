@@ -3,10 +3,6 @@ import { getNetwork } from './helpers/getNetwork';
 import { getSigner } from './helpers/getSigner';
 import { Api } from './Api';
 import { SarcoClientConfig } from './types';
-import * as api from './api';
-import * as utils from './utils';
-import * as bundlr from './bundlr';
-import * as archaeologist from './archaeologist';
 
 /**
  * The SarcoClient class provides a high-level interface for interacting with the Sarcophagus V2 protocol.
