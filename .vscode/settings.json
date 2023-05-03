@@ -1,0 +1,6 @@
+{
+  "[your_file_name].txt": {
+   "editor.wordWrap": "wordWrapColumn",
+   "editor.wordWrapColumn": 80
+  }
+}

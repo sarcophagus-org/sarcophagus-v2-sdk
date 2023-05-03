@@ -1,19 +1,18 @@
-import { ethers, Signer, Wallet } from 'ethers';
+import { ethers, Signer } from 'ethers';
+import { getNetwork } from './helpers/getNetwork';
+import { getSigner } from './helpers/getSigner';
 import { SarcoClientConfig } from './types';
-import * as api from './api';
-import * as utils from './utils';
-import * as bundlr from './bundlr';
-import * as archaeologist from './archaeologist';
+import { Api } from './Api';
+import { Token } from './Token';
 
 /**
  * The SarcoClient class provides a high-level interface for interacting with the Sarcophagus V2 protocol.
  */
 export class SarcoClient {
-  private signer: Signer;
-  public api: typeof api;
-  public utils: typeof utils;
-  public bundlr: typeof bundlr;
-  public archaeologist: typeof archaeologist;
+  signer: Signer = {} as Signer;
+  network: ethers.providers.Network = {} as ethers.providers.Network;
+  api: Api;
+  token: Token;
 
   /**
    * Constructs a new SarcoClient instance. The provider defaults to ethers default provider if not
@@ -22,22 +21,23 @@ export class SarcoClient {
    * @param config - The configuration options for the SarcoClient.
    * @throws Will throw an error if none of the signer, private key, or mnemonic is provided.
    */
-  constructor(config: SarcoClientConfig) {
-    const provider = config.provider || ethers.getDefaultProvider();
+  constructor(config?: SarcoClientConfig) {
+    this.initialize(config);
+    this.api = new Api(this);
+    this.token = new Token(this);
+  }
 
-    if (config.signer) {
-      this.signer = config.signer;
-    } else if (config.privateKey) {
-      this.signer = new Wallet(config.privateKey, provider);
-    } else if (config.mnemonic) {
-      this.signer = Wallet.fromMnemonic(config.mnemonic).connect(provider);
-    } else {
-      throw new Error('A signer, private key, or mnemonic must be provided');
-    }
+  async initialize(config?: SarcoClientConfig): Promise<void> {
+    // Get the signer based on the configuration
+    this.signer = getSigner(config);
 
-    this.api = api;
-    this.utils = utils;
-    this.bundlr = bundlr;
-    this.archaeologist = archaeologist;
+    // Gets the network the signer is connected to
+    this.network = await getNetwork(this.signer);
+  }
+
+  async setProvider(customProvider: ethers.providers.Provider) {
+    const signer = getSigner({ provider: customProvider });
+    this.signer = signer;
+    this.network = await getNetwork(this.signer);
   }
 }
