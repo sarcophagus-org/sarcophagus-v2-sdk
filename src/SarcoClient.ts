@@ -3,6 +3,7 @@ import { getNetwork } from './helpers/getNetwork';
 import { getSigner } from './helpers/getSigner';
 import { SarcoClientConfig } from './types';
 import { Api } from './Api';
+import { Token } from './Token';
 
 /**
  * The SarcoClient class provides a high-level interface for interacting with the Sarcophagus V2 protocol.
@@ -11,6 +12,7 @@ export class SarcoClient {
   signer: Signer = {} as Signer;
   network: ethers.providers.Network = {} as ethers.providers.Network;
   api: Api;
+  token: Token;
 
   /**
    * Constructs a new SarcoClient instance. The provider defaults to ethers default provider if not
@@ -20,9 +22,9 @@ export class SarcoClient {
    * @throws Will throw an error if none of the signer, private key, or mnemonic is provided.
    */
   constructor(config?: SarcoClientConfig) {
-    this.api = new Api(this);
-
     this.initialize(config);
+    this.api = new Api(this);
+    this.token = new Token(this);
   }
 
   async initialize(config?: SarcoClientConfig): Promise<void> {
