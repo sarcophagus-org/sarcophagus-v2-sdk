@@ -16,7 +16,7 @@ jest.spyOn(testProvider, 'getSigner').mockImplementation(() => mockSigner);
 
 // Example test for the SarcophagusSDK
 describe('SarcophagusSDK', () => {
-  describe('Constructor', () => {
+  describe('SarcoClient Constructor', () => {
     test('should initialize with a signer', () => {
       const signer = ethers.Wallet.createRandom({});
       const sarco = new SarcoClient({ signer });
