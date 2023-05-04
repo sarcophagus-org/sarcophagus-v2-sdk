@@ -21,7 +21,7 @@ export async function safeContractCall(
   args: any[],
   options: CallOptions = {}
 ): Promise<ethers.providers.TransactionResponse> {
-  const useSafeCall = options.ignoreSafeCall !== undefined ? options.ignoreSafeCall : true;
+  const useSafeCall = options.ignoreSafeCall ?? true;
 
   if (useSafeCall) {
     try {
