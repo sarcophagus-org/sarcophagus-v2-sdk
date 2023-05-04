@@ -3,11 +3,8 @@ import { BigNumber, ethers } from 'ethers';
 import { SarcoClient } from './SarcoClient';
 import { safeContractCall } from './helpers/safeContractCall';
 import { Address, CallOptions } from './types';
+import { goerliNetworkConfig } from './networkConfig/index';
 
-// Temporary
-// TODO: Get this from the contracts package
-const sarcoTokenAddress = '0x4633b43990b41B57b3678c6F3Ac35bA75C3D8436';
-const goerliDiamondAddress = '0x6B84f17bbfCe26776fEFDf5cF039cA0E66C46Caf';
 
 export class Token {
   sarcoClient: SarcoClient;
@@ -16,7 +13,7 @@ export class Token {
   constructor(sarcoClient: SarcoClient) {
     this.sarcoClient = sarcoClient;
     this.sarcoToken = new ethers.Contract(
-      sarcoTokenAddress,
+      goerliNetworkConfig.sarcoTokenAddress,
       SarcoTokenMock__factory.abi,
       this.sarcoClient.signer
     );
@@ -26,14 +23,14 @@ export class Token {
     return await safeContractCall(
       this.sarcoToken,
       'approve',
-      [goerliDiamondAddress, amount],
+      [goerliNetworkConfig.diamondDeployAddress, amount],
       options
     );
   }
 
   async allowance(owner: Address): Promise<BigNumber> {
     try {
-      return await this.sarcoToken.allowance(owner, goerliDiamondAddress);
+      return await this.sarcoToken.allowance(owner, goerliNetworkConfig.diamondDeployAddress);
     } catch (err) {
       const error = err as Error;
       console.error(`Error while getting allowance: ${error.message}`);
