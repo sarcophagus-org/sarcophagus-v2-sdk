@@ -1,5 +1,4 @@
 import { ethers, Signer } from 'ethers';
-import { getNetwork } from './helpers/getNetwork';
 import { getSigner } from './helpers/getSigner';
 import { SarcoClientConfig } from './types';
 import { Api } from './Api';
@@ -22,22 +21,12 @@ export class SarcoClient {
    * @throws Will throw an error if none of the signer, private key, or mnemonic is provided.
    */
   constructor(config?: SarcoClientConfig) {
-    this.initialize(config);
+    this.signer = getSigner(config);
     this.api = new Api(this);
     this.token = new Token(this);
   }
 
-  async initialize(config?: SarcoClientConfig): Promise<void> {
-    // Get the signer based on the configuration
-    this.signer = getSigner(config);
-
-    // Gets the network the signer is connected to
-    this.network = await getNetwork(this.signer);
-  }
-
-  async setProvider(customProvider: ethers.providers.Provider) {
-    const signer = getSigner({ provider: customProvider });
-    this.signer = signer;
-    this.network = await getNetwork(this.signer);
+  async connect(customProvider: ethers.providers.Provider) {
+    this.signer.connect(customProvider);
   }
 }
