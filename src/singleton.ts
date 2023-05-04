@@ -2,30 +2,20 @@ import { SarcoClient } from './SarcoClient';
 
 const isBrowserEnvironment = typeof window !== 'undefined';
 
+let sarcoInstance: SarcoClient | undefined;
+
 /**
  * Provides a singleton of the SarcoClient class for use in the browser.
  * Uses window.ethereum as the provider unless a provider is provided.
+ * @returns A SarcoClient singleton.
  */
-class BrowserSarcoClient extends SarcoClient {
-  constructor() {
-    if (!isBrowserEnvironment) {
-      console.warn(
-        'sarcophagus-v2-sdk: BrowserSarcoClient is being used in a non-browser environment. Please instantiate SarcoClient manually with a custom provider.'
-      );
-    }
-
-    super();
+export const getSarcoClientInstance = (): SarcoClient => {
+  if (!isBrowserEnvironment) {
+    throw new Error(
+      'sarcophagus-v2-sdk: getSarcoClientInstance() can only be used in a browser environment. Please instantiate SarcoClient manually with a custom provider to use the sdk in a non-browser enviroment.'
+    );
   }
-}
 
-let sarcoInstance: BrowserSarcoClient | undefined;
-
-/**
- * @returns The BrowserSarcoClient singleton.
- */
-const getSarcoClientInstance = () => {
-  if (!sarcoInstance) sarcoInstance = new BrowserSarcoClient();
+  if (!sarcoInstance) sarcoInstance = new SarcoClient();
   return sarcoInstance;
 };
-
-export default getSarcoClientInstance;

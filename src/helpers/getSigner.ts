@@ -12,8 +12,7 @@ import { SarcoClientConfig } from '../types';
 export function getSigner(config?: SarcoClientConfig): Signer {
   let signer: Signer;
 
-  // Check if the environment is a browser
-  const isBrowserEnvironment = typeof window !== 'undefined' && 'ethereum' in window;
+  const isBrowserEnvironment = typeof window !== 'undefined';
 
   if (config) {
     const provider = config.provider || ethers.getDefaultProvider();
@@ -30,8 +29,15 @@ export function getSigner(config?: SarcoClientConfig): Signer {
         // If a provider is given, give it top priority
         signer = new ethers.providers.Web3Provider(config.provider as any).getSigner();
       } else {
-        // If a provider is not given, default to window.ethereum
-        signer = new ethers.providers.Web3Provider(window.ethereum as any).getSigner();
+        // Since a provider is not given, default to window.ethereum
+        if (!!window.ethereum) {
+          signer = new ethers.providers.Web3Provider(window.ethereum as any).getSigner();
+        }
+
+        // Wondering about this here, Consider storing window instead if connecting in webapp would update this here too
+        throw new Error(
+          'window.ethereum is not defined. Please provide a provider or ensure that window.ethereum is defined.'
+        );
       }
     } else {
       // In a non-browser environment, a signer, private key, or mnemonic must be provided along with the provider
