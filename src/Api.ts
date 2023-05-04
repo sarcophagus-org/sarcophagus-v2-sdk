@@ -3,12 +3,9 @@ import { BigNumber, ethers } from 'ethers';
 import { SarcoClient } from './SarcoClient';
 import { safeContractCall } from './helpers/safeContractCall';
 import { CallOptions } from './types';
+import { goerliNetworkConfig } from './networkConfig';
 
-// Temporary
-// TODO: Get this from the contracts package
-const goerliDiamondAddress = '0x6B84f17bbfCe26776fEFDf5cF039cA0E66C46Caf';
-
-interface SarocphagusSettings {
+interface SarcophagusSettings {
   name: string;
   recipientAddress: string;
   resurrectionTime: number;
@@ -35,7 +32,7 @@ export class Api {
   constructor(sarcoClient: SarcoClient) {
     this.sarcoClient = sarcoClient;
     this.embalmerFacet = new ethers.Contract(
-      goerliDiamondAddress,
+      goerliNetworkConfig.diamondDeployAddress,
       EmbalmerFacet__factory.abi,
       this.sarcoClient.signer
     );
@@ -43,7 +40,7 @@ export class Api {
 
   async createSarcophagus(
     sarcoId: string,
-    sarcophagusSettings: SarocphagusSettings,
+    sarcophagusSettings: SarcophagusSettings,
     selectedArchaeologists: ArchaeologistSettings[],
     arweaveTxId: string,
     options: CallOptions = {}
