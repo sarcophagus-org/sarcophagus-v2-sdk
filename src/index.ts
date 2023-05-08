@@ -1,6 +1,8 @@
 import { SarcoClient } from './SarcoClient';
 import { SarcoClientConfig } from './types';
 
-export { getSarcoClientInstance } from './singleton';
+import { getSarcoClientInstance } from './singleton';
+export const sarcoClient = getSarcoClientInstance();
+
 export { SarcoClient };
 export type { SarcoClientConfig };

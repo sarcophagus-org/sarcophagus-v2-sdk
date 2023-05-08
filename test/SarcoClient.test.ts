@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { SarcoClient } from '../src';
+import { SarcoClient } from '../src/SarcoClient';
 
 // Create a real provider for testing
 const testProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
