@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
-import { Api } from '../src/Api';
-import { SarcoClient } from '../src/SarcoClient';
+import { Api } from '../../src/Api';
+import { SarcoClient } from '../../src/SarcoClient';
 
 const signer = ethers.Wallet.createRandom({});
 const sarcoClient = new SarcoClient({ signer });
