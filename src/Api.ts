@@ -8,6 +8,9 @@ import { CallOptions } from './types';
 // TODO: Get this from the contracts package
 const goerliDiamondAddress = '0x6B84f17bbfCe26776fEFDf5cF039cA0E66C46Caf';
 
+/**
+ * Defines the parameters with which to create the sarcophagus.
+ */
 interface SarocphagusSettings {
   name: string;
   recipientAddress: string;
@@ -18,6 +21,11 @@ interface SarocphagusSettings {
   maximumResurrectionTime: number;
 }
 
+/**
+ * Defines the previously negotiated parameters with which to curse an archaeologist. 
+ * These parameters should have been previously signed by the archaeologist.
+ * v, r, and s are the signature provided by the archaeologist after agreeing to and signing off.
+ */
 interface ArchaeologistSettings {
   publicKey: string;
   archAddress: string;
@@ -28,6 +36,9 @@ interface ArchaeologistSettings {
   s: string;
 }
 
+/**
+ * The Api class provides a high-level interface for interacting with the Sarcophagus V2 protocol.
+ */
 export class Api {
   sarcoClient: SarcoClient;
   embalmerFacet: ethers.Contract;
