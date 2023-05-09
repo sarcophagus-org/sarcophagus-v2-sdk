@@ -1,10 +1,9 @@
 import { object, string, number, mixed, InferType, ArraySchema } from 'yup';
-import { Address } from '../types';
 import { BigNumber } from 'ethers';
 
 export const sarcophagusSettingsSchema = object({
   name: string().required(),
-  recipientAddress: string<Address>().required(),
+  recipientAddress: string().required(),
   creationTime: number().required().positive().integer(),
   resurrectionTime: number().required().positive().integer(),
   threshold: number().required().positive().integer(),
@@ -14,7 +13,7 @@ export const sarcophagusSettingsSchema = object({
 
 const archaeologistSettingsSchema = object({
   publicKey: string().required(),
-  archAddress: string<Address>().required(),
+  archAddress: string().required(),
   diggingFeePerSecond: mixed<BigNumber>().required(),
   curseFee: mixed<BigNumber>().required(),
   v: number().required().positive().integer(),

@@ -11,10 +11,6 @@ import {
   ArchaeologistSettings,
 } from './helpers/validation';
 
-// Temporary
-// TODO: Get this from the contracts package
-const goerliDiamondAddress = '0x6B84f17bbfCe26776fEFDf5cF039cA0E66C46Caf';
-
 export class Api {
   sarcoClient: SarcoClient;
   embalmerFacet: ethers.Contract;

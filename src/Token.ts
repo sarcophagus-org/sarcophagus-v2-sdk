@@ -2,9 +2,8 @@ import { ERC20, SarcoTokenMock__factory } from '@sarcophagus-org/sarcophagus-v2-
 import { BigNumber, ethers } from 'ethers';
 import { SarcoClient } from './SarcoClient';
 import { safeContractCall } from './helpers/safeContractCall';
-import { Address, CallOptions } from './types';
+import { CallOptions } from './types';
 import { goerliNetworkConfig } from './networkConfig/index';
-
 
 export class Token {
   sarcoClient: SarcoClient;
@@ -28,7 +27,7 @@ export class Token {
     );
   }
 
-  async allowance(owner: Address): Promise<BigNumber> {
+  async allowance(owner: string): Promise<BigNumber> {
     try {
       return await this.sarcoToken.allowance(owner, goerliNetworkConfig.diamondDeployAddress);
     } catch (err) {

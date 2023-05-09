@@ -14,7 +14,6 @@ const mockSigner = {
 // Mock the provider's getSigner method
 jest.spyOn(testProvider, 'getSigner').mockImplementation(() => mockSigner);
 
-// Example test for the SarcophagusSDK
 describe('SarcoClient', () => {
   describe('SarcoClient Constructor', () => {
     test('should initialize with a signer', () => {
