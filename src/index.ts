@@ -1,8 +1,12 @@
 import { SarcoClient } from './SarcoClient';
-import { SarcoClientConfig } from './types';
+import { SarcoClientConfig, SarcoNetworkConfig } from './types';
 
-import { getSarcoClientInstance } from './singleton';
-export const sarcoClient = getSarcoClientInstance();
-
+export { sarco } from './singleton';
 export { SarcoClient };
-export type { SarcoClientConfig };
+export type { SarcoClientConfig, SarcoNetworkConfig };
+
+export {
+    goerliNetworkConfig,
+    sepoliaNetworkConfig,
+    mainnetNetworkConfig
+} from './networkConfig/index';

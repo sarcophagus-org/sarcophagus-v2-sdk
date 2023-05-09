@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@sarcophagus-org/sarcophagus-v2-contracts": "^0.16.0",
+    "arweave": "^1.13.7",
     "ethers": "^5.7.2",
+    "yup": "^1.1.1",
     "isomorphic-fetch": "^3.0.0"
   },
   "devDependencies": {
