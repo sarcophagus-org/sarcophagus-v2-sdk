@@ -1,5 +1,5 @@
 import { EmbalmerFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
-import { BigNumber, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import { SarcoClient } from './SarcoClient';
 import { safeContractCall } from './helpers/safeContractCall';
 import { CallOptions } from './types';
@@ -10,10 +10,6 @@ import {
   archaeologistSettingsArraySchema,
   ArchaeologistSettings,
 } from './helpers/validation';
-
-// Temporary
-// TODO: Get this from the contracts package
-const goerliDiamondAddress = '0x6B84f17bbfCe26776fEFDf5cF039cA0E66C46Caf';
 
 export class Api {
   sarcoClient: SarcoClient;
@@ -36,9 +32,7 @@ export class Api {
     options: CallOptions = {}
   ): Promise<ethers.providers.TransactionResponse> {
     sarcophagusSettings = await sarcophagusSettingsSchema.validate(sarcophagusSettings);
-    selectedArchaeologists = await archaeologistSettingsArraySchema.validate(
-      selectedArchaeologists
-    );
+    selectedArchaeologists = await archaeologistSettingsArraySchema.validate(selectedArchaeologists);
 
     if (selectedArchaeologists.length < sarcophagusSettings.threshold) {
       throw new Error('Not enough archaeologists selected');
@@ -57,18 +51,10 @@ export class Api {
     resurrectionTime: number,
     options: CallOptions = {}
   ): Promise<ethers.providers.TransactionResponse> {
-    return safeContractCall(
-      this.embalmerFacet,
-      'rewrapSarcophagus',
-      [sarcoId, resurrectionTime],
-      options
-    );
+    return safeContractCall(this.embalmerFacet, 'rewrapSarcophagus', [sarcoId, resurrectionTime], options);
   }
 
-  async burySarcophagus(
-    sarcoId: string,
-    options: CallOptions = {}
-  ): Promise<ethers.providers.TransactionResponse> {
+  async burySarcophagus(sarcoId: string, options: CallOptions = {}): Promise<ethers.providers.TransactionResponse> {
     return safeContractCall(this.embalmerFacet, 'burySarcophagus', [sarcoId], options);
   }
 
@@ -81,10 +67,7 @@ export class Api {
    * @param options - Options for the contract method call
    * @returns The transaction response
    * */
-  async cleanSarcophagus(
-    sarcoId: string,
-    options: CallOptions = {}
-  ): Promise<ethers.providers.TransactionResponse> {
+  async cleanSarcophagus(sarcoId: string, options: CallOptions = {}): Promise<ethers.providers.TransactionResponse> {
     return safeContractCall(this.embalmerFacet, 'cleanSarcophagus', [sarcoId], options);
   }
 }

@@ -23,7 +23,6 @@ export interface BundlrConfig {
   providerUrl: string;
 }
 
-
 /**
  * Network configuration options
  */

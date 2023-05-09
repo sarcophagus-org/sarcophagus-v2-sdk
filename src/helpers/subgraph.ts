@@ -12,27 +12,24 @@ export interface ArchDataSubgraph {
 }
 
 async function queryGraphQl(query: string) {
-    const subgraphUrl = process.env.REACT_APP_SUBGRAPH_API_URL!;
+  const subgraphUrl = process.env.REACT_APP_SUBGRAPH_API_URL!;
 
-    let response: Response;
-    const fetchOptions = {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ query }),
-    };
+  let response: Response;
+  const fetchOptions = {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ query }),
+  };
 
-    if (window === undefined) {
-      console.log('node feytch');
-      
-      let fetch = require('isomorphic-fetch');
-      response = await fetch(subgraphUrl, fetchOptions);
-    } else {
-      console.log('normal feytch');
-      response = await fetch(subgraphUrl, fetchOptions);
-    }
+  if (window === undefined) {
+    let fetch = require('isomorphic-fetch');
+    response = await fetch(subgraphUrl, fetchOptions);
+  } else {
+    response = await fetch(subgraphUrl, fetchOptions);
+  }
 
-    const { data } = (await response!.json()) as { data: any };
-    return data;
+  const { data } = (await response!.json()) as { data: any };
+  return data;
 }
 
 const getArchsQuery = `query {
@@ -56,7 +53,7 @@ const getSarcoRewrapsQuery = (sarcoId: string) => `query {
 
 export const getArchaeologists = async (): Promise<ArchDataSubgraph[]> => {
   try {
-    const { archaeologists } = await queryGraphQl(getArchsQuery) as { archaeologists: ArchDataSubgraph[] };
+    const { archaeologists } = (await queryGraphQl(getArchsQuery)) as { archaeologists: ArchDataSubgraph[] };
     return archaeologists;
   } catch (e) {
     console.error(e);
@@ -66,7 +63,9 @@ export const getArchaeologists = async (): Promise<ArchDataSubgraph[]> => {
 
 export const getSarcophagusRewraps = async (sarcoId: string) => {
   try {
-    const { rewrapSarcophaguses } = await queryGraphQl(getSarcoRewrapsQuery(sarcoId)) as { rewrapSarcophaguses: any[] };
+    const { rewrapSarcophaguses } = (await queryGraphQl(getSarcoRewrapsQuery(sarcoId))) as {
+      rewrapSarcophaguses: any[];
+    };
 
     return rewrapSarcophaguses;
   } catch (e) {

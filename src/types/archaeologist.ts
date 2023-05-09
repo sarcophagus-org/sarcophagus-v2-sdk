@@ -8,7 +8,6 @@ export enum ArchaeologistExceptionCode {
   DECLINED_SIGNATURE,
 }
 
-
 export interface ArchaeologistException {
   code: ArchaeologistExceptionCode;
   message: string;

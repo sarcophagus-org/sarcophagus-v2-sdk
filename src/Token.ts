@@ -5,7 +5,6 @@ import { safeContractCall } from './helpers/safeContractCall';
 import { Address, CallOptions } from './types';
 import { goerliNetworkConfig } from './networkConfig/index';
 
-
 export class Token {
   sarcoClient: SarcoClient;
   sarcoToken: ERC20;

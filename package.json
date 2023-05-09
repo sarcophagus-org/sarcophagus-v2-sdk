@@ -7,6 +7,7 @@
   "scripts": {
     "test": "jest",
     "build": "tsc",
+    "prettier": "npx prettier --write src/**",
     "docs": "typedoc --out docs --readme README.md src"
   },
   "dependencies": {

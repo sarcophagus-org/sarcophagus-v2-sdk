@@ -12,7 +12,7 @@ import { Connection } from '@libp2p/interface-connection';
 const goerliDiamondAddress = '0x6B84f17bbfCe26776fEFDf5cF039cA0E66C46Caf';
 
 /**
- * The ArchaeologistApi class provides a high-level interface for interacting with 
+ * The ArchaeologistApi class provides a high-level interface for interacting with
  * archaeologists on the Sarcophagus V2 protocol.
  */
 export class ArchaeologistApi {
@@ -31,17 +31,18 @@ export class ArchaeologistApi {
   /**
    * Returns the full profiles of the given archaeologist addresses. If no addresses are provided,
    * returns the full profiles of all registered archaeologists.
-   * 
+   *
    * @param addresses - The addresses of the archaeologists to get the full profiles of.
    * @returns The full profiles of the given archaeologists.
    */
   async getFullArchProfiles(addresses?: string[]): Promise<ArchaeologistData[]> {
     try {
       if (!addresses) {
-        addresses = await safeContractCall(
+        addresses = (await safeContractCall(
           this.viewStateFacet,
-          'getArchaeologistProfileAddresses', []
-        ) as unknown as string[];
+          'getArchaeologistProfileAddresses',
+          []
+        )) as unknown as string[];
       }
 
       const archData = await getArchaeologists();
@@ -81,8 +82,8 @@ export class ArchaeologistApi {
       // TODO: Get these env variables from SarcoClient config object (or hard code those that are not configurable)
       const onlineArchsUrl = `${process.env.REACT_APP_ARCH_MONITOR}/online-archaeologists`;
       const fetchOptions = {
-        method: "GET",
-        headers: { "content-type": "application/json" },
+        method: 'GET',
+        headers: { 'content-type': 'application/json' },
       };
 
       if (window === undefined) {
@@ -91,7 +92,7 @@ export class ArchaeologistApi {
       } else {
         response = await fetch(onlineArchsUrl, fetchOptions);
       }
-      
+
       const onlinePeerIds = (await response!.json()) as string[];
 
       for (let arch of registeredArchaeologists) {
@@ -118,27 +119,24 @@ export class ArchaeologistApi {
     }
   }
 
-  dialPeerIdOrMultiAddr  (
-    arch: ArchaeologistData,
-    isPing?: boolean
-  ): Promise<Connection> | Promise<number> | undefined {
+  dialPeerIdOrMultiAddr(arch: ArchaeologistData, isPing?: boolean): Promise<Connection> | Promise<number> | undefined {
     const dialAddr = this.getDialAddress(arch);
 
     return isPing ? libp2pNode?.ping(dialAddr) : libp2pNode?.dial(dialAddr);
   }
 
-  hangUpArch (arch: ArchaeologistData) {
+  hangUpArch(arch: ArchaeologistData) {
     const dialAddr = this.getDialAddress(arch);
     return libp2pNode?.hangUp(dialAddr);
   }
 
-  async dialArchaeologist (arch: ArchaeologistData): Promise<Connection | ArchaeologistExceptionCode> {
+  async dialArchaeologist(arch: ArchaeologistData): Promise<Connection | ArchaeologistExceptionCode> {
     try {
       const connection = (await this.dialPeerIdOrMultiAddr(arch)) as Connection;
       if (!connection) throw Error('No connection obtained from dial');
       return connection;
     } catch (e) {
-      return ArchaeologistExceptionCode.CONNECTION_EXCEPTION
+      return ArchaeologistExceptionCode.CONNECTION_EXCEPTION;
     }
   }
 

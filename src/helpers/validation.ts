@@ -22,9 +22,7 @@ const archaeologistSettingsSchema = object({
   s: string().required(),
 });
 
-export const archaeologistSettingsArraySchema = new ArraySchema()
-  .of(archaeologistSettingsSchema)
-  .required();
+export const archaeologistSettingsArraySchema = new ArraySchema().of(archaeologistSettingsSchema).required();
 
 export type SarcophagusSettings = InferType<typeof sarcophagusSettingsSchema>;
 export type ArchaeologistSettings = InferType<typeof archaeologistSettingsSchema>;
