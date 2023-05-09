@@ -2,9 +2,12 @@ import { BigNumber, ethers } from 'ethers';
 import { SarcoClient } from './SarcoClient';
 import { getArchaeologists } from './helpers/subgraph';
 
-import { ArchaeologistData } from './types/archaeologist';
+import { ArchaeologistData, ArchaeologistExceptionCode } from './types/archaeologist';
 import { ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
 import { safeContractCall } from './helpers/safeContractCall';
+import { PeerId } from '@libp2p/interface-peer-id';
+import { Multiaddr, multiaddr } from '@multiformats/multiaddr';
+import { Connection } from '@libp2p/interface-connection';
 
 const goerliDiamondAddress = '0x6B84f17bbfCe26776fEFDf5cF039cA0E66C46Caf';
 
@@ -100,6 +103,60 @@ export class ArchaeologistApi {
       return registeredArchaeologists;
     } catch (e) {
       throw e;
+    }
+  }
+
+  getDialAddress(arch: ArchaeologistData): PeerId | Multiaddr {
+    // If peerIdParsed has 2 elements, it has a domain and peerId <domain>:<peerId>
+    // Otherwise it is just <peerId>
+    const peerIdParsed = arch.profile.peerId.split(':');
+
+    if (peerIdParsed.length === 2) {
+      return multiaddr(`/dns4/${peerIdParsed[0]}/tcp/443/wss/p2p/${peerIdParsed[1]}`);
+    } else {
+      return arch.fullPeerId!;
+    }
+  }
+
+  dialPeerIdOrMultiAddr  (
+    arch: ArchaeologistData,
+    isPing?: boolean
+  ): Promise<Connection> | Promise<number> | undefined {
+    const dialAddr = this.getDialAddress(arch);
+
+    return isPing ? libp2pNode?.ping(dialAddr) : libp2pNode?.dial(dialAddr);
+  }
+
+  hangUpArch (arch: ArchaeologistData) {
+    const dialAddr = this.getDialAddress(arch);
+    return libp2pNode?.hangUp(dialAddr);
+  }
+
+  async dialArchaeologist (arch: ArchaeologistData): Promise<Connection | ArchaeologistExceptionCode> {
+    try {
+      const connection = (await this.dialPeerIdOrMultiAddr(arch)) as Connection;
+      if (!connection) throw Error('No connection obtained from dial');
+      return connection;
+    } catch (e) {
+      return ArchaeologistExceptionCode.CONNECTION_EXCEPTION
+    }
+  }
+
+  async pingArchaeologist(arch: ArchaeologistData, onComplete: Function, pingTimeout: number = 5000) {
+    const peerIdString = arch.profile.peerId;
+    const couldNotConnect = setTimeout(() => {
+      console.log('ping timeout!');
+      onComplete();
+    }, pingTimeout);
+
+    console.log(`pinging ${peerIdString}`);
+
+    const latency = await this.dialPeerIdOrMultiAddr(arch, true);
+    await this.hangUpArch(arch);
+
+    if (!!latency) {
+      clearTimeout(couldNotConnect);
+      onComplete();
     }
   }
 }
