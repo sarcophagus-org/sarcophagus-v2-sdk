@@ -11,6 +11,11 @@ export interface SarcoClientConfig {
   provider?: ethers.providers.Provider;
 }
 
+export interface SarcoInitConfig {
+  providerUrl?: string;
+  etherscanApiKey?: string;
+}
+
 export interface CallOptions {
   ignoreSafeCall?: boolean;
 }

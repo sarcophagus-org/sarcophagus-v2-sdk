@@ -8,8 +8,10 @@ import { safeContractCall } from './helpers/safeContractCall';
 import { PeerId } from '@libp2p/interface-peer-id';
 import { Multiaddr, multiaddr } from '@multiformats/multiaddr';
 import { Connection } from '@libp2p/interface-connection';
+import { Address } from './types';
 
 const goerliDiamondAddress = '0x6B84f17bbfCe26776fEFDf5cF039cA0E66C46Caf';
+const libp2pNode = {} as any;
 
 /**
  * The ArchaeologistApi class provides a high-level interface for interacting with
@@ -63,7 +65,7 @@ export class ArchaeologistApi {
 
         return {
           profile: {
-            archAddress,
+            archAddress: archAddress as Address,
             peerId,
             successes: BigNumber.from(successes.length),
             accusals: BigNumber.from(accusals),

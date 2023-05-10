@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers';
 import { PeerId } from '@libp2p/interface-peer-id';
 import { Connection } from '@libp2p/interface-connection';
+import { Address } from '../types';
 
 export enum ArchaeologistExceptionCode {
   CONNECTION_EXCEPTION,
@@ -15,7 +16,7 @@ export interface ArchaeologistException {
 
 export interface ArchaeologistProfile {
   accusals: BigNumber;
-  archAddress: string;
+  archAddress: Address;
   failures: BigNumber;
   freeBond: BigNumber;
   maximumRewrapInterval: BigNumber;
