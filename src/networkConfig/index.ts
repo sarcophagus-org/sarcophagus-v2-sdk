@@ -8,8 +8,6 @@ const arweaveConfig = {
   logging: false,
 };
 
-// TODO: `process.env.REACT_APP_XYZ` refs below. Update to accept these values as params on constructor.
-
 export const mainnetNetworkConfig: SarcoNetworkConfig = {
   chainId: 1,
   networkName: 'Etherum Mainnet',

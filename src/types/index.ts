@@ -12,6 +12,7 @@ export interface SarcoClientConfig {
 }
 
 export interface SarcoInitConfig {
+  chainId: number;
   providerUrl?: string;
   etherscanApiKey?: string;
 }

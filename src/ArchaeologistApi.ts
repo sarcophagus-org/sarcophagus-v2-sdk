@@ -81,7 +81,7 @@ export class ArchaeologistApi {
 
       let response: Response;
       // TODO: Get these env variables from SarcoClient config object (or hard code those that are not configurable)
-      const onlineArchsUrl = `${process.env.REACT_APP_ARCH_MONITOR}/online-archaeologists`;
+      const onlineArchsUrl = 'https://api.encryptafile.com/online-archaeologists';
       const fetchOptions = {
         method: 'GET',
         headers: { 'content-type': 'application/json' },
