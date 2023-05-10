@@ -5,8 +5,7 @@ import { getArchaeologists } from './helpers/subgraph';
 import { ArchaeologistData, ArchaeologistExceptionCode } from './types/archaeologist';
 import { ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
 import { safeContractCall } from './helpers/safeContractCall';
-import { PeerId } from '@libp2p/interface-peer-id';
-import { Multiaddr, multiaddr } from '@multiformats/multiaddr';
+import { Multiaddr } from '@multiformats/multiaddr';
 import { Connection } from '@libp2p/interface-connection';
 import { Address } from './types';
 
@@ -109,32 +108,9 @@ export class ArchaeologistApi {
     }
   }
 
-  getDialAddress(arch: ArchaeologistData): PeerId | Multiaddr {
-    // If peerIdParsed has 2 elements, it has a domain and peerId <domain>:<peerId>
-    // Otherwise it is just <peerId>
-    const peerIdParsed = arch.profile.peerId.split(':');
-
-    if (peerIdParsed.length === 2) {
-      return multiaddr(`/dns4/${peerIdParsed[0]}/tcp/443/wss/p2p/${peerIdParsed[1]}`);
-    } else {
-      return arch.fullPeerId!;
-    }
-  }
-
-  dialPeerIdOrMultiAddr(arch: ArchaeologistData, isPing?: boolean): Promise<Connection> | Promise<number> | undefined {
-    const dialAddr = this.getDialAddress(arch);
-
-    return isPing ? libp2pNode?.ping(dialAddr) : libp2pNode?.dial(dialAddr);
-  }
-
-  hangUpArch(arch: ArchaeologistData) {
-    const dialAddr = this.getDialAddress(arch);
-    return libp2pNode?.hangUp(dialAddr);
-  }
-
-  async dialArchaeologist(arch: ArchaeologistData): Promise<Connection | ArchaeologistExceptionCode> {
+  async dialArchaeologist(arch: Multiaddr): Promise<Connection | ArchaeologistExceptionCode> {
     try {
-      const connection = (await this.dialPeerIdOrMultiAddr(arch)) as Connection;
+      const connection = (await libp2pNode?.dial(arch)) as Connection;
       if (!connection) throw Error('No connection obtained from dial');
       return connection;
     } catch (e) {
@@ -142,17 +118,14 @@ export class ArchaeologistApi {
     }
   }
 
-  async pingArchaeologist(arch: ArchaeologistData, onComplete: Function, pingTimeout: number = 5000) {
-    const peerIdString = arch.profile.peerId;
+  async pingArchaeologist(arch: Multiaddr, onComplete: Function, pingTimeout: number = 5000) {
     const couldNotConnect = setTimeout(() => {
-      console.log('ping timeout!');
+      console.log(`${arch.toString()}: ping timeout!`);
       onComplete();
     }, pingTimeout);
 
-    console.log(`pinging ${peerIdString}`);
-
-    const latency = await this.dialPeerIdOrMultiAddr(arch, true);
-    await this.hangUpArch(arch);
+    const latency = await libp2pNode?.ping(arch);
+    await libp2pNode?.hangUp(arch)(arch);
 
     if (!!latency) {
       clearTimeout(couldNotConnect);

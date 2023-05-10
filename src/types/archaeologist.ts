@@ -4,9 +4,9 @@ import { Connection } from '@libp2p/interface-connection';
 import { Address } from '../types';
 
 export enum ArchaeologistExceptionCode {
-  CONNECTION_EXCEPTION,
-  STREAM_EXCEPTION,
-  DECLINED_SIGNATURE,
+  CONNECTION_EXCEPTION = 'connection_exception',
+  STREAM_EXCEPTION = 'stream_exception',
+  DECLINED_SIGNATURE = 'declined_signature',
 }
 
 export interface ArchaeologistException {
