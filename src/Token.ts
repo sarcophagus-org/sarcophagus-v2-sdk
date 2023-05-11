@@ -12,7 +12,7 @@ export class Token {
   constructor(sarcoClient: SarcoClient) {
     this.sarcoClient = sarcoClient;
     this.sarcoToken = new ethers.Contract(
-      goerliNetworkConfig.sarcoTokenAddress,
+      sarcoClient.networkConfig!.sarcoTokenAddress,
       SarcoTokenMock__factory.abi,
       this.sarcoClient.signer
     );
@@ -22,14 +22,14 @@ export class Token {
     return await safeContractCall(
       this.sarcoToken,
       'approve',
-      [goerliNetworkConfig.diamondDeployAddress, amount],
+      [this.sarcoClient.networkConfig.diamondDeployAddress, amount],
       options
     );
   }
 
   async allowance(owner: Address): Promise<BigNumber> {
     try {
-      return await this.sarcoToken.allowance(owner, goerliNetworkConfig.diamondDeployAddress);
+      return await this.sarcoToken.allowance(owner, this.sarcoClient.networkConfig.diamondDeployAddress);
     } catch (err) {
       const error = err as Error;
       console.error(`Error while getting allowance: ${error.message}`);

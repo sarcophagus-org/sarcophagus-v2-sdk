@@ -42,20 +42,14 @@ export const bootLip2p = async (): Promise<Libp2p> => {
   await newLibp2pNode.start();
   console.log(`LibP2P node starting with peerID: ${newLibp2pNode.peerId.toString()}`);
 
-  newLibp2pNode.connectionManager.addEventListener("peer:connect", async evt => {
+  newLibp2pNode.connectionManager.addEventListener('peer:connect', async evt => {
     const peerId = evt.detail.remotePeer.toString();
-    console.log(
-      `Connection established to ${peerId.slice(peerId.length - idTruncateLimit)}`,
-      true
-    );
+    console.log(`Connection established to ${peerId.slice(peerId.length - idTruncateLimit)}`, true);
   });
 
-  newLibp2pNode.connectionManager.addEventListener("peer:disconnect", evt => {
+  newLibp2pNode.connectionManager.addEventListener('peer:disconnect', evt => {
     const peerId = evt.detail.remotePeer.toString();
-    console.log(
-      `Connection dropped from ${peerId.slice(peerId.length - idTruncateLimit)}`,
-      true
-    );
+    console.log(`Connection dropped from ${peerId.slice(peerId.length - idTruncateLimit)}`, true);
   });
 
   return newLibp2pNode;

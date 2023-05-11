@@ -3,7 +3,6 @@ import { ethers } from 'ethers';
 import { SarcoClient } from './SarcoClient';
 import { safeContractCall } from './helpers/safeContractCall';
 import { CallOptions } from './types';
-import { goerliNetworkConfig } from './networkConfig';
 import {
   SarcophagusSettings,
   sarcophagusSettingsSchema,
@@ -18,7 +17,7 @@ export class Api {
   constructor(sarcoClient: SarcoClient) {
     this.sarcoClient = sarcoClient;
     this.embalmerFacet = new ethers.Contract(
-      goerliNetworkConfig.diamondDeployAddress,
+      sarcoClient.networkConfig!.diamondDeployAddress,
       EmbalmerFacet__factory.abi,
       this.sarcoClient.signer
     );
