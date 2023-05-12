@@ -8,7 +8,7 @@ const arweaveConfig = {
   logging: false,
 };
 
-export function goerliNetworkConfig(providerUrl: string, etherscanApiKey = ''): SarcoNetworkConfig {
+export const goerliNetworkConfig = (providerUrl: string, etherscanApiKey = ''): SarcoNetworkConfig => {
   return {
     chainId: 5,
     networkName: 'Goerli Testnet',
