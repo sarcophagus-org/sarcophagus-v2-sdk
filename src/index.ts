@@ -3,7 +3,7 @@ import {
   ArchaeologistException,
   ArchaeologistExceptionCode,
   ArchaeologistProfile,
-} from 'types/archaeologist';
+} from './types/archaeologist';
 import { SarcoClient } from './SarcoClient';
 import { SarcoClientConfig, SarcoNetworkConfig } from './types';
 import { goerliNetworkConfig } from './networkConfig';

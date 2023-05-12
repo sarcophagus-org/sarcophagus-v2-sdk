@@ -1,4 +1,4 @@
-import { SarcoClient } from 'SarcoClient';
+import { SarcoClient } from '../SarcoClient';
 
 export const wait = (ms: number) => new Promise(res => setTimeout(res, ms));
 

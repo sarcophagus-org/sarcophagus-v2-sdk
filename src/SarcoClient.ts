@@ -8,11 +8,15 @@ import { ArchaeologistApi } from './ArchaeologistApi';
 import { bootLip2p } from './libp2p_node';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
 
+// providerUrl!: string;
+// etherscanApiKey!: string;
+
 /**
  * The SarcoClient class provides a high-level interface for interacting with the Sarcophagus V2 protocol.
  *
  * **NOTE:** If in a browser environment, import the sarcoClient singleton instead.
  */
+
 export class SarcoClient {
   signer: Signer = {} as Signer;
   api!: Api;
@@ -44,17 +48,20 @@ export class SarcoClient {
     switch (config.chainId) {
       case 1:
         this.providerUrl = config.providerUrl ?? 'https://rpc.ankr.com/eth';
-        this.networkConfig = mainnetNetworkConfig(this.providerUrl, config.etherscanApiKey);
+        this.networkConfig = mainnetNetworkConfig;
+        // this.networkConfig = mainnetNetworkConfig(this.providerUrl, config.etherscanApiKey);
         break;
 
       case 5:
         this.providerUrl = config.providerUrl ?? 'https://rpc.ankr.com/eth_goerli';
-        this.networkConfig = goerliNetworkConfig(this.providerUrl, config.etherscanApiKey);
+        this.networkConfig = goerliNetworkConfig;
+        // this.networkConfig = goerliNetworkConfig(this.providerUrl, config.etherscanApiKey);
         break;
 
       case 11155111:
         this.providerUrl = config.providerUrl ?? 'https://rpc.ankr.com/eth_sepolia';
-        this.networkConfig = sepoliaNetworkConfig(this.providerUrl, config.etherscanApiKey);
+        this.networkConfig = sepoliaNetworkConfig;
+        // this.networkConfig = sepoliaNetworkConfig(this.providerUrl, config.etherscanApiKey);
         break;
 
       default:
