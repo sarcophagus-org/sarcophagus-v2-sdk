@@ -6,11 +6,11 @@ import {
 } from './types/archaeologist';
 import { SarcoClient } from './SarcoClient';
 import { SarcoClientConfig, SarcoNetworkConfig } from './types';
-import { goerliNetworkConfig } from './networkConfig';
+import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
 
 export { sarco } from './singleton';
 export { SarcoClient };
 export type { SarcoClientConfig, SarcoNetworkConfig };
 export type { ArchaeologistData, ArchaeologistException, ArchaeologistProfile, ArchaeologistExceptionCode };
 
-export { goerliNetworkConfig };
+export { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig };
