@@ -31,6 +31,15 @@ const sarcoProxy = new Proxy<SarcoClient>({} as SarcoClient, {
     // This uses the 'prop' argument as a key in the sarcoInstance object.
     return sarcoInstance[prop as keyof SarcoClient];
   },
+  set(target, p, newValue, receiver) {
+    if (!sarcoInstance) {
+      sarcoInstance = getSarcoClientInstance();
+    }
+    
+    // @ts-ignore
+    sarcoInstance[p as keyof SarcoClient] = newValue;
+    return true;
+  },
 });
 
 // Export the sarcoProxy object, which will handle the lazy initialization of the sarco singleton.

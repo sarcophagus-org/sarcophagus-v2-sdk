@@ -64,17 +64,12 @@ export class SarcoClient {
         this.providerUrl = params.providerUrl ?? 'https://rpc.ankr.com/eth_goerli';
         const networkConfig1 = goerliNetworkConfig(this.providerUrl, params.etherscanApiKey);
         this.networkConfig = networkConfig1;
-        console.log('5 network config ', networkConfig1);
-        console.log('5 network config from this', this.networkConfig);
         break;
 
       case 11155111:
         this.providerUrl = params.providerUrl ?? 'https://rpc.ankr.com/eth_sepolia';
         const networkConfig = sepoliaNetworkConfig(this.providerUrl, params.etherscanApiKey);
         this.networkConfig = networkConfig;
-        console.log('sep network config ', networkConfig);
-        console.log('sep network config from this', this.networkConfig);
-
         break;
 
       default:
