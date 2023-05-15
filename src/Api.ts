@@ -1,6 +1,5 @@
 import { EmbalmerFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
 import { ethers } from 'ethers';
-import { SarcoClient } from './SarcoClient';
 import { safeContractCall } from './helpers/safeContractCall';
 import { CallOptions } from './types';
 import {
@@ -11,16 +10,10 @@ import {
 } from './helpers/validation';
 
 export class Api {
-  sarcoClient: SarcoClient;
-  embalmerFacet: ethers.Contract;
+  private embalmerFacet: ethers.Contract;
 
-  constructor(sarcoClient: SarcoClient) {
-    this.sarcoClient = sarcoClient;
-    this.embalmerFacet = new ethers.Contract(
-      sarcoClient.networkConfig!.diamondDeployAddress,
-      EmbalmerFacet__factory.abi,
-      this.sarcoClient.signer
-    );
+  constructor(diamondDeployAddress: string, signer: ethers.Signer) {
+    this.embalmerFacet = new ethers.Contract(diamondDeployAddress, EmbalmerFacet__factory.abi, signer);
   }
 
   async createSarcophagus(

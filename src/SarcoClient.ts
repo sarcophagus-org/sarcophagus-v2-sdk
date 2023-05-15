@@ -14,15 +14,15 @@ import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from 
  * **NOTE:** If in a browser environment, import the sarcoClient singleton instead.
  */
 export class SarcoClient {
-  signer: Signer = {} as Signer;
+  private providerUrl!: string;
+  private etherscanApiKey: string = '';
+  private p2pNode!: Libp2p;
+  private signer: Signer = {} as Signer;
+  private networkConfig!: SarcoNetworkConfig;
+
   api!: Api;
   token!: Token;
   archaeologist!: ArchaeologistApi;
-  providerUrl!: string;
-  etherscanApiKey: string = '';
-  p2pNode!: Libp2p;
-  networkConfig!: SarcoNetworkConfig;
-
   isInitialised: boolean = false;
 
   /**
@@ -78,9 +78,13 @@ export class SarcoClient {
 
     this.etherscanApiKey = params.etherscanApiKey ?? '';
 
-    this.api = new Api(this);
-    this.token = new Token(this);
-    this.archaeologist = new ArchaeologistApi(this);
+    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer);
+    this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
+    this.archaeologist = new ArchaeologistApi(
+      this.networkConfig.diamondDeployAddress,
+      this.signer,
+      this.networkConfig.subgraphUrl
+    );
 
     this.p2pNode = await bootLip2p();
     this.startLibp2pNode();

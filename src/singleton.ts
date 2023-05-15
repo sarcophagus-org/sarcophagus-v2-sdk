@@ -35,7 +35,7 @@ const sarcoProxy = new Proxy<SarcoClient>({} as SarcoClient, {
     if (!sarcoInstance) {
       sarcoInstance = getSarcoClientInstance();
     }
-    
+
     // @ts-ignore
     sarcoInstance[p as keyof SarcoClient] = newValue;
     return true;

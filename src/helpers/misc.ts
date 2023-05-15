@@ -1,10 +1,9 @@
-import { SarcoClient } from '../SarcoClient';
+import { ethers } from 'ethers';
 
 export const wait = (ms: number) => new Promise(res => setTimeout(res, ms));
 
-export const getBlockTimestamp = async (sarco: SarcoClient): Promise<number> => {
+export const getBlockTimestamp = async (provider: ethers.providers.Provider): Promise<number> => {
   try {
-    const provider = sarco.signer.provider!;
     const blockNumber = await provider.getBlockNumber();
     const block = await provider.getBlock(blockNumber);
 

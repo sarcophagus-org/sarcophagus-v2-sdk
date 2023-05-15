@@ -10,8 +10,6 @@ import { Connection } from '@libp2p/interface-connection';
 import { PeerId } from '@libp2p/interface-peer-id';
 import { Address } from './types';
 
-const goerliDiamondAddress = '0x6B84f17bbfCe26776fEFDf5cF039cA0E66C46Caf';
-
 const getDialAddress = (arch: ArchaeologistData): PeerId | Multiaddr => {
   // If peerIdParsed has 2 elements, it has a domain and peerId <domain>:<peerId>
   // Otherwise it is just <peerId>
@@ -31,16 +29,12 @@ const getDialAddress = (arch: ArchaeologistData): PeerId | Multiaddr => {
  * archaeologists on the Sarcophagus V2 protocol.
  */
 export class ArchaeologistApi {
-  sarcoClient: SarcoClient;
-  viewStateFacet: ethers.Contract;
+  private viewStateFacet: ethers.Contract;
+  private subgraphUrl: string;
 
-  constructor(sarcoClient: SarcoClient) {
-    this.sarcoClient = sarcoClient;
-    this.viewStateFacet = new ethers.Contract(
-      goerliDiamondAddress,
-      ViewStateFacet__factory.abi,
-      this.sarcoClient.signer
-    );
+  constructor(diamondDeployAddress: string, signer: ethers.Signer, subgraphUrl: string) {
+    this.subgraphUrl = subgraphUrl;
+    this.viewStateFacet = new ethers.Contract(diamondDeployAddress, ViewStateFacet__factory.abi, signer);
   }
 
   /**
@@ -60,7 +54,7 @@ export class ArchaeologistApi {
         )) as unknown as string[];
       }
 
-      const archData = await getArchaeologists(this.sarcoClient.networkConfig.subgraphUrl);
+      const archData = await getArchaeologists(this.subgraphUrl);
 
       const registeredArchaeologists = archData.map(arch => {
         const {

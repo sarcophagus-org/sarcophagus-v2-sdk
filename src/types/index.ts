@@ -1,6 +1,5 @@
 import { Signer, ethers } from 'ethers';
 import { ApiConfig as ArweaveConfig } from 'arweave/node/lib/api';
-import { Libp2p } from 'libp2p';
 
 /**
  * Configuration options for the SarcoClient class.
