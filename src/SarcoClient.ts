@@ -49,7 +49,6 @@ export class SarcoClient {
    * @param onInit - Callback function to be called after the SarcoClient has been initialised.
    */
   async init(params: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<void> {
-    // TODO: Allow client to choose when to start/stop libp2p node
     if (this.p2pNode?.isStarted()) {
       await this.stopLibp2pNode();
     }
@@ -80,14 +79,18 @@ export class SarcoClient {
 
     this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer);
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
+
+    this.p2pNode = await bootLip2p();
+    // TODO: Allow client to choose when to start/stop libp2p node
+    await this.startLibp2pNode();
+
     this.archaeologist = new ArchaeologistApi(
       this.networkConfig.diamondDeployAddress,
       this.signer,
-      this.networkConfig.subgraphUrl
+      this.networkConfig.subgraphUrl,
+      this.p2pNode
     );
 
-    this.p2pNode = await bootLip2p();
-    this.startLibp2pNode();
     this.isInitialised = true;
     onInit(this.p2pNode);
   }

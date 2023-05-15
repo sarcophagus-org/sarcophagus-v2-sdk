@@ -9,6 +9,7 @@ import { Multiaddr, multiaddr } from '@multiformats/multiaddr';
 import { Connection } from '@libp2p/interface-connection';
 import { PeerId } from '@libp2p/interface-peer-id';
 import { Address } from './types';
+import { Libp2p } from 'libp2p';
 
 const getDialAddress = (arch: ArchaeologistData): PeerId | Multiaddr => {
   // If peerIdParsed has 2 elements, it has a domain and peerId <domain>:<peerId>
@@ -31,10 +32,12 @@ const getDialAddress = (arch: ArchaeologistData): PeerId | Multiaddr => {
 export class ArchaeologistApi {
   private viewStateFacet: ethers.Contract;
   private subgraphUrl: string;
+  private p2pNode: Libp2p;
 
-  constructor(diamondDeployAddress: string, signer: ethers.Signer, subgraphUrl: string) {
+  constructor(diamondDeployAddress: string, signer: ethers.Signer, subgraphUrl: string, p2pNode: Libp2p) {
     this.subgraphUrl = subgraphUrl;
     this.viewStateFacet = new ethers.Contract(diamondDeployAddress, ViewStateFacet__factory.abi, signer);
+    this.p2pNode = p2pNode;
   }
 
   /**
@@ -119,7 +122,7 @@ export class ArchaeologistApi {
   async dialArchaeologist(arch: ArchaeologistData): Promise<Connection> {
     try {
       // @ts-ignore
-      const connection = (await this.sarcoClient.p2pNode?.dial(getDialAddress(arch))) as Connection;
+      const connection = (await this.p2pNode?.dial(getDialAddress(arch))) as Connection;
       if (!connection) throw Error('No connection obtained from dial');
       return connection;
     } catch (e) {
@@ -134,7 +137,7 @@ export class ArchaeologistApi {
 
   async hangUp(arch: ArchaeologistData) {
     // @ts-ignore
-    return this.sarcoClient.p2pNode?.hangUp(getDialAddress(arch));
+    return this.p2pNode?.hangUp(getDialAddress(arch));
   }
 
   async pingArchaeologist(
@@ -151,7 +154,7 @@ export class ArchaeologistApi {
     console.log(`pinging ${peerIdString}`);
 
     // @ts-ignore
-    const latency = await this.sarcoClient.p2pNode?.ping(getDialAddress(arch));
+    const latency = await this.p2pNode?.ping(getDialAddress(arch));
     await this.hangUp(arch);
 
     if (!!latency) {
