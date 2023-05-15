@@ -12,11 +12,10 @@ export interface SarcoClientConfig {
   provider?: ethers.providers.Provider;
 }
 
-export interface SarcoInitConfig {
+export interface SarcoInitParams {
   chainId: number;
   providerUrl?: string;
   etherscanApiKey?: string;
-  onInit?: (p2pNode: Libp2p) => void;
 }
 
 export interface CallOptions {

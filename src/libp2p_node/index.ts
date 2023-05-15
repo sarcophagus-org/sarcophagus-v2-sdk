@@ -39,8 +39,6 @@ const idTruncateLimit = 5;
 
 export const bootLip2p = async (): Promise<Libp2p> => {
   const newLibp2pNode = await createLibp2p(p2pNodeConfig);
-  await newLibp2pNode.start();
-  console.log(`LibP2P node starting with peerID: ${newLibp2pNode.peerId.toString()}`);
 
   newLibp2pNode.connectionManager.addEventListener('peer:connect', async evt => {
     const peerId = evt.detail.remotePeer.toString();
