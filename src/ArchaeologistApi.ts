@@ -19,8 +19,6 @@ const getDialAddress = (arch: ArchaeologistData): PeerId | Multiaddr => {
   if (peerIdParsed.length === 2) {
     return multiaddr(`/dns4/${peerIdParsed[0]}/tcp/443/wss/p2p/${peerIdParsed[1]}`);
   } else {
-    // TODO: import PeerId type from sarco-sdk?
-    // @ts-ignore
     return arch.fullPeerId!;
   }
 };
