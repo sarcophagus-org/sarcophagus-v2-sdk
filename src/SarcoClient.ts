@@ -19,17 +19,17 @@ export class SarcoClient {
   token!: Token;
   archaeologist!: ArchaeologistApi;
   providerUrl!: string;
-  etherscanApiKey!: string;
+  etherscanApiKey: string = '';
   p2pNode!: Libp2p;
   networkConfig!: SarcoNetworkConfig;
 
   isInitialised: boolean = false;
 
   /**
-   * Constructs a new SarcoClient instance. 
-   * 
+   * Constructs a new SarcoClient instance.
+   *
    * In a non-browser environment, a signer, private key, or mnemonic must be provided along with the provider.
-   * 
+   *
    * In a browser environment, import the `sarco` SarcoClient singleton instead.
    * The provider defaults to ethers' default provider, and to `window.ethereum` in a browser.
    *
@@ -38,16 +38,17 @@ export class SarcoClient {
    */
   constructor(config?: SarcoClientConfig) {
     this.signer = getSigner(config);
+    // this.init({ chainId: 5, etherscanApiKey: '' });
   }
 
   /**
    * Initialises the SarcoClient instance. This method must be called before any other methods
    * can be called.
-   * 
+   *
    * @param params - The configuration options for the SarcoClient.
    * @param onInit - Callback function to be called after the SarcoClient has been initialised.
    */
-  async init(params: SarcoInitParams, onInit = (p2pNode: Libp2p) => {}): Promise<void> {
+  async init(params: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<void> {
     // TODO: Allow client to choose when to start/stop libp2p node
     if (this.p2pNode?.isStarted()) {
       await this.stopLibp2pNode();
@@ -61,12 +62,19 @@ export class SarcoClient {
 
       case 5:
         this.providerUrl = params.providerUrl ?? 'https://rpc.ankr.com/eth_goerli';
-        this.networkConfig = goerliNetworkConfig(this.providerUrl, params.etherscanApiKey);
+        const networkConfig1 = goerliNetworkConfig(this.providerUrl, params.etherscanApiKey);
+        this.networkConfig = networkConfig1;
+        console.log('5 network config ', networkConfig1);
+        console.log('5 network config from this', this.networkConfig);
         break;
 
       case 11155111:
         this.providerUrl = params.providerUrl ?? 'https://rpc.ankr.com/eth_sepolia';
-        this.networkConfig = sepoliaNetworkConfig(this.providerUrl, params.etherscanApiKey);
+        const networkConfig = sepoliaNetworkConfig(this.providerUrl, params.etherscanApiKey);
+        this.networkConfig = networkConfig;
+        console.log('sep network config ', networkConfig);
+        console.log('sep network config from this', this.networkConfig);
+
         break;
 
       default:
@@ -78,10 +86,9 @@ export class SarcoClient {
     this.api = new Api(this);
     this.token = new Token(this);
     this.archaeologist = new ArchaeologistApi(this);
-    
+
     this.p2pNode = await bootLip2p();
     this.startLibp2pNode();
-
     this.isInitialised = true;
     onInit(this.p2pNode);
   }

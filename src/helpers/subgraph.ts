@@ -11,9 +11,7 @@ export interface ArchDataSubgraph {
   curseFee: string;
 }
 
-async function queryGraphQl(query: string) {
-  const subgraphUrl = process.env.REACT_APP_SUBGRAPH_API_URL!;
-
+async function queryGraphQl(subgraphUrl: string, query: string) {
   let response: Response;
   const fetchOptions = {
     method: 'POST',
@@ -51,9 +49,11 @@ const getSarcoRewrapsQuery = (sarcoId: string) => `query {
   rewrapSarcophaguses (where: {sarcoId: "${sarcoId}"}) { id }
 }`;
 
-export const getArchaeologists = async (): Promise<ArchDataSubgraph[]> => {
+export const getArchaeologists = async (subgraphUrl: string): Promise<ArchDataSubgraph[]> => {
   try {
-    const { archaeologists } = (await queryGraphQl(getArchsQuery)) as { archaeologists: ArchDataSubgraph[] };
+    const { archaeologists } = (await queryGraphQl(subgraphUrl, getArchsQuery)) as {
+      archaeologists: ArchDataSubgraph[];
+    };
     return archaeologists;
   } catch (e) {
     console.error(e);
@@ -61,9 +61,9 @@ export const getArchaeologists = async (): Promise<ArchDataSubgraph[]> => {
   }
 };
 
-export const getSarcophagusRewraps = async (sarcoId: string) => {
+export const getSarcophagusRewraps = async (subgraphUrl: string, sarcoId: string) => {
   try {
-    const { rewrapSarcophaguses } = (await queryGraphQl(getSarcoRewrapsQuery(sarcoId))) as {
+    const { rewrapSarcophaguses } = (await queryGraphQl(subgraphUrl, getSarcoRewrapsQuery(sarcoId))) as {
       rewrapSarcophaguses: any[];
     };
 

@@ -11,6 +11,8 @@ import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from 
 export { sarco } from './singleton';
 export { SarcoClient };
 export type { SarcoClientConfig, SarcoNetworkConfig };
-export type { ArchaeologistData, ArchaeologistException, ArchaeologistProfile, ArchaeologistExceptionCode };
+export type { ArchaeologistData, ArchaeologistException, ArchaeologistProfile };
+
+export { ArchaeologistExceptionCode };
 
 export { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig };

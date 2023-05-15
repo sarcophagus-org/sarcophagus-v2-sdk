@@ -44,7 +44,7 @@ export interface SarcoNetworkConfig {
   etherscanApiKey: string;
   bundlr: BundlrConfig;
   arweaveConfig: ArweaveConfig;
-  subgraphUrl?: string;
+  subgraphUrl: string;
   providerUrl?: string;
   signalServerPort?: number;
 }

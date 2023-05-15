@@ -5,12 +5,26 @@ import { getArchaeologists } from './helpers/subgraph';
 import { ArchaeologistData, ArchaeologistExceptionCode } from './types/archaeologist';
 import { ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
 import { safeContractCall } from './helpers/safeContractCall';
-import { Multiaddr } from '@multiformats/multiaddr';
+import { Multiaddr, multiaddr } from '@multiformats/multiaddr';
 import { Connection } from '@libp2p/interface-connection';
+import { PeerId } from '@libp2p/interface-peer-id';
 import { Address } from './types';
 
 const goerliDiamondAddress = '0x6B84f17bbfCe26776fEFDf5cF039cA0E66C46Caf';
-const libp2pNode = {} as any;
+
+const getDialAddress = (arch: ArchaeologistData): PeerId | Multiaddr => {
+  // If peerIdParsed has 2 elements, it has a domain and peerId <domain>:<peerId>
+  // Otherwise it is just <peerId>
+  const peerIdParsed = arch.profile.peerId.split(':');
+
+  if (peerIdParsed.length === 2) {
+    return multiaddr(`/dns4/${peerIdParsed[0]}/tcp/443/wss/p2p/${peerIdParsed[1]}`);
+  } else {
+    // TODO: import PeerId type from sarco-sdk?
+    // @ts-ignore
+    return arch.fullPeerId!;
+  }
+};
 
 /**
  * The ArchaeologistApi class provides a high-level interface for interacting with
@@ -46,7 +60,7 @@ export class ArchaeologistApi {
         )) as unknown as string[];
       }
 
-      const archData = await getArchaeologists();
+      const archData = await getArchaeologists(this.sarcoClient.networkConfig.subgraphUrl);
 
       const registeredArchaeologists = archData.map(arch => {
         const {
@@ -108,28 +122,47 @@ export class ArchaeologistApi {
     }
   }
 
-  async dialArchaeologist(arch: Multiaddr): Promise<Connection | ArchaeologistExceptionCode> {
+  async dialArchaeologist(arch: ArchaeologistData): Promise<Connection> {
     try {
-      const connection = (await libp2pNode?.dial(arch)) as Connection;
+      // @ts-ignore
+      const connection = (await this.sarcoClient.p2pNode?.dial(getDialAddress(arch))) as Connection;
       if (!connection) throw Error('No connection obtained from dial');
       return connection;
     } catch (e) {
-      return ArchaeologistExceptionCode.CONNECTION_EXCEPTION;
+      throw {
+        error: e,
+        msg: 'Failed to dial archaeologist',
+        code: ArchaeologistExceptionCode.CONNECTION_EXCEPTION,
+        arch,
+      };
     }
   }
 
-  async pingArchaeologist(arch: Multiaddr, onComplete: Function, pingTimeout: number = 5000) {
+  async hangUp(arch: ArchaeologistData) {
+    // @ts-ignore
+    return this.sarcoClient.p2pNode?.hangUp(getDialAddress(arch));
+  }
+
+  async pingArchaeologist(
+    arch: ArchaeologistData,
+    onComplete: (latency: number | null) => void,
+    pingTimeout: number = 5000
+  ) {
     const couldNotConnect = setTimeout(() => {
       console.log(`${arch.toString()}: ping timeout!`);
-      onComplete();
+      onComplete(null);
     }, pingTimeout);
 
-    const latency = await libp2pNode?.ping(arch);
-    await libp2pNode?.hangUp(arch)(arch);
+    const peerIdString = arch.profile.peerId;
+    console.log(`pinging ${peerIdString}`);
+
+    // @ts-ignore
+    const latency = await this.sarcoClient.p2pNode?.ping(getDialAddress(arch));
+    await this.hangUp(arch);
 
     if (!!latency) {
       clearTimeout(couldNotConnect);
-      onComplete();
+      onComplete(latency);
     }
   }
 }
