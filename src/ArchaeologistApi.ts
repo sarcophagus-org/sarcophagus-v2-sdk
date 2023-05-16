@@ -116,6 +116,15 @@ export class ArchaeologistApi {
     }
   }
 
+  /**
+   * Dials the given archaeologist and returns the connection.
+   * 
+   * @param arch - The archaeologist to dial.
+   * @returns The connection to the archaeologist.
+   * 
+   * @throws if the archaeologist cannot be dialed.
+   * @throws if the archaeologist does not have a valid peerId ("<domain>:<p2pPeerId>").
+   */
   async dialArchaeologist(arch: ArchaeologistData): Promise<Connection> {
     try {
       // @ts-ignore
@@ -132,11 +141,27 @@ export class ArchaeologistApi {
     }
   }
 
+  /**
+   * Hangs up the connection to the given archaeologist.
+   * 
+   * @param arch - The archaeologist to hang up.
+   */
   async hangUp(arch: ArchaeologistData) {
     // @ts-ignore
     return this.p2pNode?.hangUp(getDialAddress(arch));
   }
 
+  /**
+   * Pings the given archaeologist. Completes with the latency of the ping. If the archaeologist
+   * cannot be pinged, completes with null.
+   * 
+   * @param arch - The archaeologist to ping.
+   * @param onComplete - Callback function to be called after the archaeologist has been pinged. Latency is passed as an argument.
+   * @param pingTimeout - The timeout for the ping.
+   * 
+   * @throws if the archaeologist cannot be dialed.
+   * @throws if the archaeologist does not have a valid peerId ("<domain>:<p2pPeerId>").
+   */
   async pingArchaeologist(
     arch: ArchaeologistData,
     onComplete: (latency: number | null) => void,
