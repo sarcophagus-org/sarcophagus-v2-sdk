@@ -7,11 +7,10 @@ import { ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contrac
 import { safeContractCall } from './helpers/safeContractCall';
 import { Multiaddr, multiaddr } from '@multiformats/multiaddr';
 import { Connection } from '@libp2p/interface-connection';
-import { PeerId } from '@libp2p/interface-peer-id';
 import { Address } from './types';
 import { Libp2p } from 'libp2p';
 
-const getDialAddress = (arch: ArchaeologistData): PeerId | Multiaddr => {
+const getDialAddress = (arch: ArchaeologistData): Multiaddr => {
   // If peerIdParsed has 2 elements, it has a domain and peerId <domain>:<peerId>
   // Otherwise it is just <peerId>
   const peerIdParsed = arch.profile.peerId.split(':');
@@ -19,7 +18,7 @@ const getDialAddress = (arch: ArchaeologistData): PeerId | Multiaddr => {
   if (peerIdParsed.length === 2) {
     return multiaddr(`/dns4/${peerIdParsed[0]}/tcp/443/wss/p2p/${peerIdParsed[1]}`);
   } else {
-    return arch.fullPeerId!;
+    throw new Error('PeerId is not valid');
   }
 };
 
