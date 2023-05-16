@@ -313,6 +313,6 @@ export class ArchaeologistApi {
       throw Error(`Error retrieving arch signatures ${error}`);
     });
 
-    return negotiationResult;
+    return [negotiationResult, negotiationTimestamp] as const;
   }
 }
