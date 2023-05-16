@@ -6,7 +6,7 @@ import { Token } from './Token';
 
 /**
  * The SarcoClient class provides a high-level interface for interacting with the Sarcophagus V2 protocol.
- * 
+ *
  * **NOTE:** If in a browser environment, import the sarcoClient singleton instead.
  */
 export class SarcoClient {

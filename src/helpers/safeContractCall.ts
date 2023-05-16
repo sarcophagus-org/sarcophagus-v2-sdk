@@ -21,7 +21,7 @@ export async function safeContractCall(
   args: any[],
   options: CallOptions = {}
 ): Promise<ethers.providers.TransactionResponse> {
-  const useSafeCall = options.ignoreSafeCall ?? true;
+  const useSafeCall = options.ignoreSafeCall !== true;
 
   if (useSafeCall) {
     try {
@@ -33,7 +33,6 @@ export async function safeContractCall(
       return transactionResponse;
     } catch (err) {
       const error = err as Error;
-      console.error(`Error during the safe contract call: ${error.message}`);
       throw error;
     }
   } else {

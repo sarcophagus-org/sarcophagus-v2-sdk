@@ -15,14 +15,11 @@ export interface CallOptions {
   ignoreSafeCall?: boolean;
 }
 
-export type Address = `0x${string}`;
-
 export interface BundlrConfig {
   currencyName: string;
   nodeUrl: string;
   providerUrl: string;
 }
-
 
 /**
  * Network configuration options
