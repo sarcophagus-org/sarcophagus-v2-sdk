@@ -68,7 +68,6 @@ export class Api {
   }
 
   async getRewrapsOnSarcophagus(sarcoId: string) {
-      const archData = await getSarcophagusRewraps(this.subgraphUrl, sarcoId);
-
+    const archData = await getSarcophagusRewraps(this.subgraphUrl, sarcoId);
   }
 }

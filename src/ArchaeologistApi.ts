@@ -220,12 +220,12 @@ export class ArchaeologistApi {
    * Initiates a negotiation with the given archaeologists. Completes with a map of the archaeologists'
    * signatures and public keys, or with a map of the archaeologists' exceptions if the archaeologists
    * decline the negotiation.
-   * 
+   *
    * @param selectedArchaeologists - The archaeologists to negotiate with.
    * @param isRetry - Whether or not this is a retry of a previous negotiation.
-   * 
+   *
    * @returns A map of the archaeologists' signatures and public keys, or a map of the archaeologists' exceptions.
-   * 
+   *
    * @throws if the archaeologists do not have valid peerIds ("<domain>:<p2pPeerId>").
    * @throws if the archaeologists' streams throw an exception.
    */

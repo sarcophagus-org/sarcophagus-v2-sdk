@@ -76,7 +76,7 @@ export class SarcoClient {
 
     this.etherscanApiKey = params.etherscanApiKey ?? '';
 
-    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer);
+    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig.subgraphUrl);
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
 
     this.p2pNode = await bootLip2p();
