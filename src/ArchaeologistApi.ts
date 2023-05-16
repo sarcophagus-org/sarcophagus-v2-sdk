@@ -303,7 +303,6 @@ export class ArchaeologistApi {
                   message,
                 },
               });
-              throw Error('stream exception');
             })
             .finally(() => stream.close());
         } catch (e) {
