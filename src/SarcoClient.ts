@@ -38,7 +38,6 @@ export class SarcoClient {
    */
   constructor(config?: SarcoClientConfig) {
     this.signer = getSigner(config);
-    // this.init({ chainId: 5, etherscanApiKey: '' });
   }
 
   /**
