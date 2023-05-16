@@ -38,3 +38,12 @@ export interface ArchaeologistData {
   hiddenReason?: string;
   exception?: ArchaeologistException;
 }
+
+export enum SarcophagusValidationError {
+  UNKNOWN_ERROR,
+  MAX_REWRAP_INTERVAL_TOO_LARGE,
+  DIGGING_FEE_TOO_LOW,
+  INVALID_TIMESTAMP,
+  MAX_RESURRECTION_TIME_TOO_LARGE,
+  CURSE_FEE_TOO_LOW,
+}
