@@ -9,6 +9,8 @@ export interface SarcoClientConfig {
   privateKey?: string;
   mnemonic?: string;
   provider?: ethers.providers.Provider;
+  bundlrNode?: string;
+  bundlrCurrency?: string;
 }
 
 export interface CallOptions {

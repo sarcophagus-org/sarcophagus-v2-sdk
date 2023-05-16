@@ -19,6 +19,7 @@
     "@libp2p/webrtc-star": "^5.0.3",
     "@libp2p/websockets": "^5.0.1",
     "@multiformats/multiaddr": "^10.0.3",
+    "@bundlr-network/client": "^0.11.2",
     "@sarcophagus-org/sarcophagus-v2-contracts": "^0.16.0",
     "arweave": "^1.13.7",
     "ethers": "^5.7.2",
