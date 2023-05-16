@@ -47,3 +47,38 @@ export enum SarcophagusValidationError {
   MAX_RESURRECTION_TIME_TOO_LARGE,
   CURSE_FEE_TOO_LOW,
 }
+
+export interface SarcophagusArchaeologist {
+  diggingFeePerSecond: BigNumber;
+  curseFee: BigNumber;
+  isAccused: boolean;
+  publicKey: string;
+  privateKey: string;
+}
+
+export interface ArchaeologistEncryptedShard {
+  publicKey: string;
+  encryptedShard: string;
+}
+
+export interface ArchaeologistSignatureNegotiationParams {
+  maxRewrapInterval: number;
+  maximumResurrectionTime: number;
+  diggingFeePerSecond: string;
+  timestamp: number;
+  curseFee: string;
+}
+
+export interface ArchaeologistNegotiationResponse {
+  publicKey: string;
+  signature: string;
+  error?: any;
+  exception?: ArchaeologistException;
+}
+
+export interface ArchaeologistNegotiationResult {
+  peerId: string;
+  publicKey?: string;
+  signature?: string;
+  exception?: ArchaeologistException;
+}

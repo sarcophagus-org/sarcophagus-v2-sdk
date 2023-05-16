@@ -23,7 +23,9 @@
     "arweave": "^1.13.7",
     "ethers": "^5.7.2",
     "isomorphic-fetch": "^3.0.0",
+    "it-pipe": "^3.0.1",
     "libp2p": "^0.40.0",
+    "moment": "^2.29.4",
     "yup": "^1.1.1"
   },
   "devDependencies": {
