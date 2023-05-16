@@ -23,6 +23,7 @@ export const goerliNetworkConfig = (providerUrl: string, etherscanApiKey = ''): 
     providerUrl,
   },
   arweaveConfig,
+  providerUrl,
   subgraphUrl: 'https://api.studio.thegraph.com/query/44302/sarcotest2/18',
 });
 
@@ -40,6 +41,7 @@ export const mainnetNetworkConfig = (providerUrl: string, etherscanApiKey = ''):
     nodeUrl: 'https://node1.bundlr.network',
     providerUrl,
   },
+  providerUrl,
   arweaveConfig,
   subgraphUrl: '',
 });
@@ -58,6 +60,7 @@ export const sepoliaNetworkConfig = (providerUrl: string, etherscanApiKey: strin
     nodeUrl: 'https://devnet.bundlr.network',
     providerUrl,
   },
+  providerUrl,
   arweaveConfig,
   subgraphUrl: 'https://api.studio.thegraph.com/query/44302/sarcotest2/18',
 });

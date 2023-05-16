@@ -22,7 +22,6 @@ import {
   getTotalFeesInSarco,
 } from './helpers/archHelpers';
 import { calculateDiggingFees, formatSarco } from './helpers/misc';
-import { getSarcophagusRewraps } from 'helpers/subgraph';
 
 export { sarco } from './singleton';
 export { SarcoClient };
@@ -44,7 +43,6 @@ export { NEGOTIATION_SIGNATURE_STREAM };
 export { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig };
 
 export {
-  getSarcophagusRewraps,
   getLowestRewrapInterval,
   getLowestResurrectionTime,
   getTotalFeesInSarco,

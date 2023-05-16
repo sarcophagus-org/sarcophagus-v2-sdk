@@ -8,12 +8,16 @@ import {
   archaeologistSettingsArraySchema,
   ArchaeologistSettings,
 } from './helpers/validation';
+import { getSarcophagusRewraps } from './helpers/subgraph';
+import { sarco } from 'singleton';
 
 export class Api {
   private embalmerFacet: ethers.Contract;
+  private subgraphUrl: string;
 
-  constructor(diamondDeployAddress: string, signer: ethers.Signer) {
+  constructor(diamondDeployAddress: string, signer: ethers.Signer, subgraphUrl: string) {
     this.embalmerFacet = new ethers.Contract(diamondDeployAddress, EmbalmerFacet__factory.abi, signer);
+    this.subgraphUrl = subgraphUrl;
   }
 
   async createSarcophagus(
@@ -61,5 +65,10 @@ export class Api {
    * */
   async cleanSarcophagus(sarcoId: string, options: CallOptions = {}): Promise<ethers.providers.TransactionResponse> {
     return safeContractCall(this.embalmerFacet, 'cleanSarcophagus', [sarcoId], options);
+  }
+
+  async getRewrapsOnSarcophagus(sarcoId: string) {
+      const archData = await getSarcophagusRewraps(this.subgraphUrl, sarcoId);
+
   }
 }
