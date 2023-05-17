@@ -54,16 +54,17 @@ export class SarcoClient {
     
     this.providerUrl = params.providerUrl;
 
-    const networkConfigByChainId = {
-      1: mainnetNetworkConfig(this.providerUrl, params.etherscanApiKey),
-      5: goerliNetworkConfig(this.providerUrl, params.etherscanApiKey),
-      11155111: sepoliaNetworkConfig(this.providerUrl, params.etherscanApiKey),
-    };
+    const networkConfigByChainId = new Map<number, SarcoNetworkConfig>([
+      [1, mainnetNetworkConfig(this.providerUrl, params.etherscanApiKey)],
+      [5, goerliNetworkConfig(this.providerUrl, params.etherscanApiKey)],
+      [11155111, sepoliaNetworkConfig(this.providerUrl, params.etherscanApiKey)],
+    ]);
 
-    this.networkConfig = networkConfigByChainId[params.chainId];
-    if (!this.networkConfig) {
+    const networkConfig = networkConfigByChainId.get(params.chainId);
+    if (!networkConfig) {
       throw new Error('Unsupported chainId');
     }
+    this.networkConfig = networkConfig;
 
     this.etherscanApiKey = params.etherscanApiKey ?? '';
 

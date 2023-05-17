@@ -241,8 +241,6 @@ export class ArchaeologistApi {
 
     await Promise.all(
       selectedArchaeologists.map(async arch => {
-        // if (cancelToken.cancelled) return;
-
         if (!arch.connection) {
           console.log(`${arch.profile.peerId} connection is undefined`);
           negotiationResult.set(arch.profile.peerId, {
