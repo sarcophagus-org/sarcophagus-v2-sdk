@@ -9,5 +9,15 @@ describe('Api', () => {
       const api = new Api(signer.address, signer, 'subgraph/url/test');
       expect(api).toBeDefined();
     });
+
+    test('should have an embalmerFacet instance', () => {	
+      const api = new Api(signer.address, signer, 'subgraph/url/test');
+      expect(api['embalmerFacet']).toBeDefined();	
+    });
+
+    test('should set its subgraph url', () => {	
+      const api = new Api(signer.address, signer, 'subgraph/url/test');
+      expect(api['subgraphUrl']).toEqual('subgraph/url/test');	
+    });
   });
 });
