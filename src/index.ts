@@ -6,7 +6,7 @@ import {
   ArchaeologistNegotiationResponse,
   ArchaeologistNegotiationResult,
   ArchaeologistProfile,
-  ArchaeologistSignatureNegotiationParams,
+  ArchaeologistCurseNegotiationParams,
   SarcophagusArchaeologist,
   SarcophagusValidationError,
 } from './types/archaeologist';
@@ -32,7 +32,7 @@ export type {
   ArchaeologistProfile,
   SarcophagusArchaeologist,
   ArchaeologistEncryptedShard,
-  ArchaeologistSignatureNegotiationParams,
+  ArchaeologistCurseNegotiationParams,
   ArchaeologistNegotiationResponse,
   ArchaeologistNegotiationResult,
 };

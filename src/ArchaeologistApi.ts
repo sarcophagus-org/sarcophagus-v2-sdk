@@ -11,7 +11,7 @@ import {
   ArchaeologistExceptionCode,
   ArchaeologistNegotiationResponse,
   ArchaeologistNegotiationResult,
-  ArchaeologistSignatureNegotiationParams,
+  ArchaeologistCurseNegotiationParams,
   SarcophagusValidationError,
 } from './types/archaeologist';
 import { safeContractCall } from './helpers/safeContractCall';
@@ -262,7 +262,7 @@ export class ArchaeologistApi {
           }
         }
 
-        const negotiationParams: ArchaeologistSignatureNegotiationParams = {
+        const negotiationParams: ArchaeologistCurseNegotiationParams = {
           diggingFeePerSecond: arch.profile.minimumDiggingFeePerSecond.toString(),
           maxRewrapInterval: lowestRewrapInterval,
           maximumResurrectionTime: lowestResurrectionTime,
@@ -285,7 +285,7 @@ export class ArchaeologistApi {
                 const exception = {
                   code: ArchaeologistExceptionCode.DECLINED_SIGNATURE,
                   message: this.processDeclinedSignatureCode(
-                    response.error.code as SarcophagusValidationError,
+                    response.error.code,
                     arch.profile.archAddress
                   ),
                 };
