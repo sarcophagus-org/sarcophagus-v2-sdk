@@ -1,12 +1,13 @@
 import { ethers, Signer } from 'ethers';
 import { Libp2p } from 'libp2p';
 import { getSigner } from './helpers/getSigner';
-import { SarcoClientConfig, SarcoInitParams, SarcoNetworkConfig } from './types';
+import { SarcoClientConfig, SarcoNetworkConfig } from './types';
 import { Api } from './Api';
 import { Token } from './Token';
 import { ArchaeologistApi } from './ArchaeologistApi';
 import { bootLip2p } from './libp2p_node';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
+import { sarcoClientInitSchema, SarcoInitParams } from './helpers/validation';
 
 /**
  * The SarcoClient class provides a high-level interface for interacting with the Sarcophagus V2 protocol.
@@ -47,7 +48,9 @@ export class SarcoClient {
    * @param params - The configuration options for the SarcoClient.
    * @param onInit - Callback function to be called after the SarcoClient has been initialised.
    */
-  async init(params: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<void> {
+  async init(initParams: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<void> {
+    const params = await sarcoClientInitSchema.validate(initParams);
+
     if (this.p2pNode?.isStarted()) {
       await this.stopLibp2pNode();
     }

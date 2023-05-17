@@ -1,6 +1,12 @@
 import { object, string, number, mixed, InferType, ArraySchema } from 'yup';
 import { BigNumber } from 'ethers';
 
+export const sarcoClientInitSchema = object({
+  chainId: number().required(),
+  providerUrl: string().url().required('providerUrl should be a valid url string'),
+  etherscanApiKey: string(),
+});
+
 export const sarcophagusSettingsSchema = object({
   name: string().required(),
   recipientAddress: string().required(),
@@ -25,3 +31,4 @@ export const archaeologistSettingsArraySchema = new ArraySchema().of(archaeologi
 
 export type SarcophagusSettings = InferType<typeof sarcophagusSettingsSchema>;
 export type ArchaeologistSettings = InferType<typeof archaeologistSettingsSchema>;
+export type SarcoInitParams = InferType<typeof sarcoClientInitSchema>;
