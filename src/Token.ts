@@ -1,7 +1,7 @@
 import { ERC20, SarcoTokenMock__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
 import { BigNumber, ethers } from 'ethers';
 import { safeContractCall } from './helpers/safeContractCall';
-import { Address, CallOptions } from './types';
+import { CallOptions } from './types';
 
 export class Token {
   private diamondDeployAddress: string;
@@ -16,7 +16,7 @@ export class Token {
     return await safeContractCall(this.sarcoToken, 'approve', [this.diamondDeployAddress, amount], options);
   }
 
-  async allowance(owner: Address): Promise<BigNumber> {
+  async allowance(owner: string): Promise<BigNumber> {
     try {
       return await this.sarcoToken.allowance(owner, this.diamondDeployAddress);
     } catch (err) {

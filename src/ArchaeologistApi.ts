@@ -15,7 +15,6 @@ import {
   SarcophagusValidationError,
 } from './types/archaeologist';
 import { safeContractCall } from './helpers/safeContractCall';
-import { Address } from './types';
 import { getLowestResurrectionTime, getLowestRewrapInterval } from './helpers/archHelpers';
 import { getCurrentTimeSec } from './helpers/misc';
 import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
@@ -102,7 +101,7 @@ export class ArchaeologistApi {
 
         return {
           profile: {
-            archAddress: archAddress as Address,
+            archAddress,
             peerId,
             successes: BigNumber.from(successes.length),
             accusals: BigNumber.from(accusals),

@@ -9,7 +9,6 @@ import {
   ArchaeologistSettings,
 } from './helpers/validation';
 import { getSarcophagusRewraps } from './helpers/subgraph';
-import { sarco } from 'singleton';
 
 export class Api {
   private embalmerFacet: ethers.Contract;
