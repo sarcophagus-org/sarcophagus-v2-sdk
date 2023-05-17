@@ -51,27 +51,18 @@ export class SarcoClient {
     if (this.p2pNode?.isStarted()) {
       await this.stopLibp2pNode();
     }
+    
+    this.providerUrl = params.providerUrl;
 
-    switch (params.chainId) {
-      case 1:
-        this.providerUrl = params.providerUrl ?? 'https://rpc.ankr.com/eth';
-        this.networkConfig = mainnetNetworkConfig(this.providerUrl, params.etherscanApiKey);
-        break;
+    const networkConfigByChainId = {
+      1: mainnetNetworkConfig(this.providerUrl, params.etherscanApiKey),
+      5: goerliNetworkConfig(this.providerUrl, params.etherscanApiKey),
+      11155111: sepoliaNetworkConfig(this.providerUrl, params.etherscanApiKey),
+    };
 
-      case 5:
-        this.providerUrl = params.providerUrl ?? 'https://rpc.ankr.com/eth_goerli';
-        const networkConfig1 = goerliNetworkConfig(this.providerUrl, params.etherscanApiKey);
-        this.networkConfig = networkConfig1;
-        break;
-
-      case 11155111:
-        this.providerUrl = params.providerUrl ?? 'https://rpc.ankr.com/eth_sepolia';
-        const networkConfig = sepoliaNetworkConfig(this.providerUrl, params.etherscanApiKey);
-        this.networkConfig = networkConfig;
-        break;
-
-      default:
-        throw new Error('Unsupported chainId');
+    this.networkConfig = networkConfigByChainId[params.chainId];
+    if (!this.networkConfig) {
+      throw new Error('Unsupported chainId');
     }
 
     this.etherscanApiKey = params.etherscanApiKey ?? '';

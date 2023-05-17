@@ -40,9 +40,9 @@ export interface ArchaeologistProfile {
  * This data is used to determine which archaeologists are eligible for a curse.
  */
 export interface ArchaeologistData {
-  /** 
-   * The archaeologist's unique public key on a Sarcophagus. Matches the private key that will be used to resurrect. 
-   * Set after successful negotiation. 
+  /**
+   * The archaeologist's unique public key on a Sarcophagus. Matches the private key that will be used to resurrect.
+   * Set after successful negotiation.
    **/
   publicKey?: string;
   profile: ArchaeologistProfile;
@@ -81,7 +81,7 @@ export interface SarcophagusArchaeologist {
 }
 
 /**
- * The encrypted shard assigned to an Archaeologist. 
+ * The encrypted shard assigned to an Archaeologist.
  */
 export interface ArchaeologistEncryptedShard {
   publicKey: string;
@@ -90,7 +90,7 @@ export interface ArchaeologistEncryptedShard {
 
 /**
  * The parameters used to negotiate a curse with an archaeologist.
- * These parameters are sent to the archaeologist, and the archaeologist signs them, agreeing to be cursed on these terms, 
+ * These parameters are sent to the archaeologist, and the archaeologist signs them, agreeing to be cursed on these terms,
  * or else declines to sign.
  */
 export interface ArchaeologistCurseNegotiationParams {
@@ -107,17 +107,17 @@ export interface ArchaeologistCurseNegotiationParams {
 }
 
 export interface ArchaeologistNegotiationError {
-  code: SarcophagusValidationError,
-  message: string,
+  code: SarcophagusValidationError;
+  message: string;
 }
 
 /**
  * The response from an archaeologist after they have signed the `ArchaeologistCurseNegotiationParams`.
  */
 export interface ArchaeologistNegotiationResponse {
-  /** 
-   * The archaeologist's unique public key on a Sarcophagus. Matches the private key that will be used to resurrect. 
-   * Set if negotiation is successful. 
+  /**
+   * The archaeologist's unique public key on a Sarcophagus. Matches the private key that will be used to resurrect.
+   * Set if negotiation is successful.
    **/
   publicKey: string;
   /** The archaeologist's signature indicating approval on the ArchaeologistCurseNegotiationParams. */
@@ -128,11 +128,11 @@ export interface ArchaeologistNegotiationResponse {
 
 /**
  * The result of a negotiation with an archaeologist.
- * This is the final result of a negotiation sent back to the initiator of negotiation, and is used to determine 
+ * This is the final result of a negotiation sent back to the initiator of negotiation, and is used to determine
  * whether the archaeologist agreed to be cursed on a Sarcophagus.
- * 
+ *
  * If the archaeologist is eligible, `publicKey` and `signature` will be set.
- * 
+ *
  * If the archaeologist declined to sign, could not be reached, or ran into some other problem, the `exception` will be set.
  */
 export interface ArchaeologistNegotiationResult {

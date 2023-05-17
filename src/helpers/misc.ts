@@ -79,4 +79,3 @@ export async function getCurrentTimeSec(provider: ethers.providers.Provider | et
   const block = await provider.getBlock(blockNumber);
   return block.timestamp;
 }
-

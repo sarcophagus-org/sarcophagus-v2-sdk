@@ -283,10 +283,7 @@ export class ArchaeologistApi {
                 console.log(`error response from arch: \n${response.error.message}`);
                 const exception = {
                   code: ArchaeologistExceptionCode.DECLINED_SIGNATURE,
-                  message: this.processDeclinedSignatureCode(
-                    response.error.code,
-                    arch.profile.archAddress
-                  ),
+                  message: this.processDeclinedSignatureCode(response.error.code, arch.profile.archAddress),
                 };
 
                 negotiationResult.set(arch.profile.peerId, {
