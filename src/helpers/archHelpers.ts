@@ -1,5 +1,5 @@
 import { BigNumber, ethers } from 'ethers';
-import { ArchaeologistData } from 'types/archaeologist';
+import { ArchaeologistData } from '../types/archaeologist';
 import { formatSarco } from './misc';
 
 /**
@@ -24,6 +24,18 @@ export function getLowestResurrectionTime(archaeologists: ArchaeologistData[]): 
       return Number(arch.profile.maximumResurrectionTime);
     })
   );
+}
+
+export function calculateDiggingFees(
+  archaeologist: ArchaeologistData,
+  resurrectionTime: number,
+  timestampMs: number
+): BigNumber | null {
+  const nowSec = Math.floor(timestampMs / 1000);
+  const resurrectionTimeSec = Math.floor(resurrectionTime / 1000);
+  return resurrectionTimeSec > nowSec
+    ? archaeologist.profile.minimumDiggingFeePerSecond.mul(resurrectionTimeSec - nowSec)
+    : null;
 }
 
 /**

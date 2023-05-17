@@ -1,7 +1,6 @@
 import { BigNumber } from 'ethers';
 import { PeerId } from '@libp2p/interface-peer-id';
 import { Connection } from '@libp2p/interface-connection';
-import { Address } from '../types';
 
 export enum ArchaeologistExceptionCode {
   CONNECTION_EXCEPTION = 'connection_exception',
@@ -20,7 +19,7 @@ export interface ArchaeologistException {
  **/
 export interface ArchaeologistProfile {
   accusals: BigNumber;
-  archAddress: Address;
+  archAddress: string;
   failures: BigNumber;
   freeBond: BigNumber;
   /** The maximum length of time, in seconds, that the archaeologist will agree to extend a Sarcophagus resurrection time for. */

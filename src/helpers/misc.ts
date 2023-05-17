@@ -1,7 +1,6 @@
 import { BigNumber, ethers } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
 import moment from 'moment';
-import { ArchaeologistData } from 'types/archaeologist';
 
 export const wait = (ms: number) => new Promise(res => setTimeout(res, ms));
 
@@ -81,14 +80,3 @@ export async function getCurrentTimeSec(provider: ethers.providers.Provider | et
   return block.timestamp;
 }
 
-export function calculateDiggingFees(
-  archaeologist: ArchaeologistData,
-  resurrectionTime: number,
-  timestampMs: number
-): BigNumber | null {
-  const nowSec = Math.floor(timestampMs / 1000);
-  const resurrectionTimeSec = Math.floor(resurrectionTime / 1000);
-  return resurrectionTimeSec > nowSec
-    ? archaeologist.profile.minimumDiggingFeePerSecond.mul(resurrectionTimeSec - nowSec)
-    : null;
-}

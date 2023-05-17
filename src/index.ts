@@ -15,13 +15,14 @@ import { SarcoClientConfig, SarcoNetworkConfig } from './types';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
 import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
 import {
+  calculateDiggingFees,
   calculateProjectedDiggingFees,
   convertSarcoPerSecondToPerMonth,
   getLowestResurrectionTime,
   getLowestRewrapInterval,
   getTotalFeesInSarco,
 } from './helpers/archHelpers';
-import { calculateDiggingFees, formatSarco } from './helpers/misc';
+import { formatSarco } from './helpers/misc';
 
 export { sarco } from './singleton';
 export { SarcoClient };
