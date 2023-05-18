@@ -16,7 +16,6 @@ import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from 
 import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
 import {
   calculateDiggingFees,
-  calculateProjectedDiggingFees,
   convertSarcoPerSecondToPerMonth,
   getLowestResurrectionTime,
   getLowestRewrapInterval,
@@ -47,6 +46,5 @@ export {
   getLowestResurrectionTime,
   calculateDiggingFees,
   formatSarco,
-  calculateProjectedDiggingFees,
   convertSarcoPerSecondToPerMonth,
 };
