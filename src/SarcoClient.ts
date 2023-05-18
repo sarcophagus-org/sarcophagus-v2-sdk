@@ -54,7 +54,7 @@ export class SarcoClient {
     if (this.p2pNode?.isStarted()) {
       await this.stopLibp2pNode();
     }
-    
+
     this.providerUrl = params.providerUrl;
 
     const networkConfigByChainId = new Map<number, SarcoNetworkConfig>([

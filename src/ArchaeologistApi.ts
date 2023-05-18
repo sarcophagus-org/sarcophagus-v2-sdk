@@ -15,8 +15,13 @@ import {
   SarcophagusValidationError,
 } from './types/archaeologist';
 import { safeContractCall } from './helpers/safeContractCall';
-import { getLowestResurrectionTime, getLowestRewrapInterval } from './helpers/archHelpers';
-import { getCurrentTimeSec } from './helpers/misc';
+import {
+  calculateDiggingFees,
+  calculateProjectedDiggingFees,
+  getLowestResurrectionTime,
+  getLowestRewrapInterval,
+} from './helpers/archHelpers';
+import { formatSarco, getCurrentTimeSec } from './helpers/misc';
 import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
 
 /**
@@ -67,13 +72,37 @@ export class ArchaeologistApi {
   }
 
   /**
+   * Returns the peerIds of the archaeologists that are currently online.
+   */
+  private async getOnlineArchPeerIds(): Promise<string[]> {
+    let response: Response;
+    const onlineArchsUrl = 'https://api.encryptafile.com/online-archaeologists';
+    const fetchOptions = {
+      method: 'GET',
+      headers: { 'content-type': 'application/json' },
+    };
+
+    if (window === undefined) {
+      let fetch = require('isomorphic-fetch');
+      response = await fetch(onlineArchsUrl, fetchOptions);
+    } else {
+      response = await fetch(onlineArchsUrl, fetchOptions);
+    }
+
+    const onlinePeerIds = (await response!.json()) as string[];
+    return onlinePeerIds;
+  }
+
+  /**
    * Returns the full profiles of the given archaeologist addresses. If no addresses are provided,
    * returns the full profiles of all registered archaeologists.
    *
    * @param addresses - The addresses of the archaeologists to get the full profiles of.
+   * @param filterOffline - Whether or not to filter out offline archaeologists.
+   *
    * @returns The full profiles of the given archaeologists.
    */
-  async getFullArchProfiles(addresses?: string[]): Promise<ArchaeologistData[]> {
+  async getFullArchProfiles(addresses?: string[], filterOffline = false): Promise<ArchaeologistData[]> {
     try {
       if (!addresses) {
         addresses = (await safeContractCall(
@@ -116,21 +145,7 @@ export class ArchaeologistApi {
         };
       });
 
-      let response: Response;
-      const onlineArchsUrl = 'https://api.encryptafile.com/online-archaeologists';
-      const fetchOptions = {
-        method: 'GET',
-        headers: { 'content-type': 'application/json' },
-      };
-
-      if (window === undefined) {
-        let fetch = require('isomorphic-fetch');
-        response = await fetch(onlineArchsUrl, fetchOptions);
-      } else {
-        response = await fetch(onlineArchsUrl, fetchOptions);
-      }
-
-      const onlinePeerIds = (await response!.json()) as string[];
+      const onlinePeerIds = await this.getOnlineArchPeerIds();
 
       for (let arch of registeredArchaeologists) {
         if (onlinePeerIds.includes(arch.profile.peerId)) {
@@ -138,7 +153,7 @@ export class ArchaeologistApi {
         }
       }
 
-      return registeredArchaeologists;
+      return filterOffline ? registeredArchaeologists.filter(a => a.isOnline) : registeredArchaeologists;
     } catch (e) {
       throw e;
     }
@@ -213,12 +228,17 @@ export class ArchaeologistApi {
     }
   }
 
-  // TODO: Might more sense to have this method operate of a single archaeologist instead,
-  //       and have the caller worry about synchoronizing the results and retry logic
   /**
    * Initiates a negotiation with the given archaeologists. Completes with a map of the archaeologists'
    * signatures and public keys, or with a map of the archaeologists' exceptions if the archaeologists
    * decline the negotiation.
+   *
+   * **NOTE:** Not all archaeologists are guaranteed to complete the negotiation. If an archaeologist
+   * declines the negotiation, is suddenly offline, or otherwise throws an exception during the negotiation,
+   * it will be included in the returned map with a defined exception. You can retry the negotiation with the
+   * archaeologists that threw exceptions by passing them to `initiateSarcophagusNegotiation`
+   * with the `isRetry` flag set to true. This will attempt to re-dial the archaeologists that threw exceptions
+   * and retry the negotiation with them.
    *
    * @param selectedArchaeologists - The archaeologists to negotiate with.
    * @param isRetry - Whether or not this is a retry of a previous negotiation.
@@ -235,8 +255,6 @@ export class ArchaeologistApi {
 
     const negotiationTimestamp = (await getCurrentTimeSec(this.signer.provider!)) * 1000;
 
-    let archaeologistSignaturesCount = 0;
-    let archaeologistPublicKeysCount = 0;
     const negotiationResult = new Map<string, ArchaeologistNegotiationResult>([]);
 
     await Promise.all(
@@ -294,9 +312,6 @@ export class ArchaeologistApi {
                   publicKey: response.publicKey,
                   signature: response.signature,
                 });
-
-                archaeologistSignaturesCount++;
-                archaeologistPublicKeysCount++;
               }
             }
           })
@@ -322,5 +337,49 @@ export class ArchaeologistApi {
     });
 
     return [negotiationResult, negotiationTimestamp] as const;
+  }
+
+  /**
+   * Returns the total fees owed to the archaeologist, given a resurrection time and current timestamp.
+   * @param archaeologist The archaeologist to calculate fees for
+   * @param resurrectionTime The resurrection time in ms
+   * @param timestampMs The current timestamp in ms
+   *
+   * @returns The total fees owed to the archaeologist
+   * @throws if the resurrection time is less than the current timestamp
+   */
+  async getTotalFees(archaeologist: ArchaeologistData, resurrectionTime: number, timestampMs: number) {
+    const protocolFeeBasePercentage = (await safeContractCall(
+      this.viewStateFacet,
+      'getProtocolFeeBasePercentage',
+      []
+    )) as unknown as BigNumber;
+
+    const diggingFees = calculateDiggingFees(archaeologist, resurrectionTime, timestampMs);
+    const protocolFees = diggingFees.div(protocolFeeBasePercentage.mul(100));
+    return archaeologist.profile.curseFee.add(diggingFees).add(protocolFees);
+  }
+
+  /**
+   * Returns the estimated total digging fees, and protocol fee,
+   * that the embalmer will be due to pay.
+   */
+  async getTotalFeesInSarco(archaeologists: ArchaeologistData[], resurrectionTimestamp: number, timestampMs: number) {
+    const protocolFeeBasePercentage = (await safeContractCall(
+      this.viewStateFacet,
+      'getProtocolFeeBasePercentage',
+      []
+    )) as unknown as BigNumber;
+
+    const totalDiggingFees = calculateProjectedDiggingFees(archaeologists, resurrectionTimestamp, timestampMs);
+
+    const protocolFee = totalDiggingFees.div(protocolFeeBasePercentage.mul(100));
+
+    return {
+      totalDiggingFees,
+      formattedTotalDiggingFees: formatSarco(totalDiggingFees.toString()),
+      protocolFee,
+      protocolFeeBasePercentage,
+    } as const;
   }
 }

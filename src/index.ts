@@ -20,7 +20,6 @@ import {
   convertSarcoPerSecondToPerMonth,
   getLowestResurrectionTime,
   getLowestRewrapInterval,
-  getTotalFeesInSarco,
 } from './helpers/archHelpers';
 import { formatSarco } from './helpers/misc';
 
@@ -46,7 +45,6 @@ export { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig };
 export {
   getLowestRewrapInterval,
   getLowestResurrectionTime,
-  getTotalFeesInSarco,
   calculateDiggingFees,
   formatSarco,
   calculateProjectedDiggingFees,
