@@ -1,7 +1,6 @@
 import { ethers } from 'ethers';
 import { ValidationError } from 'yup';
 import { Api } from '../../src/Api';
-import { SarcoClient } from '../../src/SarcoClient';
 import { ArchaeologistSettings } from '../../src/helpers/validation';
 import {
   arweaveTxId,
@@ -12,9 +11,8 @@ import {
 import { mockSafeContractCall } from './test-utils';
 
 const signer = ethers.Wallet.createRandom({});
-const sarcoClient = new SarcoClient({ signer });
 
-const api = new Api(sarcoClient);
+const api = new Api(signer.address, signer, 'subgraph/url/test');
 
 beforeEach(() => {
   mockSafeContractCall.mockClear();
@@ -33,7 +31,7 @@ describe('createSarcophagus', () => {
     );
 
     expect(mockSafeContractCall).toHaveBeenCalledWith(
-      api.embalmerFacet,
+      api['embalmerFacet'],
       'createSarcophagus',
       [sarcoId, defaultSarcophagusSettings, defaultArchaeologists, arweaveTxId],
       {}

@@ -1,13 +1,11 @@
 import { ethers } from 'ethers';
 import { Api } from '../../src/Api';
-import { SarcoClient } from '../../src/SarcoClient';
 import { sarcoId } from './test-data';
 import { mockSafeContractCall } from './test-utils';
 
 const signer = ethers.Wallet.createRandom({});
-const sarcoClient = new SarcoClient({ signer });
 
-const api = new Api(sarcoClient);
+const api = new Api(signer.address, signer, 'subgraph/url/test');
 
 beforeEach(() => {
   mockSafeContractCall.mockClear();
@@ -21,7 +19,7 @@ describe('cleanSarcophagus', () => {
     const result = await api.cleanSarcophagus(sarcoId);
 
     expect(mockSafeContractCall).toHaveBeenCalledWith(
-      api.embalmerFacet,
+      api['embalmerFacet'],
       'cleanSarcophagus',
       [sarcoId],
       {}

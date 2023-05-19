@@ -1,27 +1,22 @@
 import { EmbalmerFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
-import { BigNumber, ethers } from 'ethers';
-import { SarcoClient } from './SarcoClient';
+import { ethers } from 'ethers';
 import { safeContractCall } from './helpers/safeContractCall';
 import { CallOptions } from './types';
-import { goerliNetworkConfig } from './networkConfig';
 import {
   SarcophagusSettings,
   sarcophagusSettingsSchema,
   archaeologistSettingsArraySchema,
   ArchaeologistSettings,
 } from './helpers/validation';
+import { getSarcophagusRewraps } from './helpers/subgraph';
 
 export class Api {
-  sarcoClient: SarcoClient;
-  embalmerFacet: ethers.Contract;
+  private embalmerFacet: ethers.Contract;
+  private subgraphUrl: string;
 
-  constructor(sarcoClient: SarcoClient) {
-    this.sarcoClient = sarcoClient;
-    this.embalmerFacet = new ethers.Contract(
-      goerliNetworkConfig.diamondDeployAddress,
-      EmbalmerFacet__factory.abi,
-      this.sarcoClient.signer
-    );
+  constructor(diamondDeployAddress: string, signer: ethers.Signer, subgraphUrl: string) {
+    this.embalmerFacet = new ethers.Contract(diamondDeployAddress, EmbalmerFacet__factory.abi, signer);
+    this.subgraphUrl = subgraphUrl;
   }
 
   async createSarcophagus(
@@ -32,9 +27,7 @@ export class Api {
     options: CallOptions = {}
   ): Promise<ethers.providers.TransactionResponse> {
     sarcophagusSettings = await sarcophagusSettingsSchema.validate(sarcophagusSettings);
-    selectedArchaeologists = await archaeologistSettingsArraySchema.validate(
-      selectedArchaeologists
-    );
+    selectedArchaeologists = await archaeologistSettingsArraySchema.validate(selectedArchaeologists);
 
     if (selectedArchaeologists.length < sarcophagusSettings.threshold) {
       throw new Error('Not enough archaeologists selected');
@@ -53,18 +46,10 @@ export class Api {
     resurrectionTime: number,
     options: CallOptions = {}
   ): Promise<ethers.providers.TransactionResponse> {
-    return safeContractCall(
-      this.embalmerFacet,
-      'rewrapSarcophagus',
-      [sarcoId, resurrectionTime],
-      options
-    );
+    return safeContractCall(this.embalmerFacet, 'rewrapSarcophagus', [sarcoId, resurrectionTime], options);
   }
 
-  async burySarcophagus(
-    sarcoId: string,
-    options: CallOptions = {}
-  ): Promise<ethers.providers.TransactionResponse> {
+  async burySarcophagus(sarcoId: string, options: CallOptions = {}): Promise<ethers.providers.TransactionResponse> {
     return safeContractCall(this.embalmerFacet, 'burySarcophagus', [sarcoId], options);
   }
 
@@ -77,10 +62,11 @@ export class Api {
    * @param options - Options for the contract method call
    * @returns The transaction response
    * */
-  async cleanSarcophagus(
-    sarcoId: string,
-    options: CallOptions = {}
-  ): Promise<ethers.providers.TransactionResponse> {
+  async cleanSarcophagus(sarcoId: string, options: CallOptions = {}): Promise<ethers.providers.TransactionResponse> {
     return safeContractCall(this.embalmerFacet, 'cleanSarcophagus', [sarcoId], options);
+  }
+
+  async getRewrapsOnSarcophagus(sarcoId: string) {
+    const archData = await getSarcophagusRewraps(this.subgraphUrl, sarcoId);
   }
 }

@@ -43,9 +43,6 @@ export function getSigner(config?: SarcoClientConfig): Signer {
       // In a non-browser environment, a signer, private key, or mnemonic must be provided along with the provider
       if (config.signer) {
         signer = config.signer;
-        if (!signer.provider) {
-          signer = signer.connect(provider);
-        }
       } else if (config.privateKey) {
         signer = new Wallet(config.privateKey, provider);
       } else if (config.mnemonic) {
@@ -55,6 +52,10 @@ export function getSigner(config?: SarcoClientConfig): Signer {
           'In a non-browser environment, you must provide a signer, private key, or mnemonic along with the provider.'
         );
       }
+    }
+
+    if (!signer.provider) {
+      signer = signer.connect(provider);
     }
   } else if (isBrowserEnvironment) {
     // If no configuration object is provided and in a browser environment, default to window.ethereum
