@@ -1,4 +1,4 @@
-import { Signer, ethers } from 'ethers';
+import { BigNumber, Signer, ethers } from 'ethers';
 import { ApiConfig as ArweaveConfig } from 'arweave/node/lib/api';
 
 /**
@@ -38,4 +38,10 @@ export interface SarcoNetworkConfig {
   subgraphUrl: string;
   providerUrl?: string;
   signalServerPort?: number;
+}
+
+export interface SarcophagusRewrap {
+  rewrapTimestamp: number;
+  diggingFeesPaid: BigNumber;
+  protocolFeesPaid: BigNumber;
 }

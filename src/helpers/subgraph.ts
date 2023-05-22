@@ -11,6 +11,12 @@ export interface ArchDataSubgraph {
   curseFee: string;
 }
 
+export interface SarcoRewrapsSubgraph {
+  blockTimestamp: string;
+  totalDiggingFees: string;
+  rewrapSarcophagusProtocolFees: string;
+}
+
 async function queryGraphQl(subgraphUrl: string, query: string) {
   let response: Response;
   const fetchOptions = {
@@ -46,7 +52,11 @@ const getArchsQuery = `query {
   }`;
 
 const getSarcoRewrapsQuery = (sarcoId: string) => `query {
-  rewrapSarcophaguses (where: {sarcoId: "${sarcoId}"}) { id }
+  rewrapSarcophaguses (where: {sarcoId: "${sarcoId}"}) {
+    blockTimestamp
+    totalDiggingFees
+    rewrapSarcophagusProtocolFees
+  }
 }`;
 
 export const getArchaeologists = async (subgraphUrl: string): Promise<ArchDataSubgraph[]> => {
@@ -61,10 +71,10 @@ export const getArchaeologists = async (subgraphUrl: string): Promise<ArchDataSu
   }
 };
 
-export const getSarcophagusRewraps = async (subgraphUrl: string, sarcoId: string) => {
+export const getSarcophagusRewraps = async (subgraphUrl: string, sarcoId: string): Promise<SarcoRewrapsSubgraph[]> => {
   try {
     const { rewrapSarcophaguses } = (await queryGraphQl(subgraphUrl, getSarcoRewrapsQuery(sarcoId))) as {
-      rewrapSarcophaguses: any[];
+      rewrapSarcophaguses: SarcoRewrapsSubgraph[];
     };
 
     return rewrapSarcophaguses;

@@ -40,7 +40,7 @@ export function calculateDiggingFees(
   const resurrectionTimeSec = Math.floor(resurrectionTime / 1000);
 
   if (resurrectionTimeSec <= nowSec) {
-    throw new Error('resurrectionTime must be larger than timestampMs');
+    throw new Error(`${archaeologist.profile.archAddress} resurrectionTime ${resurrectionTime} must be larger than timestampMs ${timestampMs}`);
   }
 
   return archaeologist.profile.minimumDiggingFeePerSecond.mul(resurrectionTimeSec - nowSec);

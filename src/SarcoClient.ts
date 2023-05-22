@@ -2,7 +2,7 @@ import { ethers, Signer } from 'ethers';
 import { Libp2p } from 'libp2p';
 import { getSigner } from './helpers/getSigner';
 import { SarcoClientConfig, SarcoNetworkConfig } from './types';
-import { Api } from './Api';
+import { SarcophagusApi } from './SarcophagusApi';
 import { Token } from './Token';
 import { ArchaeologistApi } from './ArchaeologistApi';
 import { bootLip2p } from './libp2p_node';
@@ -21,7 +21,7 @@ export class SarcoClient {
   private signer: Signer = {} as Signer;
   private networkConfig!: SarcoNetworkConfig;
 
-  api!: Api;
+  api!: SarcophagusApi;
   token!: Token;
   archaeologist!: ArchaeologistApi;
   isInitialised: boolean = false;
@@ -71,7 +71,7 @@ export class SarcoClient {
 
     this.etherscanApiKey = params.etherscanApiKey ?? '';
 
-    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig.subgraphUrl);
+    this.api = new SarcophagusApi(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig.subgraphUrl);
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
 
     this.p2pNode = await bootLip2p();
