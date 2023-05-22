@@ -1,23 +1,11 @@
 import { Signer, ethers } from 'ethers';
 import { ApiConfig as ArweaveConfig } from 'arweave/node/lib/api';
 
-/**
- * Configuration options for the SarcoClient class.
- */
-export interface SarcoClientConfig {
-  signer?: Signer;
-  privateKey?: string;
-  mnemonic?: string;
-  provider?: ethers.providers.Provider;
-  bundlrNode?: string;
-  bundlrCurrency?: string;
-}
-
 export interface CallOptions {
   ignoreSafeCall?: boolean;
 }
 
-export interface BundlrConfig {
+export interface SarcoBundlrConfig {
   currencyName: string;
   nodeUrl: string;
   providerUrl: string;
@@ -35,7 +23,7 @@ export interface SarcoNetworkConfig {
   etherscanApiUrl: string;
   explorerUrl: string;
   etherscanApiKey: string;
-  bundlr: BundlrConfig;
+  bundlr: SarcoBundlrConfig;
   arweaveConfig: ArweaveConfig;
   subgraphUrl: string;
   providerUrl?: string;

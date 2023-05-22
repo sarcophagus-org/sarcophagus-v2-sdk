@@ -10,14 +10,14 @@ describe('Api', () => {
       expect(api).toBeDefined();
     });
 
-    test('should have an embalmerFacet instance', () => {	
+    test('should have an embalmerFacet instance', () => {
       const api = new Api(signer.address, signer, 'subgraph/url/test');
-      expect(api['embalmerFacet']).toBeDefined();	
+      expect(api['embalmerFacet']).toBeDefined();
     });
 
-    test('should set its subgraph url', () => {	
+    test('should set its subgraph url', () => {
       const api = new Api(signer.address, signer, 'subgraph/url/test');
-      expect(api['subgraphUrl']).toEqual('subgraph/url/test');	
+      expect(api['subgraphUrl']).toEqual('subgraph/url/test');
     });
   });
 });

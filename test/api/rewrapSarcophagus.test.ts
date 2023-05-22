@@ -12,6 +12,10 @@ beforeEach(() => {
 });
 
 describe('rewrapSarcophagus', () => {
+  beforeEach(() => {
+    mockSafeContractCall.mockClear();
+  });
+
   test('should call safeContractCall with the correct arguments', async () => {
     const mockTransactionResponse = { hash: '0x123' } as ethers.providers.TransactionResponse;
     mockSafeContractCall.mockImplementation(() => Promise.resolve(mockTransactionResponse));

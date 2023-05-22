@@ -3,10 +3,10 @@ import { ethers } from 'ethers';
 import { safeContractCall } from './helpers/safeContractCall';
 import { CallOptions } from './types';
 import {
-  SarcophagusSettings,
-  sarcophagusSettingsSchema,
-  archaeologistSettingsArraySchema,
   ArchaeologistSettings,
+  SarcophagusSettings,
+  archaeologistSettingsArraySchema,
+  sarcophagusSettingsSchema,
 } from './helpers/validation';
 import { getSarcophagusRewraps } from './helpers/subgraph';
 
