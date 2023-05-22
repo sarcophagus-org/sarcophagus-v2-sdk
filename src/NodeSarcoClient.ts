@@ -1,7 +1,12 @@
 import Bundlr from '@bundlr-network/client/build/cjs/node/bundlr';
 import { ethers, Signer } from 'ethers';
+import { sarcoClientInitSchema, SarcoInitParams } from './helpers/validation';
+import { Libp2p } from 'libp2p';
+import { bootLip2p } from './libp2p_node';
+import { SarcoNetworkConfig } from './types';
 import { Api } from './Api';
-import { mainnetNetworkConfig } from './networkConfig';
+import { ArchaeologistApi } from './ArchaeologistApi';
+import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
 import { Token } from './Token';
 
 export interface NodeSarcoClientConfig {
@@ -10,25 +15,70 @@ export interface NodeSarcoClientConfig {
 }
 
 export class NodeSarcoClient {
-  api: Api;
-  token: Token;
+  api!: Api;
+  token!: Token;
+  archaeologist!: ArchaeologistApi;
   signer: Signer;
-  bundlr: Bundlr;
+  bundlr!: Bundlr;
+  isInitialised: boolean = false;
+
+  private providerUrl!: string;
+  private etherscanApiKey: string = '';
+  private p2pNode!: Libp2p;
+  private networkConfig!: SarcoNetworkConfig;
+  private privateKey: string;
 
   constructor(config: NodeSarcoClientConfig) {
-    this.api = new Api(this);
-    this.token = new Token(this);
-
     const customProvider = new ethers.providers.JsonRpcProvider(config.providerUrl);
     this.signer = new ethers.providers.Web3Provider(customProvider as any).getSigner();
+    this.privateKey = config.privateKey;
+  }
 
-    this.bundlr = new Bundlr(
-      mainnetNetworkConfig.bundlr.nodeUrl,
-      mainnetNetworkConfig.bundlr.currencyName,
-      config.privateKey,
-      {
-        providerUrl: config.providerUrl,
-      }
+  async init(initParams: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<void> {
+    const params = await sarcoClientInitSchema.validate(initParams);
+
+    const networkConfigByChainId = new Map<number, SarcoNetworkConfig>([
+      [1, mainnetNetworkConfig(this.providerUrl, initParams.etherscanApiKey)],
+      [5, goerliNetworkConfig(this.providerUrl, initParams.etherscanApiKey)],
+      [11155111, sepoliaNetworkConfig(this.providerUrl, initParams.etherscanApiKey)],
+    ]);
+
+    const networkConfig = networkConfigByChainId.get(params.chainId);
+    if (!networkConfig) {
+      throw new Error(`Unsupported chainId: ${params.chainId}`);
+    }
+
+    this.bundlr = new Bundlr(networkConfig.bundlr.nodeUrl, networkConfig.bundlr.currencyName, this.privateKey, {
+      providerUrl: networkConfig.bundlr.providerUrl,
+    });
+
+    this.networkConfig = networkConfig;
+    this.etherscanApiKey = params.etherscanApiKey ?? '';
+
+    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig.subgraphUrl);
+    this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
+
+    this.p2pNode = await bootLip2p();
+    // TODO: Allow client to choose when to start/stop libp2p node
+    await this.startLibp2pNode();
+
+    this.archaeologist = new ArchaeologistApi(
+      this.networkConfig.diamondDeployAddress,
+      this.signer,
+      this.networkConfig.subgraphUrl,
+      this.p2pNode
     );
+
+    this.isInitialised = true;
+    onInit(this.p2pNode);
+  }
+
+  async startLibp2pNode() {
+    console.log(`LibP2P node starting with peerID: ${this.p2pNode.peerId.toString()}`);
+    return this.p2pNode.start();
+  }
+
+  async stopLibp2pNode() {
+    return this.p2pNode.stop();
   }
 }
