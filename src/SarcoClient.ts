@@ -1,13 +1,10 @@
+import Bundlr from '@bundlr-network/client/build/cjs/node/bundlr';
 import { ethers, Signer } from 'ethers';
 import { Libp2p } from 'libp2p';
 import { getSigner } from './helpers/getSigner';
 import { SarcoClientConfig, SarcoNetworkConfig } from './types';
 import { SarcophagusApi } from './SarcophagusApi';
 import { Token } from './Token';
-import { ArchaeologistApi } from './ArchaeologistApi';
-import { bootLip2p } from './libp2p_node';
-import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
-import { sarcoClientInitSchema, SarcoInitParams } from './helpers/validation';
 
 /**
  * The SarcoClient class provides a high-level interface for interacting with the Sarcophagus V2 protocol.
@@ -23,6 +20,7 @@ export class SarcoClient {
 
   api!: SarcophagusApi;
   token!: Token;
+  bundlr: Bundlr;
   archaeologist!: ArchaeologistApi;
   isInitialised: boolean = false;
 
@@ -38,6 +36,10 @@ export class SarcoClient {
    * @throws if none of the signer, private key, or mnemonic is provided in a non-browser environment.
    */
   constructor(config?: SarcoClientConfig) {
+    if (!config || (!config.signer && !config.privateKey && !config.mnemonic)) {
+      throw new Error('No private key provided');
+    }
+
     this.signer = getSigner(config);
   }
 
@@ -49,6 +51,12 @@ export class SarcoClient {
    * @param onInit - Callback function to be called after the SarcoClient has been initialised.
    */
   async init(initParams: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<void> {
+        // Initialize the Bundlr client
+    this.bundlr = new Bundlr(
+      config?.bundlrNode || 'http://node1.bundlr.network',
+      config?.bundlrCurrency || 'ethereum',
+      config?.privateKey
+    );
     const params = await sarcoClientInitSchema.validate(initParams);
 
     if (this.p2pNode?.isStarted()) {
@@ -100,5 +108,6 @@ export class SarcoClient {
 
   connect(customProvider: ethers.providers.Provider) {
     this.signer.connect(customProvider);
+    // Assuming the Bundlr client doesn't require any extra connection handling
   }
 }

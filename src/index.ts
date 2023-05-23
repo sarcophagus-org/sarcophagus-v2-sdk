@@ -1,19 +1,4 @@
-import {
-  ArchaeologistData,
-  ArchaeologistEncryptedShard,
-  ArchaeologistException,
-  ArchaeologistExceptionCode,
-  ArchaeologistNegotiationResponse,
-  ArchaeologistNegotiationResult,
-  ArchaeologistProfile,
-  ArchaeologistCurseNegotiationParams,
-  SarcophagusArchaeologist,
-  SarcophagusValidationError,
-} from './types/archaeologist';
-import { SarcoClient } from './SarcoClient';
-import { SarcoClientConfig, SarcoNetworkConfig } from './types';
-import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
-import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
+import { NodeSarcoClient, NodeSarcoClientConfig } from 'NodeSarcoClient';
 import {
   calculateDiggingFees,
   convertSarcoPerSecondToPerMonth,
@@ -22,10 +7,25 @@ import {
 } from './helpers/archHelpers';
 import { formatSarco } from './helpers/misc';
 import { SarcophagusFilter, SarcophagusDetails, SarcophagusData, SarcophagusState } from './types/sarcophagi';
+import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
+import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
+import { SarcoNetworkConfig } from './types';
+import {
+  ArchaeologistCurseNegotiationParams,
+  ArchaeologistData,
+  ArchaeologistEncryptedShard,
+  ArchaeologistException,
+  ArchaeologistExceptionCode,
+  ArchaeologistNegotiationResponse,
+  ArchaeologistNegotiationResult,
+  ArchaeologistProfile,
+  SarcophagusArchaeologist,
+  SarcophagusValidationError,
+} from './types/archaeologist';
 
 export { sarco } from './singleton';
-export { SarcoClient };
-export type { SarcoClientConfig, SarcoNetworkConfig };
+export { NodeSarcoClient };
+export type { NodeSarcoClientConfig, SarcoNetworkConfig };
 export type {
   ArchaeologistData,
   ArchaeologistException,
@@ -40,9 +40,7 @@ export type { SarcophagusData, SarcophagusDetails };
 
 export { ArchaeologistExceptionCode, SarcophagusValidationError, SarcophagusFilter, SarcophagusState };
 export { NEGOTIATION_SIGNATURE_STREAM };
-
 export { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig };
-
 export {
   getLowestRewrapInterval,
   getLowestResurrectionTime,
