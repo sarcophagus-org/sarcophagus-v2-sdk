@@ -148,10 +148,14 @@ export const getSubgraphSarcophagusWithRewraps = async (
 
 export const getSubgraphSarcoCounts = async (subgraphUrl: string): Promise<SarcoCounts> => {
   try {
-    const { activeSarcophagusIds, inactiveSarcophagusIds } = (await queryGraphQl(subgraphUrl, getSarcoCountsQuery)) as {
-      activeSarcophagusIds: string[];
-      inactiveSarcophagusIds: string[];
-    };
+    const { activeSarcophagusIds, inactiveSarcophagusIds } = (
+      (await queryGraphQl(subgraphUrl, getSarcoCountsQuery)) as {
+        systemDatas: {
+          activeSarcophagusIds: string[];
+          inactiveSarcophagusIds: string[];
+        }[];
+      }
+    ).systemDatas[0];
 
     return { activeSarcophagi: activeSarcophagusIds.length, inactiveSarcophagi: inactiveSarcophagusIds.length };
   } catch (e) {
