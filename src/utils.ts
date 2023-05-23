@@ -1,8 +1,8 @@
 import { ethers } from 'ethers';
-import { SarcophagusResponseContract, SarcophagusState } from './types/sarcophagi';
+import { SarcophagusData, SarcophagusResponseContract, SarcophagusState } from './types/sarcophagi';
 
 export const getSarcophagusState = (
-  sarco: SarcophagusResponseContract,
+  sarco: SarcophagusResponseContract | SarcophagusData,
   gracePeriod: number,
   timestampMs: number
 ): SarcophagusState => {
