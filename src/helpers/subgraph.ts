@@ -157,7 +157,15 @@ export const getSubgraphSarcoCounts = async (subgraphUrl: string): Promise<Sarco
       }
     ).systemDatas[0];
 
-    return { activeSarcophagi: activeSarcophagusIds.length, inactiveSarcophagi: inactiveSarcophagusIds.length };
+    
+    // TODO: Remove this once the subgraph is fixed
+    const uniqueActiveSarcophagusIds: string[] = [...new Set(activeSarcophagusIds)];
+    const uniqueInactiveSarcophagusIds: string[] = [...new Set(inactiveSarcophagusIds)];
+    
+    return {
+      activeSarcophagi: uniqueActiveSarcophagusIds.filter(a => !inactiveSarcophagusIds.includes(a)).length,
+      inactiveSarcophagi: uniqueInactiveSarcophagusIds.filter(a => !activeSarcophagusIds.includes(a)).length,
+    };
   } catch (e) {
     console.error(e);
     throw new Error('Failed to get sarcophagus counts from subgraph');
