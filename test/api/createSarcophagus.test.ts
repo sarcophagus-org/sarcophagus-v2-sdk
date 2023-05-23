@@ -2,12 +2,8 @@ import { ethers } from 'ethers';
 import { ValidationError } from 'yup';
 import { Api } from '../../src/Api';
 import { ArchaeologistSettings } from '../../src/helpers/validation';
-import {
-  arweaveTxId,
-  defaultArchaeologists,
-  defaultSarcophagusSettings,
-  sarcoId,
-} from './test-data';
+import { mockSarcoClient } from '../mocks';
+import { arweaveTxId, defaultArchaeologists, defaultSarcophagusSettings, sarcoId } from './test-data';
 import { mockSafeContractCall } from './test-utils';
 
 const signer = ethers.Wallet.createRandom({});
@@ -23,12 +19,7 @@ describe('createSarcophagus', () => {
     const mockTransactionResponse = { hash: '0x123' } as ethers.providers.TransactionResponse;
     mockSafeContractCall.mockImplementation(() => Promise.resolve(mockTransactionResponse));
 
-    const result = await api.createSarcophagus(
-      sarcoId,
-      defaultSarcophagusSettings,
-      defaultArchaeologists,
-      arweaveTxId
-    );
+    const result = await api.createSarcophagus(sarcoId, defaultSarcophagusSettings, defaultArchaeologists, arweaveTxId);
 
     expect(mockSafeContractCall).toHaveBeenCalledWith(
       api['embalmerFacet'],
@@ -43,12 +34,7 @@ describe('createSarcophagus', () => {
     const notEnoughArchaeologists = [defaultArchaeologists[0]];
 
     await expect(
-      api.createSarcophagus(
-        sarcoId,
-        defaultSarcophagusSettings,
-        notEnoughArchaeologists,
-        arweaveTxId
-      )
+      api.createSarcophagus(sarcoId, defaultSarcophagusSettings, notEnoughArchaeologists, arweaveTxId)
     ).rejects.toThrow('Not enough archaeologists selected');
   });
 

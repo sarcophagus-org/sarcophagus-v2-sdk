@@ -18,12 +18,7 @@ describe('cleanSarcophagus', () => {
 
     const result = await api.cleanSarcophagus(sarcoId);
 
-    expect(mockSafeContractCall).toHaveBeenCalledWith(
-      api['embalmerFacet'],
-      'cleanSarcophagus',
-      [sarcoId],
-      {}
-    );
+    expect(mockSafeContractCall).toHaveBeenCalledWith(api['embalmerFacet'], 'cleanSarcophagus', [sarcoId], {});
     expect(result).toBe(mockTransactionResponse);
   });
 });

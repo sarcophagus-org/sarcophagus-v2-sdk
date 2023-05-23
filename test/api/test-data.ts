@@ -3,6 +3,7 @@ import { ArchaeologistSettings, SarcophagusSettings } from '../../src/helpers/va
 
 export const sarcoId = 'test-id';
 export const arweaveTxId = 'test-tx-id';
+export const privateKey = '0x0123456789012345678901234567890123456789012345678901234567890123';
 
 export const defaultSarcophagusSettings: SarcophagusSettings = {
   name: 'Test Sarcophagus',
