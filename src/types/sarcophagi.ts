@@ -34,4 +34,18 @@ export interface SarcophagusResponseContract {
   previousRewrapTime: BigNumber;
 }
 
-export type SarcophagusData = SarcophagusResponseContract & { id: string; state: SarcophagusState };
+export interface SarcophagusRewrap {
+  rewrapTimestamp: number;
+  diggingFeesPaid: BigNumber;
+  protocolFeesPaid: BigNumber;
+}
+
+
+export type SarcophagusData = SarcophagusResponseContract & {
+  id: string;
+  state: SarcophagusState;
+};
+
+export type SarcophagusDetails = SarcophagusData & {
+  rewraps: SarcophagusRewrap[];
+};

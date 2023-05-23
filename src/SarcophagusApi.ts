@@ -1,15 +1,15 @@
 import { EmbalmerFacet__factory, ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
 import { BigNumber, ethers } from 'ethers';
 import { safeContractCall } from './helpers/safeContractCall';
-import { CallOptions, SarcophagusRewrap } from './types';
+import { CallOptions } from './types';
 import {
   SarcophagusSettings,
   sarcophagusSettingsSchema,
   archaeologistSettingsArraySchema,
   ArchaeologistSettings,
 } from './helpers/validation';
-import { getSarcophagusRewraps, getSubgraphSarcophagi, getSubgraphSarcophagusWithRewraps } from './helpers/subgraph';
-import { SarcophagusData, SarcophagusFilter, SarcophagusResponseContract } from './types/sarcophagi';
+import { getSubgraphSarcophagi, getSubgraphSarcophagusWithRewraps } from './helpers/subgraph';
+import { SarcophagusData, SarcophagusDetails, SarcophagusFilter, SarcophagusResponseContract } from './types/sarcophagi';
 import { getSarcophagusState } from './utils';
 import { getCurrentTimeSec } from './helpers/misc';
 
@@ -106,10 +106,7 @@ export class SarcophagusApi {
     return safeContractCall(this.embalmerFacet, 'cleanSarcophagus', [sarcoId], options);
   }
 
-  async getSarcophagusDetails(
-    sarcoId: string,
-    options: CallOptions = {}
-  ): Promise<SarcophagusData & { rewraps: SarcophagusRewrap[] }> {
+  async getSarcophagusDetails(sarcoId: string, options: CallOptions = {}): Promise<SarcophagusDetails> {
     const sarcosSubgraph = await getSubgraphSarcophagusWithRewraps(this.subgraphUrl, sarcoId);
 
     const gracePeriod = (await safeContractCall(
@@ -140,19 +137,19 @@ export class SarcophagusApi {
     options: CallOptions & { filter: SarcophagusFilter }
   ): Promise<SarcophagusData[]> {
     let sarcoIds: string[] = [];
-    let method: string;
+    let methodName: string;
 
     switch (options.filter) {
       case SarcophagusFilter.embalmer:
-        method = 'getEmbalmerSarcophagi';
+        methodName = 'getEmbalmerSarcophagi';
         break;
 
       case SarcophagusFilter.recipient:
-        method = 'getRecipientSarcophagi';
+        methodName = 'getRecipientSarcophagi';
         break;
     }
 
-    sarcoIds = (await safeContractCall(this.embalmerFacet, method, [address], options)) as unknown as string[];
+    sarcoIds = (await safeContractCall(this.viewStateFacet, methodName, [address], options)) as unknown as string[];
     const sarcosSubgraph = await getSubgraphSarcophagi(this.subgraphUrl, sarcoIds);
 
     const gracePeriod = (await safeContractCall(
@@ -175,25 +172,11 @@ export class SarcophagusApi {
         return {
           ...sarcoContract,
           state: getSarcophagusState(sarcoContract, gracePeriod.toNumber(), currentTimeMs),
-          id: s.sarcoId || '',
+          id: s.sarcoId,
         } as SarcophagusData;
       })
     );
 
     return sarcophagi;
-  }
-
-  /**
-   * Gets the rewraps on a sarcophagus.
-   *
-   * @param sarcoId - The ID of the sarcophagus to get the rewraps of
-   * @returns The rewraps on the sarcophagus
-   * */
-  async getRewrapsOnSarcophagus(sarcoId: string): Promise<SarcophagusRewrap[]> {
-    return (await getSarcophagusRewraps(this.subgraphUrl, sarcoId)).map(r => ({
-      rewrapTimestamp: Number.parseInt(r.blockTimestamp),
-      diggingFeesPaid: ethers.utils.parseEther(r.totalDiggingFees),
-      protocolFeesPaid: ethers.utils.parseEther(r.rewrapSarcophagusProtocolFees),
-    }));
   }
 }

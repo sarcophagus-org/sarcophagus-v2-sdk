@@ -39,9 +39,3 @@ export interface SarcoNetworkConfig {
   providerUrl?: string;
   signalServerPort?: number;
 }
-
-export interface SarcophagusRewrap {
-  rewrapTimestamp: number;
-  diggingFeesPaid: BigNumber;
-  protocolFeesPaid: BigNumber;
-}
