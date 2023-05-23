@@ -3,7 +3,6 @@ import { BigNumber } from 'ethers';
 export enum SarcophagusFilter {
   recipient,
   embalmer,
-  all,
 }
 export enum SarcophagusState {
   DoesNotExist,
@@ -18,7 +17,7 @@ export enum SarcophagusState {
   CleanedFailed,
 }
 
-interface SarcophagusResponseContract {
+export interface SarcophagusResponseContract {
   resurrectionTime: BigNumber;
   isCompromised: boolean;
   isCleaned: boolean;

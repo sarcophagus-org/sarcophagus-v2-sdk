@@ -1,5 +1,5 @@
-import { EmbalmerFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
-import { ethers } from 'ethers';
+import { EmbalmerFacet__factory, ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
+import { BigNumber, ethers } from 'ethers';
 import { safeContractCall } from './helpers/safeContractCall';
 import { CallOptions, SarcophagusRewrap } from './types';
 import {
@@ -8,7 +8,10 @@ import {
   archaeologistSettingsArraySchema,
   ArchaeologistSettings,
 } from './helpers/validation';
-import { getSarcophagusRewraps } from './helpers/subgraph';
+import { getSarcophagusRewraps, getSubgraphSarcophagi, getSubgraphSarcophagusWithRewraps } from './helpers/subgraph';
+import { SarcophagusData, SarcophagusFilter, SarcophagusResponseContract } from './types/sarcophagi';
+import { getSarcophagusState } from './utils';
+import { getCurrentTimeSec } from './helpers/misc';
 
 /**
  * The Sarcophagus API class provides a high-level interface for interacting with
@@ -16,11 +19,15 @@ import { getSarcophagusRewraps } from './helpers/subgraph';
  */
 export class SarcophagusApi {
   private embalmerFacet: ethers.Contract;
+  private viewStateFacet: ethers.Contract;
   private subgraphUrl: string;
+  private signer: ethers.Signer;
 
   constructor(diamondDeployAddress: string, signer: ethers.Signer, subgraphUrl: string) {
     this.embalmerFacet = new ethers.Contract(diamondDeployAddress, EmbalmerFacet__factory.abi, signer);
+    this.viewStateFacet = new ethers.Contract(diamondDeployAddress, ViewStateFacet__factory.abi, signer);
     this.subgraphUrl = subgraphUrl;
+    this.signer = signer;
   }
 
   /**
@@ -99,6 +106,83 @@ export class SarcophagusApi {
     return safeContractCall(this.embalmerFacet, 'cleanSarcophagus', [sarcoId], options);
   }
 
+  async getSarcophagusDetails(
+    sarcoId: string,
+    options: CallOptions = {}
+  ): Promise<SarcophagusData & { rewraps: SarcophagusRewrap[] }> {
+    const sarcosSubgraph = await getSubgraphSarcophagusWithRewraps(this.subgraphUrl, sarcoId);
+
+    const gracePeriod = (await safeContractCall(
+      this.viewStateFacet,
+      'getGracePeriod',
+      [],
+      options
+    )) as unknown as BigNumber;
+
+    const sarcoContract = (await safeContractCall(
+      this.viewStateFacet,
+      'getSarcophagus',
+      [sarcoId],
+      options
+    )) as unknown as SarcophagusResponseContract;
+
+    const currentTimeMs = (await getCurrentTimeSec(this.signer.provider!)) * 1000;
+    return {
+      ...sarcoContract,
+      state: getSarcophagusState(sarcoContract, gracePeriod.toNumber(), currentTimeMs),
+      id: sarcoId,
+      rewraps: sarcosSubgraph.rewraps,
+    };
+  }
+
+  async getSarcophagi(
+    address: string,
+    options: CallOptions & { filter: SarcophagusFilter }
+  ): Promise<SarcophagusData[]> {
+    let sarcoIds: string[] = [];
+    let method: string;
+
+    switch (options.filter) {
+      case SarcophagusFilter.embalmer:
+        method = 'getEmbalmerSarcophagi';
+        break;
+
+      case SarcophagusFilter.recipient:
+        method = 'getRecipientSarcophagi';
+        break;
+    }
+
+    sarcoIds = (await safeContractCall(this.embalmerFacet, method, [address], options)) as unknown as string[];
+    const sarcosSubgraph = await getSubgraphSarcophagi(this.subgraphUrl, sarcoIds);
+
+    const gracePeriod = (await safeContractCall(
+      this.viewStateFacet,
+      'getGracePeriod',
+      [],
+      options
+    )) as unknown as BigNumber;
+
+    const sarcophagi: SarcophagusData[] = await Promise.all(
+      sarcosSubgraph.map(async s => {
+        const sarcoContract = (await safeContractCall(
+          this.viewStateFacet,
+          'getSarcophagus',
+          [s.sarcoId],
+          options
+        )) as unknown as SarcophagusResponseContract;
+
+        const currentTimeMs = (await getCurrentTimeSec(this.signer.provider!)) * 1000;
+        return {
+          ...sarcoContract,
+          state: getSarcophagusState(sarcoContract, gracePeriod.toNumber(), currentTimeMs),
+          id: s.sarcoId || '',
+        } as SarcophagusData;
+      })
+    );
+
+    return sarcophagi;
+  }
+
   /**
    * Gets the rewraps on a sarcophagus.
    *
@@ -108,7 +192,7 @@ export class SarcophagusApi {
   async getRewrapsOnSarcophagus(sarcoId: string): Promise<SarcophagusRewrap[]> {
     return (await getSarcophagusRewraps(this.subgraphUrl, sarcoId)).map(r => ({
       rewrapTimestamp: Number.parseInt(r.blockTimestamp),
-      diggingFeesPaid: ethers.utils.parseEther( r.totalDiggingFees),
+      diggingFeesPaid: ethers.utils.parseEther(r.totalDiggingFees),
       protocolFeesPaid: ethers.utils.parseEther(r.rewrapSarcophagusProtocolFees),
     }));
   }
