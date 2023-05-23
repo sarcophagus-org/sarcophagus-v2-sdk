@@ -40,7 +40,6 @@ export interface SarcophagusRewrap {
   protocolFeesPaid: BigNumber;
 }
 
-
 export type SarcophagusData = SarcophagusResponseContract & {
   id: string;
   state: SarcophagusState;
@@ -49,3 +48,8 @@ export type SarcophagusData = SarcophagusResponseContract & {
 export type SarcophagusDetails = SarcophagusData & {
   rewraps: SarcophagusRewrap[];
 };
+
+export interface SarcoCounts {
+  activeSarcophagi: number;
+  inactiveSarcophagi: number;
+}

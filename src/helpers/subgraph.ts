@@ -1,4 +1,4 @@
-import { SarcophagusRewrap } from "../types/sarcophagi";
+import { SarcoCounts, SarcophagusRewrap } from '../types/sarcophagi';
 
 export interface ArchDataSubgraph {
   address: string;
@@ -94,6 +94,13 @@ const getSarcosQuery = (sarcoIds: string[]) => `query {
   }
 }`;
 
+const getSarcoCountsQuery = `query {
+  systemDatas {
+    activeSarcophagusIds
+    inactiveSarcophagusIds
+  }
+}`;
+
 export const getArchaeologists = async (subgraphUrl: string): Promise<ArchDataSubgraph[]> => {
   try {
     const { archaeologists } = (await queryGraphQl(subgraphUrl, getArchsQuery)) as {
@@ -135,6 +142,20 @@ export const getSubgraphSarcophagusWithRewraps = async (
     return { ...sarcophagusData, rewraps: rewrapSarcophaguses };
   } catch (e) {
     console.error(e);
-    throw new Error('Failed to get sarcophagi from subgraph');
+    throw new Error('Failed to get sarcophagus from subgraph');
+  }
+};
+
+export const getSubgraphSarcoCounts = async (subgraphUrl: string): Promise<SarcoCounts> => {
+  try {
+    const { activeSarcophagusIds, inactiveSarcophagusIds } = (await queryGraphQl(subgraphUrl, getSarcoCountsQuery)) as {
+      activeSarcophagusIds: string[];
+      inactiveSarcophagusIds: string[];
+    };
+
+    return { activeSarcophagi: activeSarcophagusIds.length, inactiveSarcophagi: inactiveSarcophagusIds.length };
+  } catch (e) {
+    console.error(e);
+    throw new Error('Failed to get sarcophagus counts from subgraph');
   }
 };

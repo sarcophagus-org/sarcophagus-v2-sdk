@@ -8,8 +8,14 @@ import {
   archaeologistSettingsArraySchema,
   ArchaeologistSettings,
 } from './helpers/validation';
-import { getSubgraphSarcophagi, getSubgraphSarcophagusWithRewraps } from './helpers/subgraph';
-import { SarcophagusData, SarcophagusDetails, SarcophagusFilter, SarcophagusResponseContract } from './types/sarcophagi';
+import { getSubgraphSarcoCounts, getSubgraphSarcophagi, getSubgraphSarcophagusWithRewraps } from './helpers/subgraph';
+import {
+  SarcoCounts,
+  SarcophagusData,
+  SarcophagusDetails,
+  SarcophagusFilter,
+  SarcophagusResponseContract,
+} from './types/sarcophagi';
 import { getSarcophagusState } from './utils';
 import { getCurrentTimeSec } from './helpers/misc';
 
@@ -178,5 +184,8 @@ export class SarcophagusApi {
     );
 
     return sarcophagi;
+  }
+  async getSarcophagiCount(): Promise<SarcoCounts> {
+    return getSubgraphSarcoCounts(this.subgraphUrl);
   }
 }
