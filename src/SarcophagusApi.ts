@@ -8,7 +8,12 @@ import {
   archaeologistSettingsArraySchema,
   ArchaeologistSettings,
 } from './helpers/validation';
-import { getSubgraphSarcoCounts, getSubgraphSarcophagi, getSubgraphSarcophagusWithRewraps } from './helpers/subgraph';
+import {
+  getPrivateKeys,
+  getSubgraphSarcoCounts,
+  getSubgraphSarcophagi,
+  getSubgraphSarcophagusWithRewraps,
+} from './helpers/subgraph';
 import {
   SarcoCounts,
   SarcophagusData,
@@ -18,6 +23,9 @@ import {
 } from './types/sarcophagi';
 import { getSarcophagusState } from './utils';
 import { getCurrentTimeSec } from './helpers/misc';
+import { decrypt } from './helpers/encryption';
+import { arrayify } from 'ethers/lib/utils';
+import { combine } from 'shamirs-secret-sharing-ts';
 
 /**
  * The Sarcophagus API class provides a high-level interface for interacting with
@@ -185,6 +193,100 @@ export class SarcophagusApi {
 
     return sarcophagi;
   }
+
+  async claimSarcophagus(
+    sarcoId: string,
+    recipientPrivateKey: string
+  ): Promise<{
+    fileName: string;
+    data: string;
+    error?: string;
+  }> {
+    try {
+      const privateKeys = await getPrivateKeys(this.subgraphUrl, sarcoId);
+      const sarcophagus = (await getSubgraphSarcophagi(this.subgraphUrl, [sarcoId]))[0];
+      const canResurrect = privateKeys.length >= Number.parseInt(sarcophagus.threshold);
+
+      if (!canResurrect) {
+        throw new Error('Cannot resurrect -- not enough private keys');
+      }
+
+      const payloadTxId = sarcophagus?.arweaveTxId;
+
+      // In case the sarcophagus has no tx id. This should never happen but, just in case.
+      if (!payloadTxId) {
+        throw new Error(`The Arwevae tx id for the payload is missing on sarcophagus ${sarcoId}`);
+      }
+
+      // TODO: Fetch the file from arweave, using bundlr API
+      const fetchArweaveFile = async (_: any): Promise<any> => {};
+
+      // Load the payload from arweave using the txId
+      const arweaveFile = await fetchArweaveFile(payloadTxId);
+
+      if (!arweaveFile) throw Error('Failed to download file from arweave');
+
+      // Decrypt the key shares. Each share is double-encrypted with an inner layer of encryption
+      // with the recipient's key, and an outer layer of encryption with the archaeologist's key.
+      const decryptedKeyShares: Buffer[] = [];
+      for await (const archAddress of sarcophagus.cursedArchaeologists) {
+        const arch = (await safeContractCall(this.viewStateFacet, 'getSarcophagusArchaeologist', [
+          sarcoId,
+          archAddress,
+        ])) as unknown as { publicKey: string; privateKey: string };
+
+        // If arch failed to publish private key, continue to next key
+        if (arch.privateKey === ethers.constants.HashZero) {
+          continue;
+        }
+
+        const archDoubleEncryptedKeyShare = arweaveFile.keyShares[arch.publicKey];
+
+        // Decrypt outer layer with arch private key
+        const recipientEncryptedKeyShare = await decrypt(
+          arch.privateKey,
+          Buffer.from(arrayify(archDoubleEncryptedKeyShare))
+        );
+
+        // Decrypt inner layer with rceipient private key
+        const decryptedKeyShare = await decrypt(recipientPrivateKey, recipientEncryptedKeyShare);
+
+        decryptedKeyShares.push(decryptedKeyShare);
+      }
+
+      // Apply SSS with the decrypted shares to derive the payload file's decryption key
+      const payloadDecryptionKey = combine(decryptedKeyShares).toString();
+
+      // Decrypt the payload with the recombined key
+      const decryptedPayload = await decrypt(payloadDecryptionKey, arweaveFile.fileBuffer);
+
+      const decryptedfileName = await decrypt(
+        recipientPrivateKey,
+        Buffer.from(arweaveFile.metadata.fileName, 'binary')
+      );
+      const decryptedfileType = await decrypt(recipientPrivateKey, Buffer.from(arweaveFile.metadata.type, 'binary'));
+
+      const decryptedResult = {
+        fileName: decryptedfileName.toString('binary'),
+        data: `${decryptedfileType.toString('binary')},${decryptedPayload.toString('base64')}`,
+      };
+
+      if (!decryptedResult.fileName || !decryptedResult.data) {
+        console.error(`Missig fileName or data in decryptedResult: ${decryptedResult}`);
+        throw { error: 'The payload is missing the fileName or data', fileName: '', data: '' };
+      }
+
+      return decryptedResult;
+    } catch (error) {
+      console.error(`Error resurrecting sarcophagus: ${error}`);
+      throw {
+        fileName: '',
+        data: '',
+        error: 'Could not claim Sarcophagus. Please make sure you have the right private key.',
+      };
+    }
+  }
+
   async getSarcophagiCount(): Promise<SarcoCounts> {
     return getSubgraphSarcoCounts(this.subgraphUrl);
   }

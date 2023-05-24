@@ -18,6 +18,10 @@ export interface SarcoDataSubgraph {
   arweaveTxId: string;
   embalmer: string;
   publishes: string[];
+  threshold: string;
+  recipient: string;
+  cursedArchaeologists: string[];
+  accusalCount: string;
   resurrectionTime: string;
   previousRewrapTime: string;
   blockTimestamp: string;
@@ -89,9 +93,19 @@ const getSarcosQuery = (sarcoIds: string[]) => `query {
       embalmer
       previousRewrapTime
       publishes
+      recipient
+      threshold
+      cursedArchaeologists
+      accusalCount
       arweaveTxId
       blockTimestamp
   }
+}`;
+
+const getPrivateKeyPublishes = (sarcoId: string) => `query {
+  publishPrivateKeys (where:{sarcoId: "${sarcoId}"}) {
+      privateKey
+    }
 }`;
 
 const getSarcoCountsQuery = `query {
@@ -120,6 +134,21 @@ export const getSubgraphSarcophagi = async (subgraphUrl: string, sarcoIds: strin
     };
 
     return sarcophagusDatas;
+  } catch (e) {
+    console.error(e);
+    throw new Error('Failed to get sarcophagi from subgraph');
+  }
+};
+
+export const getPrivateKeys = async (subgraphUrl: string, sarcoId: string): Promise<string[]> => {
+  try {
+    const { publishPrivateKeys } = (await queryGraphQl(subgraphUrl, getPrivateKeyPublishes(sarcoId))) as {
+      publishPrivateKeys: { privateKey: string }[];
+    };
+
+    console.log('publishPrivateKeys', publishPrivateKeys);
+
+    return publishPrivateKeys.map(a => a.privateKey);
   } catch (e) {
     console.error(e);
     throw new Error('Failed to get sarcophagi from subgraph');
@@ -157,11 +186,10 @@ export const getSubgraphSarcoCounts = async (subgraphUrl: string): Promise<Sarco
       }
     ).systemDatas[0];
 
-    
     // TODO: Remove this once the subgraph is fixed
     const uniqueActiveSarcophagusIds: string[] = [...new Set(activeSarcophagusIds)];
     const uniqueInactiveSarcophagusIds: string[] = [...new Set(inactiveSarcophagusIds)];
-    
+
     return {
       activeSarcophagi: uniqueActiveSarcophagusIds.filter(a => !inactiveSarcophagusIds.includes(a)).length,
       inactiveSarcophagi: uniqueInactiveSarcophagusIds.filter(a => !activeSarcophagusIds.includes(a)).length,
