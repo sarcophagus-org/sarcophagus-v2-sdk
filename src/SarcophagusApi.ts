@@ -1,7 +1,7 @@
 import { EmbalmerFacet__factory, ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
 import { BigNumber, ethers } from 'ethers';
 import { safeContractCall } from './helpers/safeContractCall';
-import { CallOptions } from './types';
+import { CallOptions, SarcoNetworkConfig } from './types';
 import {
   SarcophagusSettings,
   sarcophagusSettingsSchema,
@@ -26,6 +26,8 @@ import { getCurrentTimeSec } from './helpers/misc';
 import { decrypt } from './helpers/encryption';
 import { arrayify } from 'ethers/lib/utils';
 import { combine } from 'shamirs-secret-sharing-ts';
+import { fetchArweaveFile } from 'helpers/arweaveUtil';
+import { OnDownloadProgress } from './types/arweave';
 
 /**
  * The Sarcophagus API class provides a high-level interface for interacting with
@@ -36,12 +38,14 @@ export class SarcophagusApi {
   private viewStateFacet: ethers.Contract;
   private subgraphUrl: string;
   private signer: ethers.Signer;
+  private networkConfig: SarcoNetworkConfig;
 
-  constructor(diamondDeployAddress: string, signer: ethers.Signer, subgraphUrl: string) {
+  constructor(diamondDeployAddress: string, signer: ethers.Signer, networkConfig: SarcoNetworkConfig) {
     this.embalmerFacet = new ethers.Contract(diamondDeployAddress, EmbalmerFacet__factory.abi, signer);
     this.viewStateFacet = new ethers.Contract(diamondDeployAddress, ViewStateFacet__factory.abi, signer);
-    this.subgraphUrl = subgraphUrl;
+    this.subgraphUrl = networkConfig.subgraphUrl;
     this.signer = signer;
+    this.networkConfig = networkConfig;
   }
 
   /**
@@ -220,7 +224,8 @@ export class SarcophagusApi {
 
   async claimSarcophagus(
     sarcoId: string,
-    recipientPrivateKey: string
+    recipientPrivateKey: string,
+    onDownloadProgress: OnDownloadProgress
   ): Promise<{
     fileName: string;
     data: string;
@@ -242,11 +247,8 @@ export class SarcophagusApi {
         throw new Error(`The Arwevae tx id for the payload is missing on sarcophagus ${sarcoId}`);
       }
 
-      // TODO: Fetch the file from arweave, using bundlr API
-      const fetchArweaveFile = async (_: any): Promise<any> => {};
-
       // Load the payload from arweave using the txId
-      const arweaveFile = await fetchArweaveFile(payloadTxId);
+      const arweaveFile = await fetchArweaveFile(payloadTxId, this.networkConfig, onDownloadProgress);
 
       if (!arweaveFile) throw Error('Failed to download file from arweave');
 

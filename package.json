@@ -20,7 +20,7 @@
     "@libp2p/websockets": "^5.0.1",
     "@multiformats/multiaddr": "^10.0.3",
     "@sarcophagus-org/sarcophagus-v2-contracts": "^0.16.0",
-    "arweave": "^1.13.7",
+    "arweave": "1.11.4",
     "ecies-geth": "^1.6.11",
     "ethers": "^5.7.2",
     "isomorphic-fetch": "^3.0.0",
