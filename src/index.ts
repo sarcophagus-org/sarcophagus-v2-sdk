@@ -38,7 +38,7 @@ export type {
 };
 export type { SarcophagusData, SarcophagusDetails };
 
-export { ArchaeologistExceptionCode, SarcophagusValidationError, SarcophagusFilter, SarcophagusState };
+export { ArchaeologistExceptionCode, SarcophagusValidationError, SarcophagusState };
 export { NEGOTIATION_SIGNATURE_STREAM };
 export { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig };
 export {

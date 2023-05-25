@@ -112,6 +112,11 @@ export class SarcophagusApi {
     return safeContractCall(this.embalmerFacet, 'cleanSarcophagus', [sarcoId], options);
   }
 
+  /**
+   * Returns detailed information about a sarcophagus.
+   * @param options - Options for the contract method call
+   * @returns The number of sarcophagi
+   * */
   async getSarcophagusDetails(sarcoId: string, options: CallOptions = {}): Promise<SarcophagusDetails> {
     const sarcosSubgraph = await getSubgraphSarcophagusWithRewraps(this.subgraphUrl, sarcoId);
 
@@ -138,7 +143,27 @@ export class SarcophagusApi {
     };
   }
 
-  async getSarcophagi(
+  /**
+   * Returns a list of sarcophagi for a given embalmer address.
+   * @param address - The address to get sarcophagi for
+   * @param options - Options for the contract method call
+   * @returns The list of sarcophagi
+   * */
+  async getEmbalmerSarcophagi(address: string, options: CallOptions = {}): Promise<SarcophagusData[]> {
+    return this.getSarcophagi(address, { ...options, filter: SarcophagusFilter.embalmer });
+  }
+
+  /**
+   * Returns a list of sarcophagi for a given recipient address.
+   * @param address - The address to get sarcophagi for
+   * @param options - Options for the contract method call
+   * @returns The list of sarcophagi
+   * */
+  async getRecipientSarcophagi(address: string, options: CallOptions = {}): Promise<SarcophagusData[]> {
+    return this.getSarcophagi(address, { ...options, filter: SarcophagusFilter.recipient });
+  }
+
+  private async getSarcophagi(
     address: string,
     options: CallOptions & { filter: SarcophagusFilter }
   ): Promise<SarcophagusData[]> {
@@ -184,6 +209,12 @@ export class SarcophagusApi {
 
     return sarcophagi;
   }
+
+  /**
+   * Returns the number of sarcophagi in the contract.
+   * @param options - Options for the contract method call
+   * @returns The number of sarcophagi
+   * */
   async getSarcophagiCount(): Promise<SarcoCounts> {
     return getSubgraphSarcoCounts(this.subgraphUrl);
   }
