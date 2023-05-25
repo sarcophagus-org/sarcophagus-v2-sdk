@@ -26,8 +26,8 @@ import { getCurrentTimeSec } from './helpers/misc';
 import { decrypt } from './helpers/encryption';
 import { arrayify } from 'ethers/lib/utils';
 import { combine } from 'shamirs-secret-sharing-ts';
-import { fetchArweaveFile } from 'helpers/arweaveUtil';
-import { OnDownloadProgress } from './types/arweave';
+import { fetchArweaveFile } from './helpers/arweaveUtil';
+import { ArweaveResponse, OnDownloadProgress } from './types/arweave';
 
 /**
  * The Sarcophagus API class provides a high-level interface for interacting with
@@ -242,7 +242,7 @@ export class SarcophagusApi {
         throw new Error('Cannot resurrect -- not enough private keys');
       }
 
-      const payloadTxId = sarcophagus?.arweaveTxId;
+      const payloadTxId = sarcophagus.arweaveTxId;
 
       // In case the sarcophagus has no tx id. This should never happen but, just in case.
       if (!payloadTxId) {
@@ -300,19 +300,23 @@ export class SarcophagusApi {
       };
 
       if (!decryptedResult.fileName || !decryptedResult.data) {
-        console.error(`Missig fileName or data in decryptedResult: ${decryptedResult}`);
-        throw { error: 'The payload is missing the fileName or data', fileName: '', data: '' };
+        console.error(`Missing fileName or data in decryptedResult: ${decryptedResult}`);
+        throw new Error('The payload is missing the fileName or data');
       }
 
       return decryptedResult;
     } catch (error) {
       console.error(`Error resurrecting sarcophagus: ${error}`);
-      throw {
-        fileName: '',
-        data: '',
-        error: 'Could not claim Sarcophagus. Please make sure you have the right private key.',
-      };
+      throw new Error('Could not claim Sarcophagus. Please make sure you have the right private key.');
     }
+  }
+
+  async getSarcophagusPayload(sarcoId: string, onDownloadProgress: OnDownloadProgress, options: CallOptions = {}): Promise<ArweaveResponse> {
+      const sarcophagus = (await getSubgraphSarcophagi(this.subgraphUrl, [sarcoId]))[0];
+      const payloadTxId = sarcophagus.arweaveTxId;
+      const arweaveFile = await fetchArweaveFile(payloadTxId, this.networkConfig, onDownloadProgress);
+      if (!arweaveFile) throw Error('Failed to download file from arweave');
+      return arweaveFile;
   }
 
   /**
