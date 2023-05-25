@@ -156,7 +156,6 @@ export class SarcophagusApi {
     }
 
     sarcoIds = (await safeContractCall(this.viewStateFacet, methodName, [address], options)) as unknown as string[];
-    const sarcosSubgraph = await getSubgraphSarcophagi(this.subgraphUrl, sarcoIds);
 
     const gracePeriod = (await safeContractCall(
       this.viewStateFacet,
@@ -166,11 +165,11 @@ export class SarcophagusApi {
     )) as unknown as BigNumber;
 
     const sarcophagi: SarcophagusData[] = await Promise.all(
-      sarcosSubgraph.map(async s => {
+      sarcoIds.map(async sarcoId => {
         const sarcoContract = (await safeContractCall(
           this.viewStateFacet,
           'getSarcophagus',
-          [s.sarcoId],
+          [sarcoId],
           options
         )) as unknown as SarcophagusResponseContract;
 
@@ -178,7 +177,7 @@ export class SarcophagusApi {
         return {
           ...sarcoContract,
           state: getSarcophagusState(sarcoContract, gracePeriod.toNumber(), currentTimeMs),
-          id: s.sarcoId,
+          id: sarcoId,
         } as SarcophagusData;
       })
     );

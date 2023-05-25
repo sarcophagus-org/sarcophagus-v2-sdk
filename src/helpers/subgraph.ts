@@ -163,7 +163,7 @@ export const getSubgraphSarcoCounts = async (subgraphUrl: string): Promise<Sarco
     const uniqueInactiveSarcophagusIds: string[] = [...new Set(inactiveSarcophagusIds)];
     
     return {
-      activeSarcophagi: uniqueActiveSarcophagusIds.filter(a => !inactiveSarcophagusIds.includes(a)).length,
+      activeSarcophagi: uniqueActiveSarcophagusIds.filter(a => !uniqueInactiveSarcophagusIds.includes(a)).length,
       inactiveSarcophagi: uniqueInactiveSarcophagusIds.filter(a => !activeSarcophagusIds.includes(a)).length,
     };
   } catch (e) {
