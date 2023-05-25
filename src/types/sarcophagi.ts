@@ -4,6 +4,7 @@ export enum SarcophagusFilter {
   recipient,
   embalmer,
 }
+
 export enum SarcophagusState {
   DoesNotExist,
   Active,
