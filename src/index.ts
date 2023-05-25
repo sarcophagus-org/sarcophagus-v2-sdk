@@ -6,6 +6,7 @@ import {
   getLowestRewrapInterval,
 } from './helpers/archHelpers';
 import { formatSarco } from './helpers/misc';
+import { SarcophagusFilter, SarcophagusDetails, SarcophagusData, SarcophagusState } from './types/sarcophagi';
 import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
 import { SarcoNetworkConfig } from './types';
@@ -35,7 +36,9 @@ export type {
   ArchaeologistNegotiationResponse,
   ArchaeologistNegotiationResult,
 };
-export { ArchaeologistExceptionCode, SarcophagusValidationError };
+export type { SarcophagusData, SarcophagusDetails };
+
+export { ArchaeologistExceptionCode, SarcophagusValidationError, SarcophagusState };
 export { NEGOTIATION_SIGNATURE_STREAM };
 export { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig };
 export {

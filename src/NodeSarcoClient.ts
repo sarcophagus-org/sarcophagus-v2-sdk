@@ -4,10 +4,10 @@ import { sarcoClientInitSchema, SarcoInitParams } from './helpers/validation';
 import { Libp2p } from 'libp2p';
 import { bootLip2p } from './libp2p_node';
 import { SarcoNetworkConfig } from './types';
-import { Api } from './Api';
 import { ArchaeologistApi } from './ArchaeologistApi';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
 import { Token } from './Token';
+import { SarcophagusApi } from 'SarcophagusApi';
 
 export interface NodeSarcoClientConfig {
   privateKey: string;
@@ -15,7 +15,7 @@ export interface NodeSarcoClientConfig {
 }
 
 export class NodeSarcoClient {
-  api!: Api;
+  api!: SarcophagusApi;
   token!: Token;
   archaeologist!: ArchaeologistApi;
   signer: Signer;
@@ -55,7 +55,7 @@ export class NodeSarcoClient {
     this.networkConfig = networkConfig;
     this.etherscanApiKey = params.etherscanApiKey ?? '';
 
-    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig.subgraphUrl);
+    this.api = new SarcophagusApi(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig.subgraphUrl);
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
 
     this.p2pNode = await bootLip2p();

@@ -1,23 +1,23 @@
 import { ethers } from 'ethers';
-import { Api } from '../../src/Api';
+import { SarcophagusApi } from '../../src/SarcophagusApi';
 
 const signer = ethers.Wallet.createRandom({});
 
 describe('Api', () => {
   describe('Api Constructor', () => {
     test('should initialize with a contract address, signer, and url string', () => {
-      const api = new Api(signer.address, signer, 'subgraph/url/test');
+      const api = new SarcophagusApi(signer.address, signer, 'subgraph/url/test');
       expect(api).toBeDefined();
     });
 
-    test('should have an embalmerFacet instance', () => {
-      const api = new Api(signer.address, signer, 'subgraph/url/test');
-      expect(api['embalmerFacet']).toBeDefined();
+    test('should have an embalmerFacet instance', () => {	
+      const api = new SarcophagusApi(signer.address, signer, 'subgraph/url/test');
+      expect(api['embalmerFacet']).toBeDefined();	
     });
 
-    test('should set its subgraph url', () => {
-      const api = new Api(signer.address, signer, 'subgraph/url/test');
-      expect(api['subgraphUrl']).toEqual('subgraph/url/test');
+    test('should set its subgraph url', () => {	
+      const api = new SarcophagusApi(signer.address, signer, 'subgraph/url/test');
+      expect(api['subgraphUrl']).toEqual('subgraph/url/test');	
     });
   });
 });

@@ -1,3 +1,5 @@
+import { SarcoCounts, SarcophagusRewrap } from '../types/sarcophagi';
+
 export interface ArchDataSubgraph {
   address: string;
   successes: string[];
@@ -9,6 +11,22 @@ export interface ArchDataSubgraph {
   maximumRewrapInterval: string;
   minimumDiggingFeePerSecond: string;
   curseFee: string;
+}
+
+export interface SarcoDataSubgraph {
+  sarcoId: string;
+  arweaveTxId: string;
+  embalmer: string;
+  publishes: string[];
+  resurrectionTime: string;
+  previousRewrapTime: string;
+  blockTimestamp: string;
+}
+
+export interface SarcoRewrapsSubgraph {
+  blockTimestamp: string;
+  totalDiggingFees: string;
+  rewrapSarcophagusProtocolFees: string;
 }
 
 async function queryGraphQl(subgraphUrl: string, query: string) {
@@ -45,8 +63,42 @@ const getArchsQuery = `query {
     }
   }`;
 
-const getSarcoRewrapsQuery = (sarcoId: string) => `query {
-  rewrapSarcophaguses (where: {sarcoId: "${sarcoId}"}) { id }
+const getSarcoWithRewrapsQuery = (sarcoId: string) => {
+  return `query {
+    sarcophagusData (id: "${sarcoId}") {
+        sarcoId
+        resurrectionTime
+        embalmer
+        previousRewrapTime
+        publishes
+        arweaveTxId
+        blockTimestamp
+    },
+    rewrapSarcophaguses (where:{sarcoId: "${sarcoId}"}) {
+      blockTimestamp
+      totalDiggingFees
+      rewrapSarcophagusProtocolFees
+    }
+  }`;
+};
+
+const getSarcosQuery = (sarcoIds: string[]) => `query {
+  sarcophagusDatas (where: {sarcoId_in: [${sarcoIds.map(id => `"${id}",`)}]}) {
+      sarcoId
+      resurrectionTime
+      embalmer
+      previousRewrapTime
+      publishes
+      arweaveTxId
+      blockTimestamp
+  }
+}`;
+
+const getSarcoCountsQuery = `query {
+  systemDatas {
+    activeSarcophagusIds
+    inactiveSarcophagusIds
+  }
 }`;
 
 export const getArchaeologists = async (subgraphUrl: string): Promise<ArchDataSubgraph[]> => {
@@ -61,15 +113,61 @@ export const getArchaeologists = async (subgraphUrl: string): Promise<ArchDataSu
   }
 };
 
-export const getSarcophagusRewraps = async (subgraphUrl: string, sarcoId: string) => {
+export const getSubgraphSarcophagi = async (subgraphUrl: string, sarcoIds: string[]): Promise<SarcoDataSubgraph[]> => {
   try {
-    const { rewrapSarcophaguses } = (await queryGraphQl(subgraphUrl, getSarcoRewrapsQuery(sarcoId))) as {
-      rewrapSarcophaguses: any[];
+    const { sarcophagusDatas } = (await queryGraphQl(subgraphUrl, getSarcosQuery(sarcoIds))) as {
+      sarcophagusDatas: SarcoDataSubgraph[];
     };
 
-    return rewrapSarcophaguses;
+    return sarcophagusDatas;
   } catch (e) {
     console.error(e);
-    throw new Error('Failed to get rewraps from subgraph');
+    throw new Error('Failed to get sarcophagi from subgraph');
+  }
+};
+
+export const getSubgraphSarcophagusWithRewraps = async (
+  subgraphUrl: string,
+  sarcoId: string
+): Promise<SarcoDataSubgraph & { rewraps: SarcophagusRewrap[] }> => {
+  try {
+    const { sarcophagusData, rewrapSarcophaguses } = (await queryGraphQl(
+      subgraphUrl,
+      getSarcoWithRewrapsQuery(sarcoId)
+    )) as {
+      rewrapSarcophaguses: SarcophagusRewrap[];
+      sarcophagusData: SarcoDataSubgraph;
+    };
+
+    return { ...sarcophagusData, rewraps: rewrapSarcophaguses };
+  } catch (e) {
+    console.error(e);
+    throw new Error('Failed to get sarcophagus from subgraph');
+  }
+};
+
+export const getSubgraphSarcoCounts = async (subgraphUrl: string): Promise<SarcoCounts> => {
+  try {
+    const { activeSarcophagusIds, inactiveSarcophagusIds } = (
+      (await queryGraphQl(subgraphUrl, getSarcoCountsQuery)) as {
+        systemDatas: {
+          activeSarcophagusIds: string[];
+          inactiveSarcophagusIds: string[];
+        }[];
+      }
+    ).systemDatas[0];
+
+    
+    // TODO: Remove this once the subgraph is fixed
+    const uniqueActiveSarcophagusIds: string[] = [...new Set(activeSarcophagusIds)];
+    const uniqueInactiveSarcophagusIds: string[] = [...new Set(inactiveSarcophagusIds)];
+    
+    return {
+      activeSarcophagi: uniqueActiveSarcophagusIds.filter(a => !uniqueInactiveSarcophagusIds.includes(a)).length,
+      inactiveSarcophagi: uniqueInactiveSarcophagusIds.filter(a => !activeSarcophagusIds.includes(a)).length,
+    };
+  } catch (e) {
+    console.error(e);
+    throw new Error('Failed to get sarcophagus counts from subgraph');
   }
 };
