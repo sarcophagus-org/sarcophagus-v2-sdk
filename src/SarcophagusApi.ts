@@ -9,7 +9,7 @@ import {
   ArchaeologistSettings,
 } from './helpers/validation';
 import {
-  getPrivateKeys,
+  getPrivateKeyPublishes,
   getSubgraphSarcoCounts,
   getSubgraphSarcophagi,
   getSubgraphSarcophagusWithRewraps,
@@ -130,7 +130,8 @@ export class SarcophagusApi {
    * @returns The number of sarcophagi
    * */
   async getSarcophagusDetails(sarcoId: string, options: CallOptions = {}): Promise<SarcophagusDetails> {
-    const sarcosSubgraph = await getSubgraphSarcophagusWithRewraps(this.subgraphUrl, sarcoId);
+    const subgraphSarco = await getSubgraphSarcophagusWithRewraps(this.subgraphUrl, sarcoId);
+    const publishedKeys = await getPrivateKeyPublishes(this.subgraphUrl, sarcoId);
 
     const gracePeriod = (await safeContractCall(
       this.viewStateFacet,
@@ -151,7 +152,8 @@ export class SarcophagusApi {
       ...sarcoContract,
       state: getSarcophagusState(sarcoContract, gracePeriod.toNumber(), currentTimeMs),
       id: sarcoId,
-      rewraps: sarcosSubgraph.rewraps,
+      rewraps: subgraphSarco.rewraps,
+      publishedKeys,
     };
   }
 
@@ -232,7 +234,7 @@ export class SarcophagusApi {
     error?: string;
   }> {
     try {
-      const privateKeys = await getPrivateKeys(this.subgraphUrl, sarcoId);
+      const privateKeys = await getPrivateKeyPublishes(this.subgraphUrl, sarcoId);
       const sarcophagus = (await getSubgraphSarcophagi(this.subgraphUrl, [sarcoId]))[0];
       const canResurrect = privateKeys.length >= Number.parseInt(sarcophagus.threshold);
 

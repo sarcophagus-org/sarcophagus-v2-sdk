@@ -1,4 +1,4 @@
-import { SarcoCounts, SarcophagusRewrap } from '../types/sarcophagi';
+import { PrivateKeyPublish, SarcoCounts, SarcophagusRewrap } from '../types/sarcophagi';
 
 export interface ArchDataSubgraph {
   address: string;
@@ -102,9 +102,10 @@ const getSarcosQuery = (sarcoIds: string[]) => `query {
   }
 }`;
 
-const getPrivateKeyPublishes = (sarcoId: string) => `query {
+const getPrivateKeyPublishesQuery = (sarcoId: string) => `query {
   publishPrivateKeys (where:{sarcoId: "${sarcoId}"}) {
       privateKey
+      archaeologist
     }
 }`;
 
@@ -140,15 +141,13 @@ export const getSubgraphSarcophagi = async (subgraphUrl: string, sarcoIds: strin
   }
 };
 
-export const getPrivateKeys = async (subgraphUrl: string, sarcoId: string): Promise<string[]> => {
+export const getPrivateKeyPublishes = async (subgraphUrl: string, sarcoId: string): Promise<PrivateKeyPublish[]> => {
   try {
-    const { publishPrivateKeys } = (await queryGraphQl(subgraphUrl, getPrivateKeyPublishes(sarcoId))) as {
-      publishPrivateKeys: { privateKey: string }[];
+    const { publishPrivateKeys } = (await queryGraphQl(subgraphUrl, getPrivateKeyPublishesQuery(sarcoId))) as {
+      publishPrivateKeys: PrivateKeyPublish[];
     };
 
-    console.log('publishPrivateKeys', publishPrivateKeys);
-
-    return publishPrivateKeys.map(a => a.privateKey);
+    return publishPrivateKeys;
   } catch (e) {
     console.error(e);
     throw new Error('Failed to get sarcophagi from subgraph');

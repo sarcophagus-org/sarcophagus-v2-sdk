@@ -41,6 +41,11 @@ export interface SarcophagusRewrap {
   protocolFeesPaid: BigNumber;
 }
 
+export interface PrivateKeyPublish {
+  privateKey: string;
+  archaeologist: string;
+}
+
 export type SarcophagusData = SarcophagusResponseContract & {
   id: string;
   state: SarcophagusState;
@@ -48,6 +53,7 @@ export type SarcophagusData = SarcophagusResponseContract & {
 
 export type SarcophagusDetails = SarcophagusData & {
   rewraps: SarcophagusRewrap[];
+  publishedKeys: PrivateKeyPublish[];
 };
 
 export interface SarcoCounts {
