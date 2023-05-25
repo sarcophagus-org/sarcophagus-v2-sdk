@@ -1,12 +1,12 @@
-import { Api } from './Api';
-import { bootLip2p } from './libp2p_node';
+import { Api } from '../shared/Api';
+import { bootLip2p } from '../shared/libp2p_node';
 import { Libp2p } from 'libp2p';
 import { ethers, Signer } from 'ethers';
 import { SarcoWebBundlr } from './SarcoWebBundlr';
-import { Token } from './Token';
-import { Utils } from './Utils';
-import { ArchaeologistApi } from './ArchaeologistApi';
-import { SarcoInitParams } from './helpers/validation';
+import { Token } from '../shared/Token';
+import { Utils } from '../shared/Utils';
+import { ArchaeologistApi } from '../shared/ArchaeologistApi';
+import { SarcoInitParams } from '../shared/helpers/validation';
 
 // Temporary
 // TODO: move this
@@ -29,6 +29,7 @@ export class WebSarcoClient {
   private p2pNode: Libp2p;
 
   constructor() {
+    console.log('WebSarcoClient constructor!!!');
     this.provider = this.getProvider();
     this.signer = new ethers.providers.Web3Provider(this.provider as any).getSigner();
     this.p2pNode = {} as Libp2p;

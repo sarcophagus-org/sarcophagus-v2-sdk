@@ -1,4 +1,3 @@
-import { NodeSarcoClient, NodeSarcoClientConfig } from './NodeSarcoClient';
 import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
 import { SarcoNetworkConfig } from './types';
@@ -15,9 +14,7 @@ import {
   SarcophagusValidationError,
 } from './types/archaeologist';
 
-export { sarco } from './singleton';
-export { NodeSarcoClient };
-export type { NodeSarcoClientConfig, SarcoNetworkConfig };
+export type { SarcoNetworkConfig };
 export type {
   ArchaeologistData,
   ArchaeologistException,

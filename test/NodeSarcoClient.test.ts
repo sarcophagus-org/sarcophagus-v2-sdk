@@ -1,7 +1,7 @@
 import Bundlr from '@bundlr-network/client/build/cjs/node/bundlr';
-import { NodeSarcoClient } from '../src/shared/NodeSarcoClient';
 import { privateKey } from './api/test-data';
 import { ethers } from 'ethers';
+import { NodeSarcoClient } from '../src/node/NodeSarcoClient';
 
 // Mocks
 jest.mock('@bundlr-network/client/build/cjs/node/bundlr');
