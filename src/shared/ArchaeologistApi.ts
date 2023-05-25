@@ -1,28 +1,22 @@
+import { Connection } from '@libp2p/interface-connection';
+import { Multiaddr, multiaddr } from '@multiformats/multiaddr';
+import { ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
 import { BigNumber, ethers } from 'ethers';
-import { getArchaeologists } from './helpers/subgraph';
 import { pipe } from 'it-pipe';
 import { Libp2p } from 'libp2p';
-import { ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
-import { Multiaddr, multiaddr } from '@multiformats/multiaddr';
-import { Connection } from '@libp2p/interface-connection';
+import { getArchaeologists } from './helpers/subgraph';
 
+import { Utils } from './Utils';
+import { safeContractCall } from './helpers/safeContractCall';
+import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
 import {
+  ArchaeologistCurseNegotiationParams,
   ArchaeologistData,
   ArchaeologistExceptionCode,
   ArchaeologistNegotiationResponse,
   ArchaeologistNegotiationResult,
-  ArchaeologistCurseNegotiationParams,
   SarcophagusValidationError,
 } from './types/archaeologist';
-import { safeContractCall } from './helpers/safeContractCall';
-import {
-  calculateDiggingFees,
-  calculateProjectedDiggingFees,
-  getLowestResurrectionTime,
-  getLowestRewrapInterval,
-} from './helpers/archHelpers';
-import { formatSarco, getCurrentTimeSec } from './helpers/misc';
-import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
 
 /**
  * The ArchaeologistApi class provides a high-level interface for interacting with
@@ -33,12 +27,14 @@ export class ArchaeologistApi {
   private subgraphUrl: string;
   private p2pNode: Libp2p;
   private signer: ethers.Signer;
+  private utils: Utils;
 
   constructor(diamondDeployAddress: string, signer: ethers.Signer, subgraphUrl: string, p2pNode: Libp2p) {
     this.subgraphUrl = subgraphUrl;
     this.viewStateFacet = new ethers.Contract(diamondDeployAddress, ViewStateFacet__factory.abi, signer);
     this.p2pNode = p2pNode;
     this.signer = signer;
+    this.utils = new Utils();
   }
 
   private getDialAddress(arch: ArchaeologistData): Multiaddr {
@@ -250,10 +246,10 @@ export class ArchaeologistApi {
    */
   async initiateSarcophagusNegotiation(selectedArchaeologists: ArchaeologistData[], isRetry = false) {
     console.log('starting the negotiation');
-    const lowestRewrapInterval = getLowestRewrapInterval(selectedArchaeologists);
-    const lowestResurrectionTime = getLowestResurrectionTime(selectedArchaeologists);
+    const lowestRewrapInterval = this.getLowestRewrapInterval(selectedArchaeologists);
+    const lowestResurrectionTime = this.getLowestResurrectionTime(selectedArchaeologists);
 
-    const negotiationTimestamp = (await getCurrentTimeSec(this.signer.provider!)) * 1000;
+    const negotiationTimestamp = (await this.utils.getCurrentTimeSec(this.signer.provider!)) * 1000;
 
     const negotiationResult = new Map<string, ArchaeologistNegotiationResult>([]);
 
@@ -355,7 +351,7 @@ export class ArchaeologistApi {
       []
     )) as unknown as BigNumber;
 
-    const diggingFees = calculateDiggingFees(archaeologist, resurrectionTime, timestampMs);
+    const diggingFees = this.calculateDiggingFees(archaeologist, resurrectionTime, timestampMs);
     const protocolFees = diggingFees.div(protocolFeeBasePercentage.mul(100));
     return archaeologist.profile.curseFee.add(diggingFees).add(protocolFees);
   }
@@ -371,15 +367,78 @@ export class ArchaeologistApi {
       []
     )) as unknown as BigNumber;
 
-    const totalDiggingFees = calculateProjectedDiggingFees(archaeologists, resurrectionTimestamp, timestampMs);
+    const totalDiggingFees = this.calculateProjectedDiggingFees(archaeologists, resurrectionTimestamp, timestampMs);
 
     const protocolFee = totalDiggingFees.div(protocolFeeBasePercentage.mul(100));
 
     return {
       totalDiggingFees,
-      formattedTotalDiggingFees: formatSarco(totalDiggingFees.toString()),
+      formattedTotalDiggingFees: this.utils.formatSarco(totalDiggingFees.toString()),
       protocolFee,
       protocolFeeBasePercentage,
     } as const;
+  }
+  /**
+   * Returns the smallest maximumRewrapInterval value
+   * from the profiles of the archaeologists provided
+   */
+  getLowestRewrapInterval(archaeologists: ArchaeologistData[]): number {
+    return Math.min(
+      ...archaeologists.map(arch => {
+        return Number(arch.profile.maximumRewrapInterval);
+      })
+    );
+  }
+
+  /**
+   * Returns the smallest maximumResurrectionTime value
+   * from the profiles of the archaeologists provided
+   */
+  getLowestResurrectionTime(archaeologists: ArchaeologistData[]): number {
+    return Math.min(
+      ...archaeologists.map(arch => {
+        return Number(arch.profile.maximumResurrectionTime);
+      })
+    );
+  }
+
+  /**
+   * Returns the total digging fees owed to the archaeologist, given a resurrection time and current timestamp.
+   **/
+  calculateDiggingFees(archaeologist: ArchaeologistData, resurrectionTime: number, timestampMs: number): BigNumber {
+    const nowSec = Math.floor(timestampMs / 1000);
+    const resurrectionTimeSec = Math.floor(resurrectionTime / 1000);
+
+    if (resurrectionTimeSec <= nowSec) {
+      throw new Error('resurrectionTime must be larger than timestampMs');
+    }
+
+    return archaeologist.profile.minimumDiggingFeePerSecond.mul(resurrectionTimeSec - nowSec);
+  }
+
+  /**
+   * Returns the total projected digging fees owed to the archaeologist, given a resurrection time and current timestamp.
+   *
+   * @param diggingFeeRates An array of the archaeologist's digging fees per second rates
+   * @param resurrectionTimestamp The timestamp of the resurrection in ms
+   * @param timestampMs The current timestamp in ms
+   *
+   * @returns The total projected digging fees as a string
+   */
+  calculateProjectedDiggingFees(
+    archaeologists: ArchaeologistData[],
+    resurrectionTimestamp: number,
+    timestampMs: number
+  ): BigNumber {
+    if (resurrectionTimestamp === 0) return ethers.constants.Zero;
+    const totalDiggingFeesPerSecond = archaeologists.reduce(
+      (acc, curr) => acc.add(curr.profile.minimumDiggingFeePerSecond),
+      ethers.constants.Zero
+    );
+
+    const resurrectionSeconds = Math.floor(resurrectionTimestamp / 1000);
+    const nowSeconds = Math.floor(timestampMs / 1000);
+
+    return totalDiggingFeesPerSecond.mul(resurrectionSeconds - nowSeconds);
   }
 }

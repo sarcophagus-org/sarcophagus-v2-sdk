@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { Api } from '../../src/Api';
+import { Api } from '../../src/shared/Api';
 import { sarcoId } from './test-data';
 import { mockSafeContractCall } from './test-utils';
 

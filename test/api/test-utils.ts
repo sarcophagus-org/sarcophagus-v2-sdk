@@ -1,4 +1,4 @@
-import * as safeContractCallModule from '../../src/helpers/safeContractCall';
+import * as safeContractCallModule from '../../src/shared/helpers/safeContractCall';
 
 const createSafeContractCallMock = () => {
   const mock = jest.fn();
