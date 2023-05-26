@@ -311,12 +311,16 @@ export class SarcophagusApi {
     }
   }
 
-  async getSarcophagusPayload(sarcoId: string, onDownloadProgress: OnDownloadProgress, options: CallOptions = {}): Promise<ArweaveResponse> {
-      const sarcophagus = (await getSubgraphSarcophagi(this.subgraphUrl, [sarcoId]))[0];
-      const payloadTxId = sarcophagus.arweaveTxId;
-      const arweaveFile = await fetchArweaveFile(payloadTxId, this.networkConfig, onDownloadProgress);
-      if (!arweaveFile) throw Error('Failed to download file from arweave');
-      return arweaveFile;
+  async getSarcophagusPayload(
+    sarcoId: string,
+    onDownloadProgress: OnDownloadProgress,
+    options: CallOptions = {}
+  ): Promise<ArweaveResponse> {
+    const sarcophagus = (await getSubgraphSarcophagi(this.subgraphUrl, [sarcoId]))[0];
+    const payloadTxId = sarcophagus.arweaveTxId;
+    const arweaveFile = await fetchArweaveFile(payloadTxId, this.networkConfig, onDownloadProgress);
+    if (!arweaveFile) throw Error('Failed to download file from arweave');
+    return arweaveFile;
   }
 
   /**

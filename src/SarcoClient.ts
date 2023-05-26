@@ -8,6 +8,7 @@ import { ArchaeologistApi } from './ArchaeologistApi';
 import { bootLip2p } from './libp2p_node';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
 import { sarcoClientInitSchema, SarcoInitParams } from './helpers/validation';
+import { Utils } from './utils';
 
 /**
  * The SarcoClient class provides a high-level interface for interacting with the Sarcophagus V2 protocol.
@@ -23,6 +24,7 @@ export class SarcoClient {
 
   api!: SarcophagusApi;
   token!: Token;
+  utils!: Utils;
   archaeologist!: ArchaeologistApi;
   isInitialised: boolean = false;
 
@@ -73,6 +75,7 @@ export class SarcoClient {
 
     this.api = new SarcophagusApi(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig);
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
+    this.utils = new Utils(this.networkConfig, this.signer);
 
     this.p2pNode = await bootLip2p();
     // TODO: Allow client to choose when to start/stop libp2p node
