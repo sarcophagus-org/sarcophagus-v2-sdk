@@ -204,4 +204,12 @@ export class Utils {
 
     return getSarcophagusState(sarcoContract, gracePeriod.toNumber(), currentTimeMs);
   }
+
+  generateKeyPair() {
+    const wallet = ethers.Wallet.createRandom();
+    const publicKey = wallet.publicKey;
+    const privateKey = wallet.privateKey;
+
+    return { publicKey, privateKey };
+  }
 }

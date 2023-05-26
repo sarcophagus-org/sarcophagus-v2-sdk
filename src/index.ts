@@ -23,6 +23,7 @@ import {
 import { formatSarco } from './helpers/misc';
 import { SarcophagusDetails, SarcophagusData, SarcophagusState } from './types/sarcophagi';
 import { OnDownloadProgress } from 'types/arweave';
+import { RecoverPublicKeyErrorStatus, RecoverPublicKeyResponse } from './types/utils';
 
 export { sarco } from './singleton';
 export { SarcoClient };
@@ -39,6 +40,9 @@ export type {
 };
 export type { SarcophagusData, SarcophagusDetails };
 export type { OnDownloadProgress };
+
+export type { RecoverPublicKeyResponse };
+export { RecoverPublicKeyErrorStatus };
 
 export { ArchaeologistExceptionCode, SarcophagusValidationError, SarcophagusState };
 export { NEGOTIATION_SIGNATURE_STREAM };
