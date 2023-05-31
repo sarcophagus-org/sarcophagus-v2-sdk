@@ -3,12 +3,41 @@
   "version": "0.1.0-alpha.1",
   "main": "dist/node/index.js",
   "browser": "dist/browser/index.js",
+  "module": "dist/index.ts",
   "types": "dist/index.d.ts",
-  "typings": "dist/index.d.ts",
+  "sideEffects": false,
   "license": "UNLICENSED",
+  "exports": {
+    "./node": {
+      "import": {
+        "types": "./dist/node/index.d.ts",
+        "default": "./dist/node/index.js"
+      }
+    },
+    "./browser": {
+      "import": {
+        "types": "./dist/browser/index.d.ts",
+        "default": "./dist/browser/index.js"
+      }
+    },
+    ".": {
+      "browser": "./dist/browser/index.js",
+      "import": {
+        "types": "./dist/browser/index.d.ts",
+        "default": "./dist/browser/index.js"
+      }
+    },
+    "./*": {
+      "types": "./*.d.ts",
+      "default": "./*.js"
+    }
+  },
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "test": "jest",
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "prettier": "npx prettier --write src/**",
     "docs": "typedoc --out docs --readme README.md src"
   },
