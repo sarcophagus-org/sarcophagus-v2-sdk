@@ -1,11 +1,11 @@
 import { ethers } from 'ethers';
-import { SarcophagusApi } from '../../src/SarcophagusApi';
+import { Api } from '../../src/shared/Api';
 import { sarcoId } from './test-data';
 import { mockSafeContractCall } from './test-utils';
 
 const signer = ethers.Wallet.createRandom({});
 
-const api = new SarcophagusApi(signer.address, signer, 'subgraph/url/test');
+const api = new Api(signer.address, signer, 'subgraph/url/test');
 
 beforeEach(() => {
   mockSafeContractCall.mockClear();

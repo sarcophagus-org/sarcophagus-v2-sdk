@@ -1,13 +1,13 @@
 import Bundlr from '@bundlr-network/client/build/cjs/node/bundlr';
 import { ethers, Signer } from 'ethers';
-import { sarcoClientInitSchema, SarcoInitParams } from './helpers/validation';
+import { sarcoClientInitSchema, SarcoInitParams } from '../shared/helpers/validation';
 import { Libp2p } from 'libp2p';
-import { bootLip2p } from './libp2p_node';
-import { SarcoNetworkConfig } from './types';
-import { ArchaeologistApi } from './ArchaeologistApi';
-import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
-import { Token } from './Token';
-import { SarcophagusApi } from 'SarcophagusApi';
+import { bootLip2p } from '../shared/libp2p_node';
+import { SarcoNetworkConfig } from '../shared/types';
+import { Api } from '../shared/Api';
+import { ArchaeologistApi } from '../shared/ArchaeologistApi';
+import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from '../shared/networkConfig';
+import { Token } from '../shared/Token';
 
 export interface NodeSarcoClientConfig {
   privateKey: string;
@@ -15,7 +15,7 @@ export interface NodeSarcoClientConfig {
 }
 
 export class NodeSarcoClient {
-  api!: SarcophagusApi;
+  api!: Api;
   token!: Token;
   archaeologist!: ArchaeologistApi;
   signer: Signer;
@@ -29,6 +29,7 @@ export class NodeSarcoClient {
   private privateKey: string;
 
   constructor(config: NodeSarcoClientConfig) {
+    console.log('NodeSarcoClient constructor!!!');
     const customProvider = new ethers.providers.JsonRpcProvider(config.providerUrl);
     this.signer = new ethers.providers.Web3Provider(customProvider as any).getSigner();
     this.privateKey = config.privateKey;
@@ -55,7 +56,7 @@ export class NodeSarcoClient {
     this.networkConfig = networkConfig;
     this.etherscanApiKey = params.etherscanApiKey ?? '';
 
-    this.api = new SarcophagusApi(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig.subgraphUrl);
+    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig.subgraphUrl);
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
 
     this.p2pNode = await bootLip2p();

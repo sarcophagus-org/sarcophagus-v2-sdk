@@ -1,11 +1,11 @@
 import Bundlr from '@bundlr-network/client/build/cjs/node/bundlr';
-import { NodeSarcoClient } from '../src/NodeSarcoClient';
 import { privateKey } from './api/test-data';
 import { ethers } from 'ethers';
+import { NodeSarcoClient } from '../src/node/NodeSarcoClient';
 
 // Mocks
 jest.mock('@bundlr-network/client/build/cjs/node/bundlr');
-jest.mock('../src/Api', () => {
+jest.mock('../src/shared/Api', () => {
   // Mock class
   return {
     Api: jest.fn().mockImplementation(() => {
@@ -30,7 +30,7 @@ jest.mock('ethers', () => {
     },
   };
 });
-jest.mock('../src/Token', () => {
+jest.mock('../src/shared/Token', () => {
   // Mock class
   return {
     Token: jest.fn().mockImplementation(() => {
@@ -43,9 +43,7 @@ const BundlrMock = Bundlr as jest.Mocked<typeof Bundlr>;
 const JsonRpcProviderMock = ethers.providers.JsonRpcProvider as jest.MockedClass<
   typeof ethers.providers.JsonRpcProvider
 >;
-const Web3ProviderMock = ethers.providers.Web3Provider as jest.MockedClass<
-  typeof ethers.providers.Web3Provider
->;
+const Web3ProviderMock = ethers.providers.Web3Provider as jest.MockedClass<typeof ethers.providers.Web3Provider>;
 
 // Test setup
 describe('NodeSarcoClient', () => {
@@ -68,12 +66,9 @@ describe('NodeSarcoClient', () => {
       expect(JsonRpcProviderMock).toHaveBeenCalledWith(mockProviderUrl);
       expect(Web3ProviderMock).toHaveBeenCalledWith(mockJsonRpcProvider);
       expect(mockWeb3Provider.getSigner).toHaveBeenCalled();
-      expect(BundlrMock).toHaveBeenCalledWith(
-        'https://node1.bundlr.network',
-        'ethereum',
-        privateKey,
-        { providerUrl: mockProviderUrl }
-      );
+      expect(BundlrMock).toHaveBeenCalledWith('https://node1.bundlr.network', 'ethereum', privateKey, {
+        providerUrl: mockProviderUrl,
+      });
     });
   });
 });

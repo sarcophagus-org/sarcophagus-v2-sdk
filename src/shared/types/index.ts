@@ -1,4 +1,3 @@
-import { BigNumber, Signer, ethers } from 'ethers';
 import { ApiConfig as ArweaveConfig } from 'arweave/node/lib/api';
 
 export interface CallOptions {

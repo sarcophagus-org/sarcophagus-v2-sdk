@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { ArchaeologistSettings, SarcophagusSettings } from '../../src/helpers/validation';
+import { ArchaeologistSettings, SarcophagusSettings } from '../../src/shared/helpers/validation';
 
 export const sarcoId = 'test-id';
 export const arweaveTxId = 'test-tx-id';
