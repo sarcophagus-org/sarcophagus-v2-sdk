@@ -1,6 +1,5 @@
 import { BigNumber, ethers } from 'ethers';
-import { ArchaeologistData } from '../types/archaeologist';
-import { formatSarco } from './misc';
+import { ArchaeologistData } from 'shared';
 
 // TODO: Should these be moved to the ArchaeologistApi?
 

@@ -8,7 +8,7 @@ import {
   archaeologistSettingsArraySchema,
   sarcophagusSettingsSchema,
 } from './helpers/validation';
-import { getSarcophagusRewraps } from './helpers/subgraph';
+import { getSubgraphSarcophagusWithRewraps } from './helpers/subgraph';
 
 export class Api {
   private embalmerFacet: ethers.Contract;
@@ -67,6 +67,6 @@ export class Api {
   }
 
   async getRewrapsOnSarcophagus(sarcoId: string) {
-    const archData = await getSarcophagusRewraps(this.subgraphUrl, sarcoId);
+    const archData = await getSubgraphSarcophagusWithRewraps(this.subgraphUrl, sarcoId);
   }
 }
