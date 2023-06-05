@@ -1,4 +1,4 @@
-import { SarcoCounts, SarcophagusRewrap } from '../types/sarcophagi';
+import { SarcoCounts, SarcophagusRewrap } from 'types/sarcophagi';
 
 export interface ArchDataSubgraph {
   address: string;
@@ -157,11 +157,10 @@ export const getSubgraphSarcoCounts = async (subgraphUrl: string): Promise<Sarco
       }
     ).systemDatas[0];
 
-    
     // TODO: Remove this once the subgraph is fixed
     const uniqueActiveSarcophagusIds: string[] = [...new Set(activeSarcophagusIds)];
     const uniqueInactiveSarcophagusIds: string[] = [...new Set(inactiveSarcophagusIds)];
-    
+
     return {
       activeSarcophagi: uniqueActiveSarcophagusIds.filter(a => !uniqueInactiveSarcophagusIds.includes(a)).length,
       inactiveSarcophagi: uniqueInactiveSarcophagusIds.filter(a => !activeSarcophagusIds.includes(a)).length,
