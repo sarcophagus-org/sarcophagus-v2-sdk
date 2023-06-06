@@ -135,6 +135,16 @@ export class SarcophagusApi {
     return this.getSarcophagi(address, { ...options, filter: SarcophagusFilter.embalmer });
   }
 
+  /**
+   * Returns a list of sarcophagi for a given recipient address.
+   * @param address - The address to get sarcophagi for
+   * @param options - Options for the contract method call
+   * @returns The list of sarcophagi
+   * */
+  async getRecipientSarcophagi(address: string, options: CallOptions = {}): Promise<SarcophagusData[]> {
+    return this.getSarcophagi(address, { ...options, filter: SarcophagusFilter.recipient });
+  }
+
   async claimSarcophagus(
     sarcoId: string,
     recipientPrivateKey: string,
