@@ -53,7 +53,7 @@ export class WebSarcoClient {
     // TODO: Allow client to choose when to start/stop libp2p node
     await this.startLibp2pNode();
 
-    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig.subgraphUrl);
+    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig);
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
     this.archaeologist = new ArchaeologistApi(
       this.networkConfig.diamondDeployAddress,

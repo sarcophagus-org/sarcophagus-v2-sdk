@@ -1,4 +1,4 @@
-import { SarcoCounts, SarcophagusRewrap } from 'types/sarcophagi';
+import { PrivateKeyPublish, SarcoCounts, SarcophagusRewrap } from '../../types/sarcophagi';
 
 export interface ArchDataSubgraph {
   address: string;
@@ -18,6 +18,10 @@ export interface SarcoDataSubgraph {
   arweaveTxId: string;
   embalmer: string;
   publishes: string[];
+  threshold: string;
+  recipient: string;
+  cursedArchaeologists: string[];
+  accusalCount: string;
   resurrectionTime: string;
   previousRewrapTime: string;
   blockTimestamp: string;
@@ -89,9 +93,20 @@ const getSarcosQuery = (sarcoIds: string[]) => `query {
       embalmer
       previousRewrapTime
       publishes
+      recipient
+      threshold
+      cursedArchaeologists
+      accusalCount
       arweaveTxId
       blockTimestamp
   }
+}`;
+
+const getPrivateKeyPublishesQuery = (sarcoId: string) => `query {
+  publishPrivateKeys (where:{sarcoId: "${sarcoId}"}) {
+      privateKey
+      archaeologist
+    }
 }`;
 
 const getSarcoCountsQuery = `query {
@@ -120,6 +135,19 @@ export const getSubgraphSarcophagi = async (subgraphUrl: string, sarcoIds: strin
     };
 
     return sarcophagusDatas;
+  } catch (e) {
+    console.error(e);
+    throw new Error('Failed to get sarcophagi from subgraph');
+  }
+};
+
+export const getPrivateKeyPublishes = async (subgraphUrl: string, sarcoId: string): Promise<PrivateKeyPublish[]> => {
+  try {
+    const { publishPrivateKeys } = (await queryGraphQl(subgraphUrl, getPrivateKeyPublishesQuery(sarcoId))) as {
+      publishPrivateKeys: PrivateKeyPublish[];
+    };
+
+    return publishPrivateKeys;
   } catch (e) {
     console.error(e);
     throw new Error('Failed to get sarcophagi from subgraph');
