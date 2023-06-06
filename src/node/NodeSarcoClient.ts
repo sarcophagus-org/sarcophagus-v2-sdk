@@ -8,6 +8,7 @@ import { SarcophagusApi } from '../shared/SarcophagusApi';
 import { ArchaeologistApi } from '../shared/ArchaeologistApi';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from '../shared/networkConfig';
 import { Token } from '../shared/Token';
+import { Utils } from 'shared/Utils';
 
 export interface NodeSarcoClientConfig {
   privateKey: string;
@@ -21,6 +22,7 @@ export class NodeSarcoClient {
   signer: Signer;
   bundlr!: Bundlr;
   isInitialised: boolean = false;
+  utils!: Utils;
 
   private providerUrl!: string;
   private etherscanApiKey: string = '';
@@ -55,7 +57,7 @@ export class NodeSarcoClient {
 
     this.networkConfig = networkConfig;
     this.etherscanApiKey = params.etherscanApiKey ?? '';
-
+    this.utils = new Utils(networkConfig, this.signer);
     this.api = new SarcophagusApi(
       this.networkConfig.diamondDeployAddress,
       this.signer,
@@ -72,7 +74,8 @@ export class NodeSarcoClient {
       this.networkConfig.diamondDeployAddress,
       this.signer,
       this.networkConfig.subgraphUrl,
-      this.p2pNode
+      this.p2pNode,
+      this.utils
     );
 
     this.isInitialised = true;

@@ -14,7 +14,7 @@ export class WebSarcoClient {
   public token!: Token;
   private _bundlr!: SarcoWebBundlr;
   public archaeologist!: ArchaeologistApi;
-  public utils: Utils;
+  public utils!: Utils;
   public isInitialised: boolean = false;
 
   private signer: Signer;
@@ -29,7 +29,6 @@ export class WebSarcoClient {
 
     this.provider = window.ethereum;
     this.signer = new ethers.providers.Web3Provider(this.provider as any).getSigner();
-    this.utils = new Utils();
   }
 
   async init(initParams: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<void> {
@@ -62,6 +61,7 @@ export class WebSarcoClient {
         providerUrl: networkConfig.bundlr.providerUrl,
       }
     );
+    this.utils = new Utils(networkConfig, this.signer);
     this.api = new SarcophagusApi(
       this.networkConfig.diamondDeployAddress,
       this.signer,
@@ -73,7 +73,8 @@ export class WebSarcoClient {
       this.networkConfig.diamondDeployAddress,
       this.signer,
       this.networkConfig.subgraphUrl,
-      this.p2pNode
+      this.p2pNode,
+      this.utils
     );
 
     this.isInitialised = true;

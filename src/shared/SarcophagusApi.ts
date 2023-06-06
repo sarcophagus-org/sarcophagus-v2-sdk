@@ -58,7 +58,7 @@ export class SarcophagusApi {
     this.signer = signer;
     this.networkConfig = networkConfig;
     this.bundlr = bundlr;
-    this.utils = new Utils();
+    this.utils = new Utils(networkConfig, signer);
   }
 
   /**

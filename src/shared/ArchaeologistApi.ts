@@ -29,12 +29,12 @@ export class ArchaeologistApi {
   private signer: ethers.Signer;
   private utils: Utils;
 
-  constructor(diamondDeployAddress: string, signer: ethers.Signer, subgraphUrl: string, p2pNode: Libp2p) {
+  constructor(diamondDeployAddress: string, signer: ethers.Signer, subgraphUrl: string, p2pNode: Libp2p, utils: Utils) {
     this.subgraphUrl = subgraphUrl;
     this.viewStateFacet = new ethers.Contract(diamondDeployAddress, ViewStateFacet__factory.abi, signer);
     this.p2pNode = p2pNode;
     this.signer = signer;
-    this.utils = new Utils();
+    this.utils = utils;
   }
 
   private getDialAddress(arch: ArchaeologistData): Multiaddr {
