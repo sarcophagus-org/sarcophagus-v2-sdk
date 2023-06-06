@@ -20,9 +20,9 @@ import {
   SarcophagusDetails,
   SarcophagusFilter,
   SarcophagusResponseContract,
-} from '../types/sarcophagi';
+} from './types/sarcophagi';
 import { Utils } from './Utils';
-import { ArweaveResponse, OnDownloadProgress } from '../types/arweave';
+import { ArweaveResponse, OnDownloadProgress } from './types/arweave';
 import { fetchArweaveFile } from './helpers/arweaveUtil';
 import { decrypt } from './helpers/encryption';
 import { arrayify } from 'ethers/lib/utils';

@@ -1,7 +1,7 @@
 import Arweave from 'arweave';
 import { SarcoNetworkConfig } from '../types';
 import { ApiConfig } from 'arweave/node/lib/api';
-import { ArweaveResponse, OnDownloadProgress } from '../../types/arweave';
+import { ArweaveResponse, OnDownloadProgress } from '../types/arweave';
 
 let arweave: Arweave;
 

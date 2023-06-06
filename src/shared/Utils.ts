@@ -1,7 +1,7 @@
 import { BigNumber, ethers } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
 import moment from 'moment';
-import { SarcophagusData, SarcophagusResponseContract, SarcophagusState } from '../types/sarcophagi';
+import { SarcophagusData, SarcophagusResponseContract, SarcophagusState } from './types/sarcophagi';
 
 export class Utils {
   formatSarco(valueInWei: string | number, precision: number = 2): string {

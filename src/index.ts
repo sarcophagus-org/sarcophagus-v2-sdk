@@ -7,4 +7,6 @@ export type {
   SarcophagusArchaeologist,
   ArchaeologistException,
 } from './shared/types/archaeologist';
+export type { SarcophagusData, SarcophagusDetails } from './shared/types/sarcophagi';
+export { SarcophagusState } from './shared/types/sarcophagi';
 export type { SarcoNetworkConfig } from './shared/types/index';

@@ -28,3 +28,6 @@ export type {
 export { ArchaeologistExceptionCode, SarcophagusValidationError };
 export { NEGOTIATION_SIGNATURE_STREAM };
 export { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig };
+
+export type { SarcophagusData, SarcophagusDetails } from './types/sarcophagi';
+export { SarcophagusState } from './types/sarcophagi';

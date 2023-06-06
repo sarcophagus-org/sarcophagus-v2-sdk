@@ -1,4 +1,4 @@
-import { PrivateKeyPublish, SarcoCounts, SarcophagusRewrap } from '../../types/sarcophagi';
+import { PrivateKeyPublish, SarcoCounts, SarcophagusRewrap } from '../types/sarcophagi';
 
 export interface ArchDataSubgraph {
   address: string;
