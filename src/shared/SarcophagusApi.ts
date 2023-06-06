@@ -23,10 +23,19 @@ import {
 } from './types/sarcophagi';
 import { Utils } from './Utils';
 import { ArweaveResponse, OnDownloadProgress } from './types/arweave';
-import { fetchArweaveFile } from './helpers/arweaveUtil';
-import { decrypt } from './helpers/encryption';
+import { arweaveDataDelimiter, fetchArweaveFile, readFileDataAsBase64 } from './helpers/arweaveUtil';
+import { decrypt, encrypt } from './helpers/encryption';
 import { arrayify } from 'ethers/lib/utils';
-import { combine } from 'shamirs-secret-sharing-ts';
+import { combine, split } from 'shamirs-secret-sharing-ts';
+import {
+  chunkedUploaderFileSize,
+  encryptMetadataFields,
+  encryptShardsWithArchaeologistPublicKeys,
+  encryptShardsWithRecipientPublicKey,
+} from './helpers/sarco';
+import { SarcoWebBundlr } from 'browser/SarcoWebBundlr';
+import Bundlr from '@bundlr-network/client/build/cjs/common/bundlr';
+import { ChunkingUploader } from '@bundlr-network/client/build/cjs/common/chunkingUploader';
 
 export class SarcophagusApi {
   private embalmerFacet: ethers.Contract;
@@ -35,13 +44,20 @@ export class SarcophagusApi {
   private signer: ethers.Signer;
   private utils: Utils;
   private networkConfig: SarcoNetworkConfig;
+  private bundlr: SarcoWebBundlr | Bundlr;
 
-  constructor(diamondDeployAddress: string, signer: ethers.Signer, networkConfig: SarcoNetworkConfig) {
+  constructor(
+    diamondDeployAddress: string,
+    signer: ethers.Signer,
+    networkConfig: SarcoNetworkConfig,
+    bundlr: SarcoWebBundlr | Bundlr
+  ) {
     this.embalmerFacet = new ethers.Contract(diamondDeployAddress, EmbalmerFacet__factory.abi, signer);
     this.viewStateFacet = new ethers.Contract(diamondDeployAddress, ViewStateFacet__factory.abi, signer);
     this.subgraphUrl = networkConfig.subgraphUrl;
     this.signer = signer;
     this.networkConfig = networkConfig;
+    this.bundlr = bundlr;
     this.utils = new Utils();
   }
 
@@ -229,6 +245,137 @@ export class SarcophagusApi {
     } catch (error) {
       console.error(`Error resurrecting sarcophagus: ${error}`);
       throw new Error('Could not claim Sarcophagus. Please make sure you have the right private key.');
+    }
+  }
+
+  async uploadFileToArweave(args: {
+    file: File;
+    onStep: Function;
+    payloadPublicKey: string;
+    payloadPrivateKey: string;
+    recipientPublicKey: string;
+    shares: number;
+    threshold: number;
+    archaeologistPublicKeys: Map<string, string>;
+    onUploadChunk: (chunkedUploader: ChunkingUploader, chunkedUploadProgress: number) => void;
+    onUploadChunkError: (msg: string) => void;
+    onUploadComplete: (uploadId: string) => void;
+  }): Promise<void> {
+    try {
+      const {
+        onStep,
+        file,
+        payloadPublicKey,
+        shares,
+        threshold,
+        payloadPrivateKey,
+        recipientPublicKey,
+        archaeologistPublicKeys,
+        onUploadChunk,
+        onUploadChunkError,
+        onUploadComplete,
+      } = args;
+      onStep('Reading file...');
+      const payload: { type: string; data: Buffer } = await readFileDataAsBase64(file!);
+
+      /**
+       * File upload data
+       */
+      // Step 1: Encrypt the payload with the generated keypair
+      onStep('Encrypting...');
+      const encryptedPayload = await encrypt(payloadPublicKey!, payload.data);
+
+      /**
+       * Double encrypted keyshares upload data
+       */
+      // Step 1: Split the outer layer private key using shamirs secret sharing
+      const keyShares: Uint8Array[] = split(payloadPrivateKey, {
+        shares,
+        threshold,
+      });
+
+      // Step 2: Encrypt each shard with the recipient public key
+      const keySharesEncryptedInner = await encryptShardsWithRecipientPublicKey(recipientPublicKey, keyShares);
+
+      // Step 3: Encrypt each shard again with the arch public keys
+      const keySharesEncryptedOuter = await encryptShardsWithArchaeologistPublicKeys(
+        Array.from(archaeologistPublicKeys.values()),
+        keySharesEncryptedInner
+      );
+
+      /**
+       * Format data for upload
+       */
+      const doubleEncryptedKeyShares: Record<string, string> = keySharesEncryptedOuter.reduce(
+        (acc, keyShare) => ({
+          ...acc,
+          [keyShare.publicKey]: keyShare.encryptedShard,
+        }),
+        {}
+      );
+
+      // Upload file data + keyshares data to arweave
+      const encKeysBuffer = Buffer.from(JSON.stringify(doubleEncryptedKeyShares), 'binary');
+
+      const encryptedMetadata = await encryptMetadataFields(recipientPublicKey, {
+        fileName: file!.name,
+        type: payload.type,
+      });
+
+      const metadataBuffer = Buffer.from(JSON.stringify(encryptedMetadata), 'binary');
+
+      // <meta_buf_size><delimiter><keyshare_buf_size><delimiter><metatadata><keyshares><payload>
+
+      const arweavePayload = Buffer.concat([
+        Buffer.from(metadataBuffer.length.toString(), 'binary'),
+        arweaveDataDelimiter,
+        Buffer.from(encKeysBuffer.length.toString()),
+        arweaveDataDelimiter,
+        metadataBuffer,
+        encKeysBuffer,
+        encryptedPayload,
+      ]);
+
+      onStep(`Uploading to Arweave...`);
+
+      // SET UP UPLOAD EVENT LISTENERS
+      const chunkedUploader = this.bundlr.uploader.chunkedUploader;
+
+      chunkedUploader.setChunkSize(chunkedUploaderFileSize);
+
+      chunkedUploader?.on('chunkUpload', chunkInfo => {
+        const chunkedUploadProgress = chunkInfo.totalUploaded / arweavePayload.length;
+        onUploadChunk(chunkedUploader, chunkedUploadProgress);
+      });
+
+      chunkedUploader?.on('chunkError', e => {
+        const errorMsg = `Error uploading chunk number ${e.id} - ${e.res.statusText}`;
+        onUploadChunkError(errorMsg);
+      });
+
+      chunkedUploader?.on('done', finishRes => {
+        const uploadId = JSON.stringify(finishRes.data?.id ?? finishRes.id);
+        console.log(`Upload completed with ID ${uploadId}`);
+      });
+
+      const uploadPromise = chunkedUploader
+        .uploadData(arweavePayload)
+        .then(res => {
+          if (!res) {
+            throw new Error('Error uploading file payload to Bundlr');
+          }
+
+          onUploadComplete(res.data.id);
+        })
+        .catch(err => {
+          console.log('err', err);
+          throw new Error(err);
+        });
+
+      return uploadPromise;
+    } catch (error: any) {
+      console.log(error);
+      throw new Error(error.message || 'Error uploading file payload to Bundlr');
     }
   }
 

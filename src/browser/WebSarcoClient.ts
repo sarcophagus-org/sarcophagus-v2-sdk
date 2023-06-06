@@ -53,18 +53,23 @@ export class WebSarcoClient {
     // TODO: Allow client to choose when to start/stop libp2p node
     await this.startLibp2pNode();
 
-    this.api = new SarcophagusApi(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig);
+    this.bundlr = new SarcoWebBundlr(
+      this.networkConfig.bundlr.nodeUrl,
+      this.networkConfig.bundlr.currencyName,
+      this.provider
+    );
+    this.api = new SarcophagusApi(
+      this.networkConfig.diamondDeployAddress,
+      this.signer,
+      this.networkConfig,
+      this.bundlr
+    );
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
     this.archaeologist = new ArchaeologistApi(
       this.networkConfig.diamondDeployAddress,
       this.signer,
       this.networkConfig.subgraphUrl,
       this.p2pNode
-    );
-    this.bundlr = new SarcoWebBundlr(
-      this.networkConfig.bundlr.nodeUrl,
-      this.networkConfig.bundlr.currencyName,
-      this.provider
     );
 
     this.isInitialised = true;
