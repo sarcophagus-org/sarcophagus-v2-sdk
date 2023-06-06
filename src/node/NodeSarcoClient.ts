@@ -56,7 +56,7 @@ export class NodeSarcoClient {
     this.networkConfig = networkConfig;
     this.etherscanApiKey = params.etherscanApiKey ?? '';
 
-    this.api = new SarcophagusApi(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig.subgraphUrl);
+    this.api = new SarcophagusApi(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig);
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
 
     this.p2pNode = await bootLip2p();
