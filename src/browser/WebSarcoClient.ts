@@ -12,7 +12,7 @@ import { goerliNetworkConfig, mainnetNetworkConfig, SarcoNetworkConfig, sepoliaN
 export class WebSarcoClient {
   public api!: SarcophagusApi;
   public token!: Token;
-  public bundlr!: SarcoWebBundlr;
+  private _bundlr!: SarcoWebBundlr;
   public archaeologist!: ArchaeologistApi;
   public utils: Utils;
   public isInitialised: boolean = false;
@@ -53,16 +53,20 @@ export class WebSarcoClient {
     // TODO: Allow client to choose when to start/stop libp2p node
     await this.startLibp2pNode();
 
-    this.bundlr = new SarcoWebBundlr(
+    this._bundlr = new SarcoWebBundlr(
       this.networkConfig.bundlr.nodeUrl,
       this.networkConfig.bundlr.currencyName,
-      this.provider
+      new ethers.providers.Web3Provider(this.provider as any),
+      {
+        timeout: 100000,
+        providerUrl: networkConfig.bundlr.providerUrl,
+      }
     );
     this.api = new SarcophagusApi(
       this.networkConfig.diamondDeployAddress,
       this.signer,
       this.networkConfig,
-      this.bundlr
+      this._bundlr
     );
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
     this.archaeologist = new ArchaeologistApi(
@@ -84,4 +88,15 @@ export class WebSarcoClient {
   async stopLibp2pNode() {
     return this.p2pNode.stop();
   }
+
+  
+  // TODO: Replicate this pattern for all other properties that should only be accessed after initialisation
+  public get bundlr() : SarcoWebBundlr {
+    if (!this.isInitialised) {
+      throw new Error('WebSarcoClient is not initialised');
+    }
+
+    return this._bundlr;
+  }
+  
 }
