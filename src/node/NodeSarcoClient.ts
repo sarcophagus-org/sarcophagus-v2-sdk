@@ -29,7 +29,6 @@ export class NodeSarcoClient {
   private privateKey: string;
 
   constructor(config: NodeSarcoClientConfig) {
-    console.log('NodeSarcoClient constructor!!!');
     const customProvider = new ethers.providers.JsonRpcProvider(config.providerUrl);
     this.signer = new ethers.providers.Web3Provider(customProvider as any).getSigner();
     this.privateKey = config.privateKey;
