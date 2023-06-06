@@ -21,22 +21,28 @@ export class SarcoWebBundlr extends WebBundlr {
    * Injects a public key into the current bundlr instance
    * @param publicKey - The public key to inject
    */
-  injectPublicKey(publicKey: string): void {
+  injectPublicKey(publicKey: Buffer): void {
     // Get the address from the public key
-    const address = computeAddress(publicKey);
-
-    // Get the web3 provider in order to create an injected signer
-    const web3Provider = new ethers.providers.Web3Provider(this.provider as any);
-
-    const injectedSigner = new InjectedEthereumSigner(web3Provider);
-    injectedSigner.publicKey = Buffer.from(ethers.utils.arrayify(publicKey));
-
+    const _publicKey = Buffer.from(new Uint8Array(publicKey));
+    console.log('1 computeAddress fails here');
+    const address = computeAddress(_publicKey);
+    console.log('2');
+    const injectedSigner = new InjectedEthereumSigner(this.provider);
+    console.log('3');
+    injectedSigner.publicKey = _publicKey;
+    console.log('4');
+    
     // Inject required properties into the WebBundlr instance
     this.address = address.toLowerCase();
-    (this.currencyConfig as any)._address = address?.toLowerCase();
+    console.log('5');
+    (this.currencyConfig as any)._address = address.toLowerCase();
+    console.log('6');
     (this.currencyConfig as any).signer = injectedSigner;
-    (this.currencyConfig as any).providerInstance = web3Provider;
-    (this.currencyConfig as any).w3signer = web3Provider.getSigner();
+    console.log('7');
+    (this.currencyConfig as any).providerInstance = this.provider;
+    console.log('8');
+    (this.currencyConfig as any).w3signer = this.provider.getSigner();
+    console.log('9');
   }
 
   /**
@@ -49,7 +55,17 @@ export class SarcoWebBundlr extends WebBundlr {
     // Get the public key that was obtained from the signature and return it
     // The public key can be saved and injected into the client on future page loads
     const publicKey = this.currencyConfig.getSigner().publicKey;
+    console.log('publicKey', publicKey);
     this.isConnected = true;
-    return ethers.utils.hexlify(publicKey);
+    return JSON.parse(JSON.stringify(publicKey)).data;
+  }
+
+  disconnect() {
+    this.address = undefined;
+    (this.currencyConfig as any)._address = undefined;
+    (this.currencyConfig as any).signer = undefined;
+    (this.currencyConfig as any).providerInstance = undefined;
+    (this.currencyConfig as any).w3signer = undefined;
+    this.isConnected = false;
   }
 }
