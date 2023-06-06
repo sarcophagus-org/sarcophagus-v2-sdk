@@ -90,14 +90,12 @@ export class WebSarcoClient {
     return this.p2pNode.stop();
   }
 
-  
   // TODO: Replicate this pattern for all other properties that should only be accessed after initialisation
-  public get bundlr() : SarcoWebBundlr {
+  public get bundlr(): SarcoWebBundlr {
     if (!this.isInitialised) {
       throw new Error('WebSarcoClient is not initialised');
     }
 
     return this._bundlr;
   }
-  
 }

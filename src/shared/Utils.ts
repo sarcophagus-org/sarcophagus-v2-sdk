@@ -12,18 +12,14 @@ import { ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contrac
 export class Utils {
   private networkConfig: SarcoNetworkConfig;
   private signer: ethers.Signer;
-  private viewStateFacet:  ethers.Contract;
+  private viewStateFacet: ethers.Contract;
 
-  constructor(
-    networkConfig: SarcoNetworkConfig,
-    signer: ethers.Signer,
-  ) {
+  constructor(networkConfig: SarcoNetworkConfig, signer: ethers.Signer) {
     this.viewStateFacet = new ethers.Contract(networkConfig.diamondDeployAddress, ViewStateFacet__factory.abi, signer);
     this.signer = signer;
     this.networkConfig = networkConfig;
   }
 
-  
   formatSarco(valueInWei: string | number, precision: number = 2): string {
     const value = formatEther(valueInWei.toString());
     const numericValue: number = Number(value);
@@ -295,6 +291,6 @@ export class Utils {
   }
 
   private wait(ms: number) {
-   return new Promise(res => setTimeout(res, ms))
+    return new Promise(res => setTimeout(res, ms));
   }
 }

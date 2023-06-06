@@ -1,5 +1,5 @@
 export { WebSarcoClient } from './browser/WebSarcoClient';
-export { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './shared/networkConfig';
+export * from './shared';
 export { sarco } from './browser/index';
 export type {
   ArchaeologistData,

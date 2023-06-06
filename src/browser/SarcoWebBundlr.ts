@@ -31,7 +31,7 @@ export class SarcoWebBundlr extends WebBundlr {
     console.log('3');
     injectedSigner.publicKey = _publicKey;
     console.log('4');
-    
+
     // Inject required properties into the WebBundlr instance
     this.address = address.toLowerCase();
     console.log('5');
