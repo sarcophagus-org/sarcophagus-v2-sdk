@@ -37,6 +37,10 @@ export class ArchaeologistApi {
     this.utils = new Utils();
   }
 
+  public setLibp2pNode(p2pNode: Libp2p): void {
+    this.p2pNode = p2pNode;
+  }
+
   private getDialAddress(arch: ArchaeologistData): Multiaddr {
     // If peerIdParsed has 2 elements, it has a domain and peerId <domain>:<peerId>
     // Otherwise it is just <peerId>

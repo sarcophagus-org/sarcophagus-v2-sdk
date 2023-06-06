@@ -43,12 +43,13 @@ export class WebSarcoClient {
     this.bundlr = new SarcoWebBundlr(bundlrNodeUrl, bundlrCurrencyName, this.provider);
   }
 
-  async init(initParams: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<void> {
+  async init(): Promise<void> {
     this.p2pNode = await bootLip2p();
+    this.archaeologist.setLibp2pNode(this.p2pNode);
     // TODO: Allow client to choose when to start/stop libp2p node
     await this.startLibp2pNode();
     this.isInitialised = true;
-    onInit(this.p2pNode);
+    // onInit(this.p2pNode);
   }
 
   async startLibp2pNode() {
