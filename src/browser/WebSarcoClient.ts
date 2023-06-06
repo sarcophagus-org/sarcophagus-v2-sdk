@@ -7,7 +7,7 @@ import { Token } from '../shared/Token';
 import { Utils } from '../shared/Utils';
 import { ArchaeologistApi } from '../shared/ArchaeologistApi';
 import { sarcoClientInitSchema, SarcoInitParams } from '../shared/helpers/validation';
-import { goerliNetworkConfig, mainnetNetworkConfig, SarcoNetworkConfig, sepoliaNetworkConfig } from 'shared';
+import { goerliNetworkConfig, mainnetNetworkConfig, SarcoNetworkConfig, sepoliaNetworkConfig } from '../shared';
 
 export class WebSarcoClient {
   public api!: Api;
