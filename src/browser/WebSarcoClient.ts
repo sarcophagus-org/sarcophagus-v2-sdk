@@ -1,4 +1,4 @@
-import { Api } from '../shared/Api';
+import { SarcophagusApi } from '../shared/SarcophagusApi';
 import { bootLip2p } from '../shared/libp2p_node';
 import { Libp2p } from 'libp2p';
 import { ethers, Signer } from 'ethers';
@@ -10,7 +10,7 @@ import { sarcoClientInitSchema, SarcoInitParams } from '../shared/helpers/valida
 import { goerliNetworkConfig, mainnetNetworkConfig, SarcoNetworkConfig, sepoliaNetworkConfig } from '../shared';
 
 export class WebSarcoClient {
-  public api!: Api;
+  public api!: SarcophagusApi;
   public token!: Token;
   public bundlr!: SarcoWebBundlr;
   public archaeologist!: ArchaeologistApi;
@@ -53,7 +53,7 @@ export class WebSarcoClient {
     // TODO: Allow client to choose when to start/stop libp2p node
     await this.startLibp2pNode();
 
-    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig);
+    this.api = new SarcophagusApi(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig);
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
     this.archaeologist = new ArchaeologistApi(
       this.networkConfig.diamondDeployAddress,

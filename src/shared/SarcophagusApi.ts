@@ -28,7 +28,7 @@ import { decrypt } from './helpers/encryption';
 import { arrayify } from 'ethers/lib/utils';
 import { combine } from 'shamirs-secret-sharing-ts';
 
-export class Api {
+export class SarcophagusApi {
   private embalmerFacet: ethers.Contract;
   private subgraphUrl: string;
   private viewStateFacet: ethers.Contract;
