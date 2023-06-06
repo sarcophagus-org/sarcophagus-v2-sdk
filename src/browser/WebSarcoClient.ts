@@ -6,50 +6,69 @@ import { SarcoWebBundlr } from './SarcoWebBundlr';
 import { Token } from '../shared/Token';
 import { Utils } from '../shared/Utils';
 import { ArchaeologistApi } from '../shared/ArchaeologistApi';
-import { SarcoInitParams } from '../shared/helpers/validation';
-
-// Temporary
-// TODO: move this
-const goerliDiamondAddress = '0x6B84f17bbfCe26776fEFDf5cF039cA0E66C46Caf';
-const goerliSarcoAddress = '0x4633b43990b41B57b3678c6F3Ac35bA75C3D8436';
-const subgraphUrl = 'https://api.studio.thegraph.com/query/44302/sarcotest2/18';
-const bundlrNodeUrl = 'https://node1.bundlr.network';
-const bundlrCurrencyName = 'ethereum';
+import { sarcoClientInitSchema, SarcoInitParams } from '../shared/helpers/validation';
+import { goerliNetworkConfig, mainnetNetworkConfig, SarcoNetworkConfig, sepoliaNetworkConfig } from 'shared';
 
 export class WebSarcoClient {
-  public api: Api;
-  public token: Token;
-  public bundlr: SarcoWebBundlr;
+  public api!: Api;
+  public token!: Token;
+  public bundlr!: SarcoWebBundlr;
+  public archaeologist!: ArchaeologistApi;
   public utils: Utils;
-  public archaeologist: ArchaeologistApi;
   public isInitialised: boolean = false;
 
   private signer: Signer;
+  private networkConfig!: SarcoNetworkConfig;
   private provider: ethers.providers.Provider;
-  private p2pNode: Libp2p;
+  private p2pNode!: Libp2p;
 
   constructor() {
     if (!window.ethereum) {
       throw new Error('WebSarcoClient requires window.ethereum to be defined');
     }
+
     this.provider = window.ethereum;
     this.signer = new ethers.providers.Web3Provider(this.provider as any).getSigner();
-    this.p2pNode = {} as Libp2p;
-
-    this.api = new Api(goerliDiamondAddress, this.signer, subgraphUrl);
-    this.token = new Token(goerliSarcoAddress, goerliDiamondAddress, this.signer);
-    this.archaeologist = new ArchaeologistApi(goerliDiamondAddress, this.signer, subgraphUrl, this.p2pNode);
     this.utils = new Utils();
-    this.bundlr = new SarcoWebBundlr(bundlrNodeUrl, bundlrCurrencyName, this.provider);
   }
 
-  async init(): Promise<void> {
+  async init(initParams: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<void> {
+    const params = await sarcoClientInitSchema.validate(initParams);
+
+    const providerUrl = new ethers.providers.Web3Provider(this.provider as any).connection.url;
+
+    const networkConfigByChainId = new Map<number, SarcoNetworkConfig>([
+      [1, mainnetNetworkConfig(providerUrl, initParams.etherscanApiKey)],
+      [5, goerliNetworkConfig(providerUrl, initParams.etherscanApiKey)],
+      [11155111, sepoliaNetworkConfig(providerUrl, initParams.etherscanApiKey)],
+    ]);
+
+    const networkConfig = networkConfigByChainId.get(params.chainId);
+    if (!networkConfig) {
+      throw new Error(`Unsupported chainId: ${params.chainId}`);
+    }
+    this.networkConfig = networkConfig;
+
     this.p2pNode = await bootLip2p();
-    this.archaeologist.setLibp2pNode(this.p2pNode);
     // TODO: Allow client to choose when to start/stop libp2p node
     await this.startLibp2pNode();
+
+    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig.subgraphUrl);
+    this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
+    this.archaeologist = new ArchaeologistApi(
+      this.networkConfig.diamondDeployAddress,
+      this.signer,
+      this.networkConfig.subgraphUrl,
+      this.p2pNode
+    );
+    this.bundlr = new SarcoWebBundlr(
+      this.networkConfig.bundlr.nodeUrl,
+      this.networkConfig.bundlr.currencyName,
+      this.provider
+    );
+
     this.isInitialised = true;
-    // onInit(this.p2pNode);
+    onInit(this.p2pNode);
   }
 
   async startLibp2pNode() {

@@ -29,10 +29,10 @@ export class NodeSarcoClient {
   private privateKey: string;
 
   constructor(config: NodeSarcoClientConfig) {
-    console.log('NodeSarcoClient constructor!!!');
     const customProvider = new ethers.providers.JsonRpcProvider(config.providerUrl);
     this.signer = new ethers.providers.Web3Provider(customProvider as any).getSigner();
     this.privateKey = config.privateKey;
+    this.providerUrl = config.providerUrl;
   }
 
   async init(initParams: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<void> {
