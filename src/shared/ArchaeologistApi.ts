@@ -391,6 +391,29 @@ export class ArchaeologistApi {
   }
 
   /**
+   * Returns the smallest maximumResurrectionTime and maximumRewrapInterval values
+   * from the profiles of the archaeologists provided
+   */
+  getLowestResurrectionTimeAndRewrapInterval(archaeologists: ArchaeologistData[]) {
+    let lowestRewrapInterval = Number(archaeologists[0].profile.maximumRewrapInterval);
+    let lowestResurrectiontime = Number(archaeologists[0].profile.maximumResurrectionTime);
+
+    archaeologists.slice(1).forEach(arch => {
+      const resTime = Number(arch.profile.maximumResurrectionTime);
+      const rewrapInterval = Number(arch.profile.maximumRewrapInterval);
+      if (resTime < lowestResurrectiontime) {
+        lowestResurrectiontime = resTime;
+      }
+
+      if (rewrapInterval < lowestRewrapInterval) {
+        lowestRewrapInterval = rewrapInterval;
+      }
+    });
+
+    return { lowestRewrapInterval, lowestResurrectiontime };
+  }
+
+  /**
    * Returns the smallest maximumResurrectionTime value
    * from the profiles of the archaeologists provided
    */
