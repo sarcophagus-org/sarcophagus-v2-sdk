@@ -24,25 +24,16 @@ export class SarcoWebBundlr extends WebBundlr {
   injectPublicKey(publicKey: Buffer): void {
     // Get the address from the public key
     const _publicKey = Buffer.from(new Uint8Array(publicKey));
-    console.log('1 computeAddress fails here');
     const address = computeAddress(_publicKey);
-    console.log('2');
     const injectedSigner = new InjectedEthereumSigner(this.provider);
-    console.log('3');
     injectedSigner.publicKey = _publicKey;
-    console.log('4');
 
     // Inject required properties into the WebBundlr instance
     this.address = address.toLowerCase();
-    console.log('5');
     (this.currencyConfig as any)._address = address.toLowerCase();
-    console.log('6');
     (this.currencyConfig as any).signer = injectedSigner;
-    console.log('7');
     (this.currencyConfig as any).providerInstance = this.provider;
-    console.log('8');
     (this.currencyConfig as any).w3signer = this.provider.getSigner();
-    console.log('9');
   }
 
   /**
@@ -55,7 +46,6 @@ export class SarcoWebBundlr extends WebBundlr {
     // Get the public key that was obtained from the signature and return it
     // The public key can be saved and injected into the client on future page loads
     const publicKey = this.currencyConfig.getSigner().publicKey;
-    console.log('publicKey', publicKey);
     this.isConnected = true;
     return JSON.parse(JSON.stringify(publicKey)).data;
   }
