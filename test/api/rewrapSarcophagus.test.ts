@@ -5,7 +5,7 @@ import { Api } from '../../src/shared/Api';
 import { SarcoNetworkConfig } from '../../src/shared/types';
 import { SarcoWebBundlr } from '../../src/browser/SarcoWebBundlr';
 
-jest.mock('ethers');
+jest.spyOn(ethers, 'Contract').mockImplementation();
 jest.mock('@sarcophagus-org/sarcophagus-v2-contracts');
 jest.mock('../../src/browser/SarcoWebBundlr');
 
