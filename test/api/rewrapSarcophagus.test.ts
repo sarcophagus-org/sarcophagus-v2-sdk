@@ -1,21 +1,22 @@
 import { ethers } from 'ethers';
-import { Api } from '../../src/shared/Api';
 import { sarcoId } from './test-data';
 import { mockSafeContractCall } from './test-utils';
+import { Api } from '../../src/shared/Api';
+import { SarcoNetworkConfig } from '../../src/shared/types';
+import { SarcoWebBundlr } from '../../src/browser/SarcoWebBundlr';
+
+jest.mock('ethers');
+jest.mock('@sarcophagus-org/sarcophagus-v2-contracts');
+jest.mock('../../src/browser/SarcoWebBundlr');
 
 const signer = ethers.Wallet.createRandom({});
-
-const api = new Api(signer.address, signer, 'subgraph/url/test');
+const api = new Api('0x0', signer, {} as SarcoNetworkConfig, {} as SarcoWebBundlr);
 
 beforeEach(() => {
-  mockSafeContractCall.mockClear();
+  jest.clearAllMocks();
 });
 
 describe('rewrapSarcophagus', () => {
-  beforeEach(() => {
-    mockSafeContractCall.mockClear();
-  });
-
   test('should call safeContractCall with the correct arguments', async () => {
     const mockTransactionResponse = { hash: '0x123' } as ethers.providers.TransactionResponse;
     mockSafeContractCall.mockImplementation(() => Promise.resolve(mockTransactionResponse));

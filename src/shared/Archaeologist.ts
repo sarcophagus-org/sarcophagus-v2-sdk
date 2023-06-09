@@ -22,7 +22,7 @@ import {
  * The ArchaeologistApi class provides a high-level interface for interacting with
  * archaeologists on the Sarcophagus V2 protocol.
  */
-export class ArchaeologistApi {
+export class Archaeologist {
   private viewStateFacet: ethers.Contract;
   private subgraphUrl: string;
   private p2pNode: Libp2p;

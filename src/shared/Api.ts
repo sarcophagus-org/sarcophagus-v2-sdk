@@ -33,11 +33,11 @@ import {
   encryptShardsWithArchaeologistPublicKeys,
   encryptShardsWithRecipientPublicKey,
 } from './helpers/sarco';
-import { SarcoWebBundlr } from 'browser/SarcoWebBundlr';
+import { SarcoWebBundlr } from '../browser/SarcoWebBundlr';
 import Bundlr from '@bundlr-network/client/build/cjs/common/bundlr';
 import { ChunkingUploader } from '@bundlr-network/client/build/cjs/common/chunkingUploader';
 
-export class SarcophagusApi {
+export class Api {
   private embalmerFacet: ethers.Contract;
   private subgraphUrl: string;
   private viewStateFacet: ethers.Contract;

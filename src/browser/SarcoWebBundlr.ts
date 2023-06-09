@@ -17,6 +17,7 @@ export class SarcoWebBundlr extends WebBundlr {
     this.provider = provider;
   }
 
+  // TODO: Finish implementation of injectPublicKey function
   /**
    * Injects a public key into the current bundlr instance
    * @param publicKey - The public key to inject

@@ -18,7 +18,7 @@ jest.mock('../src/shared/Api', () => {
     }),
   };
 });
-jest.mock('../src/shared/ArchaeologistApi', () => {
+jest.mock('../src/shared/Archaeologist', () => {
   // Mock class
   return {
     ArchaeologistApi: jest.fn(),

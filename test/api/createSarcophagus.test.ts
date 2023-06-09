@@ -5,10 +5,15 @@ import { ArchaeologistSettings } from '../../src/shared/helpers/validation';
 import { mockSarcoClient } from '../mocks';
 import { arweaveTxId, defaultArchaeologists, defaultSarcophagusSettings, sarcoId } from './test-data';
 import { mockSafeContractCall } from './test-utils';
+import { SarcoWebBundlr } from '../../src/browser/SarcoWebBundlr';
+import { SarcoNetworkConfig } from '../../src/shared/types';
+
+jest.mock('ethers');
+jest.mock('@sarcophagus-org/sarcophagus-v2-contracts');
+jest.mock('../../src/browser/SarcoWebBundlr');
 
 const signer = ethers.Wallet.createRandom({});
-
-const api = new Api(signer.address, signer, 'subgraph/url/test');
+const api = new Api('0x0', signer, {} as SarcoNetworkConfig, {} as SarcoWebBundlr);
 
 beforeEach(() => {
   mockSafeContractCall.mockClear();

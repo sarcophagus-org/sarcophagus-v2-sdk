@@ -1,19 +1,19 @@
-import { SarcophagusApi } from '../shared/SarcophagusApi';
+import { Api } from '../shared/Api';
 import { bootLip2p } from '../shared/libp2p_node';
 import { Libp2p } from 'libp2p';
 import { ethers, Signer } from 'ethers';
 import { SarcoWebBundlr } from './SarcoWebBundlr';
 import { Token } from '../shared/Token';
 import { Utils } from '../shared/Utils';
-import { ArchaeologistApi } from '../shared/ArchaeologistApi';
+import { Archaeologist } from '../shared/Archaeologist';
 import { sarcoClientInitSchema, SarcoInitParams } from '../shared/helpers/validation';
 import { goerliNetworkConfig, mainnetNetworkConfig, SarcoNetworkConfig, sepoliaNetworkConfig } from '../shared';
 
 export class WebSarcoClient {
-  public api!: SarcophagusApi;
+  public api!: Api;
   public token!: Token;
   private _bundlr!: SarcoWebBundlr;
-  public archaeologist!: ArchaeologistApi;
+  public archaeologist!: Archaeologist;
   public utils!: Utils;
   public isInitialised: boolean = false;
 
@@ -62,14 +62,9 @@ export class WebSarcoClient {
       }
     );
     this.utils = new Utils(networkConfig, this.signer);
-    this.api = new SarcophagusApi(
-      this.networkConfig.diamondDeployAddress,
-      this.signer,
-      this.networkConfig,
-      this._bundlr
-    );
+    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig, this._bundlr);
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
-    this.archaeologist = new ArchaeologistApi(
+    this.archaeologist = new Archaeologist(
       this.networkConfig.diamondDeployAddress,
       this.signer,
       this.networkConfig.subgraphUrl,

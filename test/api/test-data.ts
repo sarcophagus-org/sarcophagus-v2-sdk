@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { ArchaeologistSettings, SarcophagusSettings } from '../../src/shared/helpers/validation';
 
 export const sarcoId = 'test-id';
@@ -19,8 +19,8 @@ export const defaultArchaeologists: ArchaeologistSettings[] = [
   {
     publicKey: '0x0123456789012345678901234567890123456789012345678901234567890123',
     archAddress: '0x0123456789012345678901234567890123456789',
-    diggingFeePerSecond: ethers.BigNumber.from(1),
-    curseFee: ethers.BigNumber.from(10),
+    diggingFeePerSecond: '1',
+    curseFee: '10',
     v: 27,
     r: '0x0123456789012345678901234567890123456789012345678901234567890123',
     s: '0x0123456789012345678901234567890123456789012345678901234567890123',
@@ -28,8 +28,8 @@ export const defaultArchaeologists: ArchaeologistSettings[] = [
   {
     publicKey: '0x0987654321098765432109876543210987654321098765432109876543210987',
     archAddress: '0x9876543210987654321098765432109876543210',
-    diggingFeePerSecond: ethers.BigNumber.from(2),
-    curseFee: ethers.BigNumber.from(20),
+    diggingFeePerSecond: '2',
+    curseFee: '20',
     v: 28,
     r: '0x0987654321098765432109876543210987654321098765432109876543210987',
     s: '0x0987654321098765432109876543210987654321098765432109876543210987',
