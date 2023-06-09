@@ -1,5 +1,7 @@
 import { ApiConfig as ArweaveConfig } from 'arweave/node/lib/api';
 
+export { RecoverPublicKeyErrorStatus } from './utils';
+export type { RecoverPublicKeyResponse } from './utils';
 export interface CallOptions {
   ignoreSafeCall?: boolean;
 }

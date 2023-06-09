@@ -1,24 +1,76 @@
-import { EmbalmerFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
-import { ethers } from 'ethers';
+import { EmbalmerFacet__factory, ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
+import { BigNumber, ethers } from 'ethers';
 import { safeContractCall } from './helpers/safeContractCall';
-import { CallOptions } from './types';
+import { CallOptions, SarcoNetworkConfig } from './types';
 import {
   ArchaeologistSettings,
   SarcophagusSettings,
   archaeologistSettingsArraySchema,
   sarcophagusSettingsSchema,
 } from './helpers/validation';
-import { getSubgraphSarcophagusWithRewraps } from './helpers/subgraph';
+import {
+  getPrivateKeyPublishes,
+  getSubgraphSarcoCounts,
+  getSubgraphSarcophagi,
+  getSubgraphSarcophagusWithRewraps,
+} from './helpers/subgraph';
+import {
+  SarcoCounts,
+  SarcophagusData,
+  SarcophagusDetails,
+  SarcophagusFilter,
+  SarcophagusResponseContract,
+} from './types/sarcophagi';
+import { Utils } from './Utils';
+import { ArweaveResponse, OnDownloadProgress } from './types/arweave';
+import { arweaveDataDelimiter, fetchArweaveFile, readFileDataAsBase64 } from './helpers/arweaveUtil';
+import { decrypt, encrypt } from './helpers/encryption';
+import { arrayify } from 'ethers/lib/utils';
+import { combine, split } from 'shamirs-secret-sharing-ts';
+import {
+  chunkedUploaderFileSize,
+  encryptMetadataFields,
+  encryptShardsWithArchaeologistPublicKeys,
+  encryptShardsWithRecipientPublicKey,
+} from './helpers/sarco';
+import { SarcoWebBundlr } from '../browser/SarcoWebBundlr';
+import Bundlr from '@bundlr-network/client/build/cjs/common/bundlr';
+import { ChunkingUploader } from '@bundlr-network/client/build/cjs/common/chunkingUploader';
 
 export class Api {
   private embalmerFacet: ethers.Contract;
   private subgraphUrl: string;
+  private viewStateFacet: ethers.Contract;
+  private signer: ethers.Signer;
+  private utils: Utils;
+  private networkConfig: SarcoNetworkConfig;
+  private bundlr: SarcoWebBundlr | Bundlr;
 
-  constructor(diamondDeployAddress: string, signer: ethers.Signer, subgraphUrl: string) {
+  constructor(
+    diamondDeployAddress: string,
+    signer: ethers.Signer,
+    networkConfig: SarcoNetworkConfig,
+    bundlr: SarcoWebBundlr | Bundlr
+  ) {
     this.embalmerFacet = new ethers.Contract(diamondDeployAddress, EmbalmerFacet__factory.abi, signer);
-    this.subgraphUrl = subgraphUrl;
+    this.viewStateFacet = new ethers.Contract(diamondDeployAddress, ViewStateFacet__factory.abi, signer);
+    this.subgraphUrl = networkConfig.subgraphUrl;
+    this.signer = signer;
+    this.networkConfig = networkConfig;
+    this.bundlr = bundlr;
+    this.utils = new Utils(networkConfig, signer);
   }
 
+  /**
+   * Creates a new sarcophagus.
+   *
+   * @param sarcoId - The ID of the sarcophagus to be created
+   * @param sarcophagusSettings - The configuration settings for the sarcophagus
+   * @param selectedArchaeologists - The archaeologists to be responsible for and cursed on the sarcophagus
+   * @param arweaveTxId - The ID of the Arweave transaction containing the encrypted data
+   * @param options - Options for the contract method call
+   * @returns The transaction response
+   * */
   async createSarcophagus(
     sarcoId: string,
     sarcophagusSettings: SarcophagusSettings,
@@ -41,6 +93,14 @@ export class Api {
     );
   }
 
+  /**
+   * Resets the resurrection time of a sarcophagus to a further time in the future.
+   *
+   * @param sarcoId - The ID of the sarcophagus to be rewrapped
+   * @param resurrectionTime - The new resurrection time
+   * @param options - Options for the contract method call
+   * @returns The transaction response
+   * */
   async rewrapSarcophagus(
     sarcoId: string,
     resurrectionTime: number,
@@ -49,6 +109,17 @@ export class Api {
     return safeContractCall(this.embalmerFacet, 'rewrapSarcophagus', [sarcoId, resurrectionTime], options);
   }
 
+  /**
+   * Invalidates the Sarcophagus by setting a MaxUint32 resurrection time. Once this is done,
+   * the sarcophagus can never be resurrected. Cursed archaeologists are freed from their curse and
+   * their locked bonds are returned to them.
+   *
+   * This can only be called by the sarcophagus owner.
+   *
+   * @param sarcoId - The ID of the sarcophagus to be buried
+   * @param options - Options for the contract method call
+   * @returns The transaction response
+   * */
   async burySarcophagus(sarcoId: string, options: CallOptions = {}): Promise<ethers.providers.TransactionResponse> {
     return safeContractCall(this.embalmerFacet, 'burySarcophagus', [sarcoId], options);
   }
@@ -68,5 +139,346 @@ export class Api {
 
   async getRewrapsOnSarcophagus(sarcoId: string) {
     const archData = await getSubgraphSarcophagusWithRewraps(this.subgraphUrl, sarcoId);
+  }
+
+  /**
+   * Returns a list of sarcophagi for a given embalmer address.
+   * @param address - The address to get sarcophagi for
+   * @param options - Options for the contract method call
+   * @returns The list of sarcophagi
+   * */
+  async getEmbalmerSarcophagi(address: string, options: CallOptions = {}): Promise<SarcophagusData[]> {
+    return this.getSarcophagi(address, { ...options, filter: SarcophagusFilter.embalmer });
+  }
+
+  /**
+   * Returns a list of sarcophagi for a given recipient address.
+   * @param address - The address to get sarcophagi for
+   * @param options - Options for the contract method call
+   * @returns The list of sarcophagi
+   * */
+  async getRecipientSarcophagi(address: string, options: CallOptions = {}): Promise<SarcophagusData[]> {
+    return this.getSarcophagi(address, { ...options, filter: SarcophagusFilter.recipient });
+  }
+
+  async claimSarcophagus(
+    sarcoId: string,
+    recipientPrivateKey: string,
+    onDownloadProgress: OnDownloadProgress
+  ): Promise<{
+    fileName: string;
+    data: string;
+    error?: string;
+  }> {
+    try {
+      const privateKeys = await getPrivateKeyPublishes(this.subgraphUrl, sarcoId);
+      const sarcophagus = (await getSubgraphSarcophagi(this.subgraphUrl, [sarcoId]))[0];
+      const canResurrect = privateKeys.length >= Number.parseInt(sarcophagus.threshold);
+
+      if (!canResurrect) {
+        throw new Error('Cannot resurrect -- not enough private keys');
+      }
+
+      const payloadTxId = sarcophagus.arweaveTxId;
+
+      // In case the sarcophagus has no tx id. This should never happen but, just in case.
+      if (!payloadTxId) {
+        throw new Error(`The Arwevae tx id for the payload is missing on sarcophagus ${sarcoId}`);
+      }
+
+      // Load the payload from arweave using the txId
+      const arweaveFile = await fetchArweaveFile(payloadTxId, this.networkConfig, onDownloadProgress);
+
+      if (!arweaveFile) throw Error('Failed to download file from arweave');
+
+      // Decrypt the key shares. Each share is double-encrypted with an inner layer of encryption
+      // with the recipient's key, and an outer layer of encryption with the archaeologist's key.
+      const decryptedKeyShares: Buffer[] = [];
+      for await (const archAddress of sarcophagus.cursedArchaeologists) {
+        const arch = (await safeContractCall(this.viewStateFacet, 'getSarcophagusArchaeologist', [
+          sarcoId,
+          archAddress,
+        ])) as unknown as { publicKey: string; privateKey: string };
+
+        // If arch failed to publish private key, continue to next key
+        if (arch.privateKey === ethers.constants.HashZero) {
+          continue;
+        }
+
+        const archDoubleEncryptedKeyShare = arweaveFile.keyShares[arch.publicKey];
+
+        // Decrypt outer layer with arch private key
+        const recipientEncryptedKeyShare = await decrypt(
+          arch.privateKey,
+          Buffer.from(arrayify(archDoubleEncryptedKeyShare))
+        );
+
+        // Decrypt inner layer with rceipient private key
+        const decryptedKeyShare = await decrypt(recipientPrivateKey, recipientEncryptedKeyShare);
+
+        decryptedKeyShares.push(decryptedKeyShare);
+      }
+
+      // Apply SSS with the decrypted shares to derive the payload file's decryption key
+      const payloadDecryptionKey = combine(decryptedKeyShares).toString();
+
+      // Decrypt the payload with the recombined key
+      const decryptedPayload = await decrypt(payloadDecryptionKey, arweaveFile.fileBuffer);
+
+      const decryptedfileName = await decrypt(
+        recipientPrivateKey,
+        Buffer.from(arweaveFile.metadata.fileName, 'binary')
+      );
+      const decryptedfileType = await decrypt(recipientPrivateKey, Buffer.from(arweaveFile.metadata.type, 'binary'));
+
+      const decryptedResult = {
+        fileName: decryptedfileName.toString('binary'),
+        data: `${decryptedfileType.toString('binary')},${decryptedPayload.toString('base64')}`,
+      };
+
+      if (!decryptedResult.fileName || !decryptedResult.data) {
+        console.error(`Missing fileName or data in decryptedResult: ${decryptedResult}`);
+        throw new Error('The payload is missing the fileName or data');
+      }
+
+      return decryptedResult;
+    } catch (error) {
+      console.error(`Error resurrecting sarcophagus: ${error}`);
+      throw new Error('Could not claim Sarcophagus. Please make sure you have the right private key.');
+    }
+  }
+
+  async uploadFileToArweave(args: {
+    file: File;
+    onStep: Function;
+    payloadPublicKey: string;
+    payloadPrivateKey: string;
+    recipientPublicKey: string;
+    shares: number;
+    threshold: number;
+    archaeologistPublicKeys: Map<string, string>;
+    onUploadChunk: (chunkedUploader: ChunkingUploader, chunkedUploadProgress: number) => void;
+    onUploadChunkError: (msg: string) => void;
+    onUploadComplete: (uploadId: string) => void;
+  }): Promise<void> {
+    try {
+      const {
+        onStep,
+        file,
+        payloadPublicKey,
+        shares,
+        threshold,
+        payloadPrivateKey,
+        recipientPublicKey,
+        archaeologistPublicKeys,
+        onUploadChunk,
+        onUploadChunkError,
+        onUploadComplete,
+      } = args;
+      onStep('Reading file...');
+      const payload: { type: string; data: Buffer } = await readFileDataAsBase64(file!);
+
+      /**
+       * File upload data
+       */
+      // Step 1: Encrypt the payload with the generated keypair
+      onStep('Encrypting...');
+      const encryptedPayload = await encrypt(payloadPublicKey!, payload.data);
+
+      /**
+       * Double encrypted keyshares upload data
+       */
+      // Step 1: Split the outer layer private key using shamirs secret sharing
+      const keyShares: Uint8Array[] = split(payloadPrivateKey, {
+        shares,
+        threshold,
+      });
+
+      // Step 2: Encrypt each shard with the recipient public key
+      const keySharesEncryptedInner = await encryptShardsWithRecipientPublicKey(recipientPublicKey, keyShares);
+
+      // Step 3: Encrypt each shard again with the arch public keys
+      const keySharesEncryptedOuter = await encryptShardsWithArchaeologistPublicKeys(
+        Array.from(archaeologistPublicKeys.values()),
+        keySharesEncryptedInner
+      );
+
+      /**
+       * Format data for upload
+       */
+      const doubleEncryptedKeyShares: Record<string, string> = keySharesEncryptedOuter.reduce(
+        (acc, keyShare) => ({
+          ...acc,
+          [keyShare.publicKey]: keyShare.encryptedShard,
+        }),
+        {}
+      );
+
+      // Upload file data + keyshares data to arweave
+      const encKeysBuffer = Buffer.from(JSON.stringify(doubleEncryptedKeyShares), 'binary');
+
+      const encryptedMetadata = await encryptMetadataFields(recipientPublicKey, {
+        fileName: file!.name,
+        type: payload.type,
+      });
+
+      const metadataBuffer = Buffer.from(JSON.stringify(encryptedMetadata), 'binary');
+
+      // <meta_buf_size><delimiter><keyshare_buf_size><delimiter><metatadata><keyshares><payload>
+
+      const arweavePayload = Buffer.concat([
+        Buffer.from(metadataBuffer.length.toString(), 'binary'),
+        arweaveDataDelimiter,
+        Buffer.from(encKeysBuffer.length.toString()),
+        arweaveDataDelimiter,
+        metadataBuffer,
+        encKeysBuffer,
+        encryptedPayload,
+      ]);
+
+      onStep(`Uploading to Arweave...`);
+
+      // SET UP UPLOAD EVENT LISTENERS
+      const chunkedUploader = this.bundlr.uploader.chunkedUploader;
+
+      chunkedUploader.setChunkSize(chunkedUploaderFileSize);
+
+      chunkedUploader?.on('chunkUpload', chunkInfo => {
+        const chunkedUploadProgress = chunkInfo.totalUploaded / arweavePayload.length;
+        onUploadChunk(chunkedUploader, chunkedUploadProgress);
+      });
+
+      chunkedUploader?.on('chunkError', e => {
+        const errorMsg = `Error uploading chunk number ${e.id} - ${e.res.statusText}`;
+        onUploadChunkError(errorMsg);
+      });
+
+      chunkedUploader?.on('done', finishRes => {
+        const uploadId = JSON.stringify(finishRes.data?.id ?? finishRes.id);
+        console.log(`Upload completed with ID ${uploadId}`);
+      });
+
+      const uploadPromise = chunkedUploader
+        .uploadData(arweavePayload)
+        .then(res => {
+          if (!res) {
+            throw new Error('Error uploading file payload to Bundlr');
+          }
+
+          onUploadComplete(res.data.id);
+        })
+        .catch(err => {
+          console.log('err', err);
+          throw new Error(err);
+        });
+
+      return uploadPromise;
+    } catch (error: any) {
+      console.log(error);
+      throw new Error(error.message || 'Error uploading file payload to Bundlr');
+    }
+  }
+
+  /**
+   * Returns detailed information about a sarcophagus.
+   * @param options - Options for the contract method call
+   * @returns The number of sarcophagi
+   * */
+  async getSarcophagusDetails(sarcoId: string, options: CallOptions = {}): Promise<SarcophagusDetails> {
+    const subgraphSarco = await getSubgraphSarcophagusWithRewraps(this.subgraphUrl, sarcoId);
+    const publishedKeys = await getPrivateKeyPublishes(this.subgraphUrl, sarcoId);
+
+    const gracePeriod = (await safeContractCall(
+      this.viewStateFacet,
+      'getGracePeriod',
+      [],
+      options
+    )) as unknown as BigNumber;
+
+    const sarcoContract = (await safeContractCall(
+      this.viewStateFacet,
+      'getSarcophagus',
+      [sarcoId],
+      options
+    )) as unknown as SarcophagusResponseContract;
+
+    const currentTimeMs = (await this.utils.getCurrentTimeSec(this.signer.provider!)) * 1000;
+    return {
+      ...sarcoContract,
+      state: this.utils.getSarcophagusState(sarcoContract, gracePeriod.toNumber(), currentTimeMs),
+      id: sarcoId,
+      rewraps: subgraphSarco.rewraps,
+      publishedKeys,
+    };
+  }
+
+  /**
+   * Return the payload file from arweave for a given sarcophagus.
+   * @param sarcoId - The ID of the sarcophagus to get the payload for
+   * @param onDownloadProgress - Callback for download progress
+   * @returns The arweave payload file
+   * */
+  async getSarcophagusPayload(sarcoId: string, onDownloadProgress: OnDownloadProgress): Promise<ArweaveResponse> {
+    const sarcophagus = (await getSubgraphSarcophagi(this.subgraphUrl, [sarcoId]))[0];
+    const payloadTxId = sarcophagus.arweaveTxId;
+    const arweaveFile = await fetchArweaveFile(payloadTxId, this.networkConfig, onDownloadProgress);
+    if (!arweaveFile) throw Error('Failed to download file from arweave');
+    return arweaveFile;
+  }
+
+  /**
+   * Returns the number of sarcophagi in the contract.
+   * @param options - Options for the contract method call
+   * @returns The number of sarcophagi
+   * */
+  async getSarcophagiCount(): Promise<SarcoCounts> {
+    return getSubgraphSarcoCounts(this.subgraphUrl);
+  }
+
+  private async getSarcophagi(
+    address: string,
+    options: CallOptions & { filter: SarcophagusFilter }
+  ): Promise<SarcophagusData[]> {
+    let sarcoIds: string[] = [];
+    let methodName: string;
+
+    switch (options.filter) {
+      case SarcophagusFilter.embalmer:
+        methodName = 'getEmbalmerSarcophagi';
+        break;
+
+      case SarcophagusFilter.recipient:
+        methodName = 'getRecipientSarcophagi';
+        break;
+    }
+
+    sarcoIds = (await safeContractCall(this.viewStateFacet, methodName, [address], options)) as unknown as string[];
+
+    const gracePeriod = (await safeContractCall(
+      this.viewStateFacet,
+      'getGracePeriod',
+      [],
+      options
+    )) as unknown as BigNumber;
+
+    const sarcophagi: SarcophagusData[] = await Promise.all(
+      sarcoIds.map(async sarcoId => {
+        const sarcoContract = (await safeContractCall(
+          this.viewStateFacet,
+          'getSarcophagus',
+          [sarcoId],
+          options
+        )) as unknown as SarcophagusResponseContract;
+
+        const currentTimeMs = (await this.utils.getCurrentTimeSec(this.signer.provider!)) * 1000;
+        return {
+          ...sarcoContract,
+          state: this.utils.getSarcophagusState(sarcoContract, gracePeriod.toNumber(), currentTimeMs),
+          id: sarcoId,
+        } as SarcophagusData;
+      })
+    );
+
+    return sarcophagi;
   }
 }

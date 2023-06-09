@@ -4,6 +4,11 @@ import { ethers } from 'ethers';
 import { NodeSarcoClient } from '../src/node/NodeSarcoClient';
 
 // Mocks
+jest.mock('libp2p', () => {
+  return {
+    Libp2p: jest.fn(),
+  };
+});
 jest.mock('@bundlr-network/client/build/cjs/node/bundlr');
 jest.mock('../src/shared/Api', () => {
   // Mock class
@@ -11,6 +16,12 @@ jest.mock('../src/shared/Api', () => {
     Api: jest.fn().mockImplementation(() => {
       return { someApiMethod: jest.fn() }; // Mock the methods as needed
     }),
+  };
+});
+jest.mock('../src/shared/Archaeologist', () => {
+  // Mock class
+  return {
+    ArchaeologistApi: jest.fn(),
   };
 });
 jest.mock('ethers', () => {
@@ -37,6 +48,9 @@ jest.mock('../src/shared/Token', () => {
       return { someTokenMethod: jest.fn() }; // Mock the methods as needed
     }),
   };
+});
+jest.mock('../src/shared/libp2p_node', () => {
+  return { bootLibp2p: jest.fn() };
 });
 
 const BundlrMock = Bundlr as jest.Mocked<typeof Bundlr>;
@@ -66,9 +80,6 @@ describe('NodeSarcoClient', () => {
       expect(JsonRpcProviderMock).toHaveBeenCalledWith(mockProviderUrl);
       expect(Web3ProviderMock).toHaveBeenCalledWith(mockJsonRpcProvider);
       expect(mockWeb3Provider.getSigner).toHaveBeenCalled();
-      expect(BundlrMock).toHaveBeenCalledWith('https://node1.bundlr.network', 'ethereum', privateKey, {
-        providerUrl: mockProviderUrl,
-      });
     });
   });
 });

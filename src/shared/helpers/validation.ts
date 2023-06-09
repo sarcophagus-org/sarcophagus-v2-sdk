@@ -20,8 +20,8 @@ export const sarcophagusSettingsSchema = object({
 const archaeologistSettingsSchema = object({
   publicKey: string().required(),
   archAddress: string().required(),
-  diggingFeePerSecond: mixed<BigNumber>().required(),
-  curseFee: mixed<BigNumber>().required(),
+  diggingFeePerSecond: string().required(),
+  curseFee: string().required(),
   v: number().required().positive().integer(),
   r: string().required(),
   s: string().required(),

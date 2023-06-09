@@ -1,6 +1,12 @@
 import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
-import { SarcoNetworkConfig } from './types';
+import {
+  SarcoNetworkConfig,
+  RecoverPublicKeyErrorStatus,
+  RecoverPublicKeyResponse,
+  CallOptions,
+  SarcoBundlrConfig,
+} from './types';
 import {
   ArchaeologistCurseNegotiationParams,
   ArchaeologistData,
@@ -14,7 +20,10 @@ import {
   SarcophagusValidationError,
 } from './types/archaeologist';
 
-export type { SarcoNetworkConfig };
+export type { SarcoNetworkConfig, RecoverPublicKeyResponse, CallOptions, SarcoBundlrConfig };
+
+export { RecoverPublicKeyErrorStatus };
+
 export type {
   ArchaeologistData,
   ArchaeologistException,
@@ -28,3 +37,6 @@ export type {
 export { ArchaeologistExceptionCode, SarcophagusValidationError };
 export { NEGOTIATION_SIGNATURE_STREAM };
 export { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig };
+
+export type { SarcophagusData, SarcophagusDetails } from './types/sarcophagi';
+export { SarcophagusState } from './types/sarcophagi';

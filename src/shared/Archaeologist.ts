@@ -22,23 +22,19 @@ import {
  * The ArchaeologistApi class provides a high-level interface for interacting with
  * archaeologists on the Sarcophagus V2 protocol.
  */
-export class ArchaeologistApi {
+export class Archaeologist {
   private viewStateFacet: ethers.Contract;
   private subgraphUrl: string;
   private p2pNode: Libp2p;
   private signer: ethers.Signer;
   private utils: Utils;
 
-  constructor(diamondDeployAddress: string, signer: ethers.Signer, subgraphUrl: string, p2pNode: Libp2p) {
+  constructor(diamondDeployAddress: string, signer: ethers.Signer, subgraphUrl: string, p2pNode: Libp2p, utils: Utils) {
     this.subgraphUrl = subgraphUrl;
     this.viewStateFacet = new ethers.Contract(diamondDeployAddress, ViewStateFacet__factory.abi, signer);
     this.p2pNode = p2pNode;
     this.signer = signer;
-    this.utils = new Utils();
-  }
-
-  public setLibp2pNode(p2pNode: Libp2p): void {
-    this.p2pNode = p2pNode;
+    this.utils = utils;
   }
 
   private getDialAddress(arch: ArchaeologistData): Multiaddr {
@@ -392,6 +388,29 @@ export class ArchaeologistApi {
         return Number(arch.profile.maximumRewrapInterval);
       })
     );
+  }
+
+  /**
+   * Returns the smallest maximumResurrectionTime and maximumRewrapInterval values
+   * from the profiles of the archaeologists provided
+   */
+  getLowestResurrectionTimeAndRewrapInterval(archaeologists: ArchaeologistData[]) {
+    let lowestRewrapInterval = Number(archaeologists[0].profile.maximumRewrapInterval);
+    let lowestResurrectiontime = Number(archaeologists[0].profile.maximumResurrectionTime);
+
+    archaeologists.slice(1).forEach(arch => {
+      const resTime = Number(arch.profile.maximumResurrectionTime);
+      const rewrapInterval = Number(arch.profile.maximumRewrapInterval);
+      if (resTime < lowestResurrectiontime) {
+        lowestResurrectiontime = resTime;
+      }
+
+      if (rewrapInterval < lowestRewrapInterval) {
+        lowestRewrapInterval = rewrapInterval;
+      }
+    });
+
+    return { lowestRewrapInterval, lowestResurrectiontime };
   }
 
   /**
