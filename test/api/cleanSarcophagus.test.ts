@@ -1,11 +1,11 @@
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { Api } from '../../src/shared/Api';
 import { sarcoId } from './test-data';
 import { mockSafeContractCall } from './test-utils';
 import { SarcoWebBundlr } from '../../src/browser/SarcoWebBundlr';
 import { SarcoNetworkConfig } from '../../src/shared/types';
 
-jest.mock('ethers');
+jest.spyOn(ethers, 'Contract').mockImplementation();
 jest.mock('@sarcophagus-org/sarcophagus-v2-contracts');
 jest.mock('../../src/browser/SarcoWebBundlr');
 
@@ -14,6 +14,7 @@ const api = new Api('0x0', signer, {} as SarcoNetworkConfig, {} as SarcoWebBundl
 
 beforeEach(() => {
   mockSafeContractCall.mockClear();
+  jest.clearAllMocks();
 });
 
 describe('cleanSarcophagus', () => {

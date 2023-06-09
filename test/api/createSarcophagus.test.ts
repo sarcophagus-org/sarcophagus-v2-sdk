@@ -8,7 +8,7 @@ import { mockSafeContractCall } from './test-utils';
 import { SarcoWebBundlr } from '../../src/browser/SarcoWebBundlr';
 import { SarcoNetworkConfig } from '../../src/shared/types';
 
-jest.mock('ethers');
+jest.spyOn(ethers, 'Contract').mockImplementation();
 jest.mock('@sarcophagus-org/sarcophagus-v2-contracts');
 jest.mock('../../src/browser/SarcoWebBundlr');
 
