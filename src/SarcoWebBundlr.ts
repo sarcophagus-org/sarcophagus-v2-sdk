@@ -1,5 +1,5 @@
-import { BundlrConfig } from '@bundlr-network/client/build/cjs/common/types';
-import WebBundlr from '@bundlr-network/client/build/cjs/web/bundlr';
+import { BundlrConfig } from '@bundlr-network/client/build/esm/common/types';
+import WebBundlr from '@bundlr-network/client/build/esm/web/bundlr';
 import { InjectedEthereumSigner } from 'arbundles';
 import { ethers } from 'ethers';
 import { computeAddress } from 'ethers/lib/utils';

@@ -1,4 +1,4 @@
-import Bundlr from '@bundlr-network/client/build/cjs/node/bundlr';
+import Bundlr from '@bundlr-network/client/build/esm/node/bundlr';
 import { Archaeologist } from './Archaeologist';
 import { Token } from './Token';
 import { Utils } from './Utils';

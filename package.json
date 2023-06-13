@@ -3,6 +3,7 @@
   "version": "0.1.0-alpha.1",
   "main": "dist/index.js",
   "module": "dist/index.ts",
+  "type": "module",
   "types": "dist/index.d.ts",
   "sideEffects": false,
   "license": "UNLICENSED",
