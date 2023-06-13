@@ -2,19 +2,24 @@
   "compilerOptions": {
     "target": "esnext",
     "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
+    "module": "CommonJS", 
+    "outDir": "./dist",   
+    "rootDir": "./src",   
     "baseUrl": "./src",
-    "outDir": "./dist",
+    "strict": true,   
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
     "declaration": true
   },
-  "include": ["src/**/*.ts",  "src/index.ts"]
+  "include": [
+    "src/**/*.ts", "src/index.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
