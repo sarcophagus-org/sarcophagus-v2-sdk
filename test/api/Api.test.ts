@@ -1,12 +1,12 @@
 import { ethers } from 'ethers';
-import { Api } from '../../src/shared/Api';
-import { SarcoWebBundlr } from '../../src/browser/SarcoWebBundlr';
-import { SarcoNetworkConfig } from '../../src/shared/types';
+import { Api } from '../../src/Api';
+import { SarcoWebBundlr } from '../../src/SarcoWebBundlr';
+import { SarcoNetworkConfig } from '../../src/types';
 
 const signer = ethers.Wallet.createRandom({});
 jest.mock('ethers');
 jest.mock('@sarcophagus-org/sarcophagus-v2-contracts');
-jest.mock('../../src/browser/SarcoWebBundlr');
+jest.mock('../../src/SarcoWebBundlr');
 
 describe('Api', () => {
   describe('Api Constructor', () => {

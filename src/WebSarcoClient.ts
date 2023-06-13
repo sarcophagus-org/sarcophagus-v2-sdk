@@ -1,13 +1,14 @@
-import { Api } from '../shared/Api';
-import { bootLip2p } from '../shared/libp2p_node';
+import { Api } from './Api';
+import { bootLip2p } from './libp2p_node';
 import { Libp2p } from 'libp2p';
 import { ethers, Signer } from 'ethers';
 import { SarcoWebBundlr } from './SarcoWebBundlr';
-import { Token } from '../shared/Token';
-import { Utils } from '../shared/Utils';
-import { Archaeologist } from '../shared/Archaeologist';
-import { sarcoClientInitSchema, SarcoInitParams } from '../shared/helpers/validation';
-import { goerliNetworkConfig, mainnetNetworkConfig, SarcoNetworkConfig, sepoliaNetworkConfig } from '../shared';
+import { Token } from './Token';
+import { Utils } from './Utils';
+import { Archaeologist } from './Archaeologist';
+import { sarcoClientInitSchema, SarcoInitParams } from './helpers/validation';
+import { SarcoNetworkConfig } from './types';
+import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
 
 export class WebSarcoClient {
   public api!: Api;

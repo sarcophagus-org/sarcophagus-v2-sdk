@@ -33,9 +33,9 @@ import {
   encryptShardsWithArchaeologistPublicKeys,
   encryptShardsWithRecipientPublicKey,
 } from './helpers/sarco';
-import { SarcoWebBundlr } from '../browser/SarcoWebBundlr';
 import Bundlr from '@bundlr-network/client/build/cjs/common/bundlr';
 import { ChunkingUploader } from '@bundlr-network/client/build/cjs/common/chunkingUploader';
+import { SarcoWebBundlr } from './SarcoWebBundlr';
 
 export class Api {
   private embalmerFacet: ethers.Contract;

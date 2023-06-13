@@ -1,7 +1,7 @@
 import Bundlr from '@bundlr-network/client/build/cjs/node/bundlr';
 import { privateKey } from './api/test-data';
 import { ethers } from 'ethers';
-import { NodeSarcoClient } from '../src/node/NodeSarcoClient';
+import { NodeSarcoClient } from '../src/NodeSarcoClient';
 
 // Mocks
 jest.mock('libp2p', () => {
@@ -10,7 +10,7 @@ jest.mock('libp2p', () => {
   };
 });
 jest.mock('@bundlr-network/client/build/cjs/node/bundlr');
-jest.mock('../src/shared/Api', () => {
+jest.mock('../src/Api', () => {
   // Mock class
   return {
     Api: jest.fn().mockImplementation(() => {
@@ -18,7 +18,7 @@ jest.mock('../src/shared/Api', () => {
     }),
   };
 });
-jest.mock('../src/shared/Archaeologist', () => {
+jest.mock('../src/Archaeologist', () => {
   // Mock class
   return {
     ArchaeologistApi: jest.fn(),
@@ -41,7 +41,7 @@ jest.mock('ethers', () => {
     },
   };
 });
-jest.mock('../src/shared/Token', () => {
+jest.mock('../src/Token', () => {
   // Mock class
   return {
     Token: jest.fn().mockImplementation(() => {
@@ -49,7 +49,7 @@ jest.mock('../src/shared/Token', () => {
     }),
   };
 });
-jest.mock('../src/shared/libp2p_node', () => {
+jest.mock('../src/libp2p_node', () => {
   return { bootLibp2p: jest.fn() };
 });
 

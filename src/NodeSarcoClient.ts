@@ -1,14 +1,14 @@
 import Bundlr from '@bundlr-network/client/build/cjs/node/bundlr';
+import { Archaeologist } from './Archaeologist';
+import { Token } from './Token';
+import { Utils } from './Utils';
 import { ethers, Signer } from 'ethers';
-import { sarcoClientInitSchema, SarcoInitParams } from '../shared/helpers/validation';
+import { SarcoInitParams, sarcoClientInitSchema } from './helpers/validation';
 import { Libp2p } from 'libp2p';
-import { bootLip2p } from '../shared/libp2p_node';
-import { SarcoNetworkConfig } from '../shared/types';
-import { Api } from '../shared/Api';
-import { Archaeologist } from '../shared/Archaeologist';
-import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from '../shared/networkConfig';
-import { Token } from '../shared/Token';
-import { Utils } from '../shared/Utils';
+import { bootLip2p } from './libp2p_node';
+import { mainnetNetworkConfig, goerliNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
+import { SarcoNetworkConfig } from './types';
+import { Api } from './Api';
 
 export interface NodeSarcoClientConfig {
   privateKey: string;

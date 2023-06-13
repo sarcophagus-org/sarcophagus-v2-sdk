@@ -1,4 +1,4 @@
-import { safeContractCall } from '../../src/shared/helpers/safeContractCall';
+import { safeContractCall } from '../../src/helpers/safeContractCall';
 import { Contract, ethers } from 'ethers';
 
 // Create a mock contract instance

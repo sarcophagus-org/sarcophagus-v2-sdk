@@ -1,4 +1,4 @@
-import { NodeSarcoClient } from '../src/shared/NodeSarcoClient';
+import { NodeSarcoClient } from '../src/NodeSarcoClient';
 import { privateKey } from './api/test-data';
 
 jest.mock('../src/NodeSarcoClient');
