@@ -17,6 +17,7 @@ import {
   ArchaeologistNegotiationResult,
   SarcophagusValidationError,
 } from './types/archaeologist';
+import { getLowestResurrectionTime, getLowestRewrapInterval } from './helpers';
 
 /**
  * The ArchaeologistApi class provides a high-level interface for interacting with
@@ -78,12 +79,12 @@ export class Archaeologist {
       headers: { 'content-type': 'application/json' },
     };
 
-    if (window === undefined) {
-      let fetch = require('isomorphic-fetch');
-      response = await fetch(onlineArchsUrl, fetchOptions);
-    } else {
-      response = await fetch(onlineArchsUrl, fetchOptions);
-    }
+    // if (window === undefined) {
+    //   let fetch = require('isomorphic-fetch');
+    //   response = await fetch(onlineArchsUrl, fetchOptions);
+    // } else {
+    response = await fetch(onlineArchsUrl, fetchOptions);
+    // }
 
     const onlinePeerIds = (await response!.json()) as string[];
     return onlinePeerIds;
@@ -108,7 +109,7 @@ export class Archaeologist {
         )) as unknown as string[];
       }
 
-      const archData = await getArchaeologists(this.subgraphUrl);
+      const archData = (await getArchaeologists(this.subgraphUrl)).filter(arch => addresses!.includes(arch.address));
 
       const registeredArchaeologists = archData.map(arch => {
         const {
@@ -246,8 +247,8 @@ export class Archaeologist {
    */
   async initiateSarcophagusNegotiation(selectedArchaeologists: ArchaeologistData[], isRetry = false) {
     console.log('starting the negotiation');
-    const lowestRewrapInterval = this.getLowestRewrapInterval(selectedArchaeologists);
-    const lowestResurrectionTime = this.getLowestResurrectionTime(selectedArchaeologists);
+    const lowestRewrapInterval = getLowestRewrapInterval(selectedArchaeologists);
+    const lowestResurrectionTime = getLowestResurrectionTime(selectedArchaeologists);
 
     const negotiationTimestamp = (await this.utils.getCurrentTimeSec(this.signer.provider!)) * 1000;
 
@@ -378,17 +379,6 @@ export class Archaeologist {
       protocolFeeBasePercentage,
     } as const;
   }
-  /**
-   * Returns the smallest maximumRewrapInterval value
-   * from the profiles of the archaeologists provided
-   */
-  getLowestRewrapInterval(archaeologists: ArchaeologistData[]): number {
-    return Math.min(
-      ...archaeologists.map(arch => {
-        return Number(arch.profile.maximumRewrapInterval);
-      })
-    );
-  }
 
   /**
    * Returns the smallest maximumResurrectionTime and maximumRewrapInterval values
@@ -411,18 +401,6 @@ export class Archaeologist {
     });
 
     return { lowestRewrapInterval, lowestResurrectiontime };
-  }
-
-  /**
-   * Returns the smallest maximumResurrectionTime value
-   * from the profiles of the archaeologists provided
-   */
-  getLowestResurrectionTime(archaeologists: ArchaeologistData[]): number {
-    return Math.min(
-      ...archaeologists.map(arch => {
-        return Number(arch.profile.maximumResurrectionTime);
-      })
-    );
   }
 
   /**

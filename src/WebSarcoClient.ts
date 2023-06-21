@@ -24,7 +24,7 @@ export class WebSarcoClient {
   private p2pNode!: Libp2p;
 
   constructor() {
-    if (!window.ethereum) {
+    if (!window?.ethereum) {
       throw new Error('WebSarcoClient requires window.ethereum to be defined');
     }
 

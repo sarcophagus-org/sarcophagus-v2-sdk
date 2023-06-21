@@ -41,12 +41,12 @@ async function queryGraphQl(subgraphUrl: string, query: string) {
     body: JSON.stringify({ query }),
   };
 
-  if (window === undefined) {
-    let fetch = require('isomorphic-fetch');
-    response = await fetch(subgraphUrl, fetchOptions);
-  } else {
-    response = await fetch(subgraphUrl, fetchOptions);
-  }
+  // if (window === undefined) {
+  //   let fetch = require('isomorphic-fetch');
+  //   response = await fetch(subgraphUrl, fetchOptions);
+  // } else {
+  response = await fetch(subgraphUrl, fetchOptions);
+  // }
 
   const { data } = (await response!.json()) as { data: any };
   return data;

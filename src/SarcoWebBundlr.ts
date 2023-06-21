@@ -1,8 +1,18 @@
+import { ChunkingUploader } from '@bundlr-network/client/build/esm/common/chunkingUploader';
 import { BundlrConfig } from '@bundlr-network/client/build/esm/common/types';
 import WebBundlr from '@bundlr-network/client/build/esm/web/bundlr';
 import { InjectedEthereumSigner } from 'arbundles';
 import { ethers } from 'ethers';
+import { decrypt, encrypt } from './helpers/encryption';
 import { computeAddress } from 'ethers/lib/utils';
+import { readFileDataAsBase64, arweaveDataDelimiter } from 'helpers/arweaveUtil';
+import {
+  encryptShardsWithRecipientPublicKey,
+  encryptShardsWithArchaeologistPublicKeys,
+  encryptMetadataFields,
+  chunkedUploaderFileSize,
+} from 'helpers/sarco';
+import { split } from 'shamirs-secret-sharing-ts';
 
 /**
  * A custom WebBundlr class for the Sarcophagus SDK that allows for the injection of a public key.
