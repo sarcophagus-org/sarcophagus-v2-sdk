@@ -28,6 +28,9 @@ export class Utils {
     this.networkConfig = networkConfig;
   }
 
+  public getLowestRewrapInterval = getLowestRewrapInterval;
+  public getLowestResurrectionTime = getLowestResurrectionTime;
+
   formatSarco(valueInWei: string | number, precision: number = 2): string {
     const value = formatEther(valueInWei.toString());
     const numericValue: number = Number(value);
