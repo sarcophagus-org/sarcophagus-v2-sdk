@@ -1,7 +1,12 @@
 import { WebSarcoClient } from './WebSarcoClient';
 
 export { NodeSarcoClient } from './NodeSarcoClient';
-export const sarco = new WebSarcoClient();
+let sarco: WebSarcoClient;
+if (typeof window !== 'undefined') {
+  sarco = new WebSarcoClient();
+}
+
+export { sarco };
 export { WebSarcoClient };
 
 import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
