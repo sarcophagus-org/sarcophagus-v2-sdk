@@ -28,7 +28,7 @@ export class WebSarcoClient {
       throw new Error('WebSarcoClient can only be used in a browser envoronment');
     }
 
-    if (window.ethereum) {
+    if (!window.ethereum) {
       throw new Error('WebSarcoClient requires window.ethereum to be defined');
     }
 
