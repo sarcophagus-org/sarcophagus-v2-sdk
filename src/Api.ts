@@ -25,7 +25,7 @@ import { Utils } from './Utils';
 import { ArweaveResponse, OnDownloadProgress } from './types/arweave';
 import { arweaveDataDelimiter, fetchArweaveFile, readFileDataAsBase64 } from './helpers/arweaveUtil';
 import { decrypt, encrypt } from './helpers/encryption';
-import { arrayify } from 'ethers/lib/utils';
+import { arrayify } from 'ethers/lib/utils.js';
 import { combine, split } from 'shamirs-secret-sharing-ts';
 import {
   chunkedUploaderFileSize,

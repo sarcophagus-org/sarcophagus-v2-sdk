@@ -4,7 +4,7 @@ import WebBundlr from '@bundlr-network/client/build/esm/web/bundlr';
 import { InjectedEthereumSigner } from 'arbundles';
 import { ethers } from 'ethers';
 import { decrypt, encrypt } from './helpers/encryption';
-import { computeAddress } from 'ethers/lib/utils';
+import { computeAddress } from 'ethers/lib/utils.js';
 import { readFileDataAsBase64, arweaveDataDelimiter } from 'helpers/arweaveUtil';
 import {
   encryptShardsWithRecipientPublicKey,

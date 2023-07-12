@@ -1,9 +1,6 @@
 module.exports = {
   //...
-  entry: {
-    node: './index.node.ts',
-    browser: './index.browser.ts',
-  },
+  entry: './src/index.ts',
   module: {
     rules: [
       {

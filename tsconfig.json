@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "noEmit": false,
     "target": "esnext",
     "allowJs": true,
     "module": "esnext",

@@ -1,5 +1,5 @@
 import { BigNumber, ethers, utils } from 'ethers';
-import { UnsignedTransaction, computeAddress, formatEther } from 'ethers/lib/utils';
+import { UnsignedTransaction, computeAddress, formatEther } from 'ethers/lib/utils.js';
 import moment from 'moment';
 import { SarcophagusData, SarcophagusResponseContract, SarcophagusState } from './types/sarcophagi';
 import { safeContractCall } from './helpers/safeContractCall';
