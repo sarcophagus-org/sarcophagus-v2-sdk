@@ -452,20 +452,17 @@ export class Api {
     address: string,
     options: CallOptions & { filter: SarcophagusFilter }
   ): Promise<SarcophagusData[]> {
-    let sarcoIds: string[] = [];
-    let methodName: string;
+    const filter = this.viewStateFacet.filters.CreateSarcophagus(null, null, null, null, address);
+    const logs =
+      (await this.signer.provider?.getLogs({
+        fromBlock: 0,
+        toBlock: 'latest',
+        address: this.viewStateFacet.address,
+        topics: filter.topics,
+      })) ?? [];
 
-    switch (options.filter) {
-      case SarcophagusFilter.embalmer:
-        methodName = 'getEmbalmerSarcophagi';
-        break;
-
-      case SarcophagusFilter.recipient:
-        methodName = 'getRecipientSarcophagi';
-        break;
-    }
-
-    sarcoIds = (await safeContractCall(this.viewStateFacet, methodName, [address], options)) as unknown as string[];
+    const events = logs.map(log => this.viewStateFacet.interface.parseLog(log)).map(event => event.args);
+    const sarcoIds: string[] = events.map(s => s.sarcoId);
 
     const gracePeriod = (await safeContractCall(
       this.viewStateFacet,
