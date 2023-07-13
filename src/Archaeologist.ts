@@ -109,6 +109,7 @@ export class Archaeologist {
         )) as unknown as string[];
       }
 
+      addresses = addresses.map(a => a.toLowerCase());
       const archData = (await getArchaeologists(this.subgraphUrl)).filter(arch => addresses!.includes(arch.address));
 
       const registeredArchaeologists = archData.map(arch => {
