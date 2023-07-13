@@ -31,8 +31,8 @@ export const mainnetNetworkConfig = (providerUrl: string, etherscanApiKey = ''):
   chainId: 1,
   networkName: 'Etherum Mainnet',
   networkShortName: 'Mainnet',
-  sarcoTokenAddress: '',
-  diamondDeployAddress: '',
+  sarcoTokenAddress: '0x7697b462a7c4ff5f8b55bdbc2f4076c2af9cf51a',
+  diamondDeployAddress: '0x0Ec977D1863Eb919a2Ecd65d17Cc3f2CFdaCe3Ab',
   etherscanApiUrl: 'https://api.etherscan.io/api',
   etherscanApiKey,
   explorerUrl: 'https://etherscan.io/',
@@ -43,7 +43,7 @@ export const mainnetNetworkConfig = (providerUrl: string, etherscanApiKey = ''):
   },
   providerUrl,
   arweaveConfig,
-  subgraphUrl: '',
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarcophagus-v2/v0.0.1',
 });
 
 export const sepoliaNetworkConfig = (providerUrl: string, etherscanApiKey: string = ''): SarcoNetworkConfig => ({
