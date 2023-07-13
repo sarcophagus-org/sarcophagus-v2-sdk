@@ -452,16 +452,16 @@ export class Api {
     address: string,
     options: CallOptions & { filter: SarcophagusFilter }
   ): Promise<SarcophagusData[]> {
-    const filter = this.viewStateFacet.filters.CreateSarcophagus(null, null, null, null, address);
+    const filter = this.embalmerFacet.filters.CreateSarcophagus(null, null, null, null, address);
     const logs =
       (await this.signer.provider?.getLogs({
         fromBlock: 0,
         toBlock: 'latest',
-        address: this.viewStateFacet.address,
+        address: this.embalmerFacet.address,
         topics: filter.topics,
       })) ?? [];
 
-    const events = logs.map(log => this.viewStateFacet.interface.parseLog(log)).map(event => event.args);
+    const events = logs.map(log => this.embalmerFacet.interface.parseLog(log)).map(event => event.args);
     const sarcoIds: string[] = events.map(s => s.sarcoId);
 
     const gracePeriod = (await safeContractCall(
