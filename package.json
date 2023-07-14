@@ -1,15 +1,11 @@
 {
   "name": "sarcophagus-v2-sdk",
   "version": "0.1.0-alpha.1",
-  "main": "dist/index.js",
-  "module": "dist/index.ts",
+  "main": "dist/server.js",
+  "browser": "dist/browser.js",
   "type": "module",
-  "types": "dist/index.d.ts",
   "sideEffects": false,
   "license": "UNLICENSED",
-  "exports": {
-    ".": "./dist/index.js"
-  },
   "files": [
     "dist/**/*"
   ],

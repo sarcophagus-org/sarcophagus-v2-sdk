@@ -1,5 +1,8 @@
-let NodeSarcoClient, sarco;
-export { sarco, NodeSarcoClient };
+import { WebSarcoClient } from './WebSarcoClient';
+
+let sarco: WebSarcoClient = new WebSarcoClient();
+export { sarco };
+export { WebSarcoClient };
 
 import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
