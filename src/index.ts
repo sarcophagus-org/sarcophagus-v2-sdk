@@ -6,7 +6,7 @@ let NodeSarcoClient;
 if (typeof window !== 'undefined') {
   sarco = new WebSarcoClient();
 } else {
-  NodeSarcoClient = (await import('./NodeSarcoClient')).NodeSarcoClient;
+  // NodeSarcoClient = (await import('./NodeSarcoClient')).NodeSarcoClient;
 }
 
 export { sarco, NodeSarcoClient };
