@@ -16,7 +16,7 @@ Read more about how to use the Sarcophagus V2 SDK [here](https://sarcophagus-org
 To install the SDK, run the following command in your project directory:
 
 ```
-npm install sarcophagus-v2-sdk
+npm install @sarcophagus-org/sarcophagus-v2-sdk
 ```
 
 ## Usage
@@ -24,7 +24,7 @@ npm install sarcophagus-v2-sdk
 Here's a basic example of using the Sarcophagus V2 SDK in a TypeScript or JavaScript project:
 
 ```typescript
-import { SarcoClient } from 'sarcophagus-v2-sdk';
+import { SarcoClient } from '@sarcophagus-org/sarcophagus-v2-sdk';
 
 // Initialize the client with a custom provider and signer
 const sarco = new SarcoClient({
