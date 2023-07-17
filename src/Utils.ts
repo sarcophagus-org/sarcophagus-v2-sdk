@@ -1,13 +1,21 @@
-import { BigNumber, ethers } from 'ethers';
-import { UnsignedTransaction, formatEther } from 'ethers/lib/utils';
+import { BigNumber, ethers, utils } from 'ethers';
+import { UnsignedTransaction, computeAddress, formatEther } from 'ethers/lib/utils.js';
 import moment from 'moment';
 import { SarcophagusData, SarcophagusResponseContract, SarcophagusState } from './types/sarcophagi';
 import { safeContractCall } from './helpers/safeContractCall';
-import { CallOptions, SarcoNetworkConfig } from './types';
+import {
+  CallOptions,
+  ContractArchaeologist,
+  SarcoNetworkConfig,
+  SubmitSarcophagusArgsTuple,
+  SubmitSarcophagusProps,
+  SubmitSarcophagusSettings,
+} from './types';
 import { RecoverPublicKeyErrorStatus, RecoverPublicKeyResponse } from './types/utils';
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import axios, { AxiosResponse } from 'axios';
 import { ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
+import { getLowestResurrectionTime, getLowestRewrapInterval } from './helpers';
 
 export class Utils {
   private networkConfig: SarcoNetworkConfig;
@@ -19,6 +27,9 @@ export class Utils {
     this.signer = signer;
     this.networkConfig = networkConfig;
   }
+
+  public getLowestRewrapInterval = getLowestRewrapInterval;
+  public getLowestResurrectionTime = getLowestResurrectionTime;
 
   formatSarco(valueInWei: string | number, precision: number = 2): string {
     const value = formatEther(valueInWei.toString());
@@ -288,6 +299,57 @@ export class Utils {
     const privateKey = wallet.privateKey;
 
     return { publicKey, privateKey };
+  }
+
+  formatSubmitSarcophagusArgs({
+    name,
+    recipientState,
+    resurrection,
+    selectedArchaeologists,
+    requiredArchaeologists,
+    negotiationTimestamp,
+    archaeologistPublicKeys,
+    archaeologistSignatures,
+    arweaveTxId,
+  }: SubmitSarcophagusProps) {
+    const getContractArchaeologists = (): ContractArchaeologist[] => {
+      return selectedArchaeologists.map(arch => {
+        const { v, r, s } = utils.splitSignature(archaeologistSignatures.get(arch.profile.archAddress)!);
+        return {
+          archAddress: arch.profile.archAddress as `0x${string}`,
+          diggingFeePerSecond: arch.profile.minimumDiggingFeePerSecond,
+          curseFee: arch.profile.curseFee,
+          publicKey: archaeologistPublicKeys.get(arch.profile.archAddress)!,
+          v,
+          r,
+          s,
+        };
+      });
+    };
+
+    const sarcoId = ethers.utils.id(name + Date.now().toString());
+    const settings: SubmitSarcophagusSettings = {
+      name,
+      recipientAddress: recipientState.publicKey ? computeAddress(recipientState.publicKey) : '',
+      resurrectionTime: Math.trunc(resurrection / 1000),
+      threshold: requiredArchaeologists,
+      creationTime: Math.trunc(negotiationTimestamp / 1000),
+      maximumRewrapInterval: getLowestRewrapInterval(selectedArchaeologists),
+      maximumResurrectionTime: getLowestResurrectionTime(selectedArchaeologists),
+    };
+
+    const contractArchaeologists = getContractArchaeologists();
+
+    const submitSarcophagusArgs: SubmitSarcophagusArgsTuple = [
+      sarcoId,
+      {
+        ...settings,
+      },
+      contractArchaeologists,
+      arweaveTxId,
+    ];
+
+    return { submitSarcophagusArgs };
   }
 
   private wait(ms: number) {

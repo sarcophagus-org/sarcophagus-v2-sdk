@@ -1,16 +1,16 @@
 import { ethers } from 'ethers';
 import { ValidationError } from 'yup';
-import { Api } from '../../src/shared/Api';
-import { ArchaeologistSettings } from '../../src/shared/helpers/validation';
+import { Api } from '../../src/Api';
+import { ArchaeologistSettings } from '../../src/helpers/validation';
 import { mockSarcoClient } from '../mocks';
 import { arweaveTxId, defaultArchaeologists, defaultSarcophagusSettings, sarcoId } from './test-data';
 import { mockSafeContractCall } from './test-utils';
-import { SarcoWebBundlr } from '../../src/browser/SarcoWebBundlr';
-import { SarcoNetworkConfig } from '../../src/shared/types';
+import { SarcoWebBundlr } from '../../src/SarcoWebBundlr';
+import { SarcoNetworkConfig } from '../../src/types';
 
 jest.spyOn(ethers, 'Contract').mockImplementation();
 jest.mock('@sarcophagus-org/sarcophagus-v2-contracts');
-jest.mock('../../src/browser/SarcoWebBundlr');
+jest.mock('../../src/SarcoWebBundlr');
 
 const signer = ethers.Wallet.createRandom({});
 const api = new Api('0x0', signer, {} as SarcoNetworkConfig, {} as SarcoWebBundlr);

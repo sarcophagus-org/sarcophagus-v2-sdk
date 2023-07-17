@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
-import { ArchaeologistEncryptedShard } from '../../shared/types/archaeologist';
+import { ArchaeologistEncryptedShard } from '../types/archaeologist';
 import { encrypt } from './encryption';
-import { ArweaveFileMetadata } from '../../shared/types/arweave';
+import { ArweaveFileMetadata } from '../types/arweave';
 
 export const maxSarcophagusNameLength = 60;
 export const maxFileSize = 400_000_000;

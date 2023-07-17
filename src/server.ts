@@ -1,11 +1,15 @@
+import { NodeSarcoClient } from './NodeSarcoClient';
+
+export { NodeSarcoClient };
+
 import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
 import {
-  SarcoNetworkConfig,
+  CallOptions,
   RecoverPublicKeyErrorStatus,
   RecoverPublicKeyResponse,
-  CallOptions,
   SarcoBundlrConfig,
+  SarcoNetworkConfig,
 } from './types';
 import {
   ArchaeologistCurseNegotiationParams,
@@ -20,23 +24,29 @@ import {
   SarcophagusValidationError,
 } from './types/archaeologist';
 
-export type { SarcoNetworkConfig, RecoverPublicKeyResponse, CallOptions, SarcoBundlrConfig };
+export type { CallOptions, RecoverPublicKeyResponse, SarcoBundlrConfig, SarcoNetworkConfig };
 
 export { RecoverPublicKeyErrorStatus };
 
+export {
+  ArchaeologistExceptionCode,
+  NEGOTIATION_SIGNATURE_STREAM,
+  SarcophagusValidationError,
+  goerliNetworkConfig,
+  mainnetNetworkConfig,
+  sepoliaNetworkConfig,
+};
 export type {
-  ArchaeologistData,
-  ArchaeologistException,
-  ArchaeologistProfile,
-  SarcophagusArchaeologist,
-  ArchaeologistEncryptedShard,
   ArchaeologistCurseNegotiationParams,
+  ArchaeologistData,
+  ArchaeologistEncryptedShard,
+  ArchaeologistException,
   ArchaeologistNegotiationResponse,
   ArchaeologistNegotiationResult,
+  ArchaeologistProfile,
+  SarcophagusArchaeologist,
 };
-export { ArchaeologistExceptionCode, SarcophagusValidationError };
-export { NEGOTIATION_SIGNATURE_STREAM };
-export { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig };
 
-export type { SarcophagusData, SarcophagusDetails } from './types/sarcophagi';
 export { SarcophagusState } from './types/sarcophagi';
+export type { SarcophagusData, SarcophagusDetails } from './types/sarcophagi';
+export { ChunkingUploader } from '@bundlr-network/client/build/esm/common/chunkingUploader';

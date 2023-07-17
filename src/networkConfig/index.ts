@@ -13,7 +13,7 @@ export const goerliNetworkConfig = (providerUrl: string, etherscanApiKey = ''): 
   networkName: 'Goerli Testnet',
   networkShortName: 'Goerli',
   sarcoTokenAddress: '0x4633b43990b41B57b3678c6F3Ac35bA75C3D8436',
-  diamondDeployAddress: '0x6B84f17bbfCe26776fEFDf5cF039cA0E66C46Caf',
+  diamondDeployAddress: '0x23205431DAa31e9b54d0EBF40e45CC03aC759a22',
   etherscanApiUrl: 'https://api-goerli.etherscan.io/api',
   etherscanApiKey,
   explorerUrl: 'https://goerli.etherscan.io/',
@@ -24,15 +24,15 @@ export const goerliNetworkConfig = (providerUrl: string, etherscanApiKey = ''): 
   },
   arweaveConfig,
   providerUrl,
-  subgraphUrl: 'https://api.studio.thegraph.com/query/44302/sarcotest2/18',
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarco-goerli-test/two',
 });
 
 export const mainnetNetworkConfig = (providerUrl: string, etherscanApiKey = ''): SarcoNetworkConfig => ({
   chainId: 1,
   networkName: 'Etherum Mainnet',
   networkShortName: 'Mainnet',
-  sarcoTokenAddress: '',
-  diamondDeployAddress: '',
+  sarcoTokenAddress: '0x7697b462a7c4ff5f8b55bdbc2f4076c2af9cf51a',
+  diamondDeployAddress: '0x0Ec977D1863Eb919a2Ecd65d17Cc3f2CFdaCe3Ab',
   etherscanApiUrl: 'https://api.etherscan.io/api',
   etherscanApiKey,
   explorerUrl: 'https://etherscan.io/',
@@ -43,7 +43,7 @@ export const mainnetNetworkConfig = (providerUrl: string, etherscanApiKey = ''):
   },
   providerUrl,
   arweaveConfig,
-  subgraphUrl: '',
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarcophagus-v2/v0.0.1',
 });
 
 export const sepoliaNetworkConfig = (providerUrl: string, etherscanApiKey: string = ''): SarcoNetworkConfig => ({

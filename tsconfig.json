@@ -1,20 +1,26 @@
 {
   "compilerOptions": {
+    "noEmit": false,
     "target": "esnext",
     "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
     "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
+    "outDir": "./dist",   
+    "rootDir": "./src",   
     "baseUrl": "./src",
-    "outDir": "./dist",
+    "strict": true,   
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
     "declaration": true
   },
-  "include": ["src/**/*.ts",  "src/index.ts"]
+  "include": [
+    "src/**/*.ts", "src/server.ts", "src/browser.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

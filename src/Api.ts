@@ -25,7 +25,7 @@ import { Utils } from './Utils';
 import { ArweaveResponse, OnDownloadProgress } from './types/arweave';
 import { arweaveDataDelimiter, fetchArweaveFile, readFileDataAsBase64 } from './helpers/arweaveUtil';
 import { decrypt, encrypt } from './helpers/encryption';
-import { arrayify } from 'ethers/lib/utils';
+import { arrayify } from 'ethers/lib/utils.js';
 import { combine, split } from 'shamirs-secret-sharing-ts';
 import {
   chunkedUploaderFileSize,
@@ -33,9 +33,9 @@ import {
   encryptShardsWithArchaeologistPublicKeys,
   encryptShardsWithRecipientPublicKey,
 } from './helpers/sarco';
-import { SarcoWebBundlr } from '../browser/SarcoWebBundlr';
-import Bundlr from '@bundlr-network/client/build/cjs/common/bundlr';
-import { ChunkingUploader } from '@bundlr-network/client/build/cjs/common/chunkingUploader';
+import Bundlr from '@bundlr-network/client/build/esm/common/bundlr';
+import { ChunkingUploader } from '@bundlr-network/client/build/esm/common/chunkingUploader';
+import { SarcoWebBundlr } from './SarcoWebBundlr';
 
 export class Api {
   private embalmerFacet: ethers.Contract;
@@ -249,14 +249,15 @@ export class Api {
   }
 
   async uploadFileToArweave(args: {
-    file: File;
+    file?: File;
+    payloadData?: { name: string; type: string; data: Buffer };
     onStep: Function;
     payloadPublicKey: string;
     payloadPrivateKey: string;
     recipientPublicKey: string;
     shares: number;
     threshold: number;
-    archaeologistPublicKeys: Map<string, string>;
+    archaeologistPublicKeys: string[];
     onUploadChunk: (chunkedUploader: ChunkingUploader, chunkedUploadProgress: number) => void;
     onUploadChunkError: (msg: string) => void;
     onUploadComplete: (uploadId: string) => void;
@@ -265,6 +266,7 @@ export class Api {
       const {
         onStep,
         file,
+        payloadData,
         payloadPublicKey,
         shares,
         threshold,
@@ -276,7 +278,18 @@ export class Api {
         onUploadComplete,
       } = args;
       onStep('Reading file...');
-      const payload: { type: string; data: Buffer } = await readFileDataAsBase64(file!);
+
+      let payload: { type: string; data: Buffer };
+      let fileName: string;
+      if (file) {
+        payload = await readFileDataAsBase64(file!);
+        fileName = file.name;
+      } else if (payloadData) {
+        payload = { type: payloadData.type, data: Buffer.from(payloadData.data) };
+        fileName = payloadData.name;
+      } else {
+        throw new Error("Can't upload file. No file or payload data provided.");
+      }
 
       /**
        * File upload data
@@ -299,7 +312,7 @@ export class Api {
 
       // Step 3: Encrypt each shard again with the arch public keys
       const keySharesEncryptedOuter = await encryptShardsWithArchaeologistPublicKeys(
-        Array.from(archaeologistPublicKeys.values()),
+        archaeologistPublicKeys,
         keySharesEncryptedInner
       );
 
@@ -318,7 +331,7 @@ export class Api {
       const encKeysBuffer = Buffer.from(JSON.stringify(doubleEncryptedKeyShares), 'binary');
 
       const encryptedMetadata = await encryptMetadataFields(recipientPublicKey, {
-        fileName: file!.name,
+        fileName: fileName,
         type: payload.type,
       });
 
@@ -439,20 +452,17 @@ export class Api {
     address: string,
     options: CallOptions & { filter: SarcophagusFilter }
   ): Promise<SarcophagusData[]> {
-    let sarcoIds: string[] = [];
-    let methodName: string;
+    const filter = this.embalmerFacet.filters.CreateSarcophagus(null, null, null, null, address);
+    const logs =
+      (await this.signer.provider?.getLogs({
+        fromBlock: 0,
+        toBlock: 'latest',
+        address: this.embalmerFacet.address,
+        topics: filter.topics,
+      })) ?? [];
 
-    switch (options.filter) {
-      case SarcophagusFilter.embalmer:
-        methodName = 'getEmbalmerSarcophagi';
-        break;
-
-      case SarcophagusFilter.recipient:
-        methodName = 'getRecipientSarcophagi';
-        break;
-    }
-
-    sarcoIds = (await safeContractCall(this.viewStateFacet, methodName, [address], options)) as unknown as string[];
+    const events = logs.map(log => this.embalmerFacet.interface.parseLog(log)).map(event => event.args);
+    const sarcoIds: string[] = events.map(s => s.sarcoId);
 
     const gracePeriod = (await safeContractCall(
       this.viewStateFacet,

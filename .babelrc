@@ -1,0 +1,6 @@
+{
+  "plugins": ["module-extension-resolver"],
+  "presets": [
+    "@babel/preset-typescript"
+  ]
+}
