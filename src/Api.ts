@@ -441,7 +441,6 @@ export class Api {
 
   /**
    * Returns the number of sarcophagi in the contract.
-   * @param options - Options for the contract method call
    * @returns The number of sarcophagi
    * */
   async getSarcophagiCount(): Promise<SarcoCounts> {
