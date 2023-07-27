@@ -14,7 +14,7 @@ import {
   ArchaeologistData,
   ArchaeologistExceptionCode,
   ArchaeologistNegotiationResponse,
-  ArchaeologistNegotiationResult,
+  ArchaeologistNegotiationResult, ArchaeologistProfile,
   SarcophagusValidationError,
 } from './types/archaeologist';
 import { getLowestResurrectionTime, getLowestRewrapInterval } from './helpers';
@@ -110,21 +110,30 @@ export class Archaeologist {
       }
 
       addresses = addresses.map(a => a.toLowerCase());
-      const archData = (await getArchaeologists(this.subgraphUrl)).filter(arch => addresses!.includes(arch.address));
+      const archSubgraphData =
+        (await getArchaeologists(this.subgraphUrl))
+          .filter(arch => addresses!.includes(arch.address));
 
-      const registeredArchaeologists = archData.map(arch => {
+      const profiles = (await safeContractCall(
+        this.viewStateFacet,
+        'getArchaeologistProfiles',
+        [addresses]
+      )) as unknown as ArchaeologistProfile[];
+
+      const registeredArchaeologists = archSubgraphData.map(arch => {
         const {
           successes,
           accusals,
           failures,
           address: archAddress,
           maximumResurrectionTime,
-          freeBond,
           maximumRewrapInterval,
           minimumDiggingFeePerSecond,
           peerId,
           curseFee,
         } = arch;
+
+        const freeBond = profiles.find(p => p.peerId === peerId)!.freeBond
 
         return {
           profile: {
@@ -134,7 +143,7 @@ export class Archaeologist {
             accusals: BigNumber.from(accusals),
             failures: BigNumber.from(failures),
             maximumResurrectionTime: BigNumber.from(maximumResurrectionTime),
-            freeBond: BigNumber.from(freeBond),
+            freeBond: freeBond,
             maximumRewrapInterval: BigNumber.from(maximumRewrapInterval),
             minimumDiggingFeePerSecond: BigNumber.from(minimumDiggingFeePerSecond),
             curseFee: BigNumber.from(curseFee),
