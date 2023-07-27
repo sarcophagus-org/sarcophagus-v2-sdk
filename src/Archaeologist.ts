@@ -24,7 +24,7 @@ import { getLowestResurrectionTime, getLowestRewrapInterval } from './helpers';
  * archaeologists on the Sarcophagus V2 protocol.
  */
 export class Archaeologist {
-  private viewStateFacet: ethers.Contract;
+  private readonly viewStateFacet: ethers.Contract;
   private subgraphUrl: string;
   private p2pNode: Libp2p;
   private signer: ethers.Signer;
@@ -95,7 +95,7 @@ export class Archaeologist {
    * returns the full profiles of all registered archaeologists.
    *
    * @param addresses - The addresses of the archaeologists to get the full profiles of.
-   * @param filterOffline - Whether or not to filter out offline archaeologists.
+   * @param filterOffline - Whether to filter out offline archaeologists.
    *
    * @returns The full profiles of the given archaeologists.
    */
@@ -239,7 +239,7 @@ export class Archaeologist {
    * and retry the negotiation with them.
    *
    * @param selectedArchaeologists - The archaeologists to negotiate with.
-   * @param isRetry - Whether or not this is a retry of a previous negotiation.
+   * @param isRetry - Whether this is a retry of a previous negotiation.
    *
    * @returns A map of the archaeologists' signatures and public keys, or a map of the archaeologists' exceptions.
    *
@@ -338,27 +338,6 @@ export class Archaeologist {
   }
 
   /**
-   * Returns the total fees owed to the archaeologist, given a resurrection time and current timestamp.
-   * @param archaeologist The archaeologist to calculate fees for
-   * @param resurrectionTime The resurrection time in ms
-   * @param timestampMs The current timestamp in ms
-   *
-   * @returns The total fees owed to the archaeologist
-   * @throws if the resurrection time is less than the current timestamp
-   */
-  async getTotalFees(archaeologist: ArchaeologistData, resurrectionTime: number, timestampMs: number) {
-    const protocolFeeBasePercentage = (await safeContractCall(
-      this.viewStateFacet,
-      'getProtocolFeeBasePercentage',
-      []
-    )) as unknown as BigNumber;
-
-    const diggingFees = this.calculateDiggingFees(archaeologist, resurrectionTime, timestampMs);
-    const protocolFees = diggingFees.div(protocolFeeBasePercentage.mul(100));
-    return archaeologist.profile.curseFee.add(diggingFees).add(protocolFees);
-  }
-
-  /**
    * Returns the estimated total digging fees, and protocol fee,
    * that the embalmer will be due to pay.
    */
@@ -371,7 +350,7 @@ export class Archaeologist {
 
     const totalDiggingFees = this.calculateProjectedDiggingFees(archaeologists, resurrectionTimestamp, timestampMs);
 
-    const protocolFee = totalDiggingFees.div(protocolFeeBasePercentage.mul(100));
+    const protocolFee = totalDiggingFees.div(BigNumber.from(10000).div(protocolFeeBasePercentage));
 
     return {
       totalDiggingFees,
@@ -421,7 +400,7 @@ export class Archaeologist {
   /**
    * Returns the total projected digging fees owed to the archaeologist, given a resurrection time and current timestamp.
    *
-   * @param diggingFeeRates An array of the archaeologist's digging fees per second rates
+   * @param archaeologists
    * @param resurrectionTimestamp The timestamp of the resurrection in ms
    * @param timestampMs The current timestamp in ms
    *
