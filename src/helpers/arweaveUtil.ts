@@ -49,12 +49,14 @@ function splitPackedDataBuffer(concatenatedBuffer: Buffer): ArweaveResponse {
 export async function fetchArweaveFile(
   arweaveTxId: string,
   networkConfig: SarcoNetworkConfig,
-  onDownloadProgress: OnDownloadProgress
+  onDownloadProgress: OnDownloadProgress,
+  arweave: Arweave
 ): Promise<ArweaveResponse> {
-  const arweave = Arweave.init(networkConfig.arweaveConfig);
+  // @ts-ignore
+  const arweaveClient = arweave.init(networkConfig.arweaveConfig);
 
   try {
-    const res = await arweave.api.get(`/${arweaveTxId}`, {
+    const res = await arweaveClient.api.get(`/${arweaveTxId}`, {
       responseType: 'arraybuffer',
       onDownloadProgress,
     });

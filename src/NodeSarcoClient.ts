@@ -9,6 +9,7 @@ import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from 
 import { Token } from './Token';
 import { SarcoNetworkConfig } from './types';
 import { Utils } from './Utils';
+import Arweave from "arweave";
 
 export class NodeSarcoClient {
   signer: Signer;
@@ -23,6 +24,9 @@ export class NodeSarcoClient {
   private networkConfig!: SarcoNetworkConfig;
   private p2pNode!: Libp2p;
 
+  // @ts-ignore
+  private arweave: Arweave = Arweave;
+
   constructor(clientConfig: NodeSarcoClientConfig) {
     const config = nodeSarcoClientSchema.validateSync(clientConfig);
     const customProvider = new ethers.providers.JsonRpcProvider(config.providerUrl);
@@ -36,7 +40,7 @@ export class NodeSarcoClient {
     this.bundlr = new Bundlr(networkConfig.bundlr.nodeUrl, networkConfig.bundlr.currencyName, config.privateKey, {
       providerUrl: networkConfig.bundlr.providerUrl,
     });
-    this.api = new Api(networkConfig.diamondDeployAddress, this.signer, networkConfig, this.bundlr);
+    this.api = new Api(networkConfig.diamondDeployAddress, this.signer, networkConfig, this.bundlr, this.arweave);
     this.token = new Token(networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
     this.utils = new Utils(networkConfig, this.signer);
   }
