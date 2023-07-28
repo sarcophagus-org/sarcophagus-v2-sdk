@@ -455,7 +455,11 @@ export class Api {
     address: string,
     options: CallOptions & { filter: SarcophagusFilter }
   ): Promise<SarcophagusData[]> {
-    const filter = this.embalmerFacet.filters.CreateSarcophagus(null, null, null, null, address);
+    // If filter is embalmer, return embalmer create events, otherwise recipient
+    const filter = options.filter === SarcophagusFilter.embalmer ?
+      this.embalmerFacet.filters.CreateSarcophagus(null, null, null, null, address) :
+      this.embalmerFacet.filters.CreateSarcophagus(null, null, null, null, null, address);
+
     const logs =
       (await this.signer.provider?.getLogs({
         fromBlock: 0,
