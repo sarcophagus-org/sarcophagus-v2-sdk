@@ -205,7 +205,7 @@ export class Utils {
 
     try {
       const response = await axios.get(
-        `${this.networkConfig.etherscanApiUrl}?${getParameters}&address=${address}&apikey=${this.networkConfig.etherscanApiKey}`
+        `${this.networkConfig.etherscanApiUrl}?${getParameters}&address=${address}`
       );
 
       if (response.status !== 200) {
