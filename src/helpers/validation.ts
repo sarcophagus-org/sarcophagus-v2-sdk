@@ -10,6 +10,7 @@ export const nodeSarcoClientSchema = object({
 
 export const sarcoClientInitSchema = object({
   chainId: number().required(),
+  bundlrPublicKey: string().required(),
   etherscanApiKey: string(),
 });
 

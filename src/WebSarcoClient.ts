@@ -42,9 +42,9 @@ export class WebSarcoClient {
     const providerUrl = new ethers.providers.Web3Provider(this.provider as any).connection.url;
 
     const networkConfigByChainId = new Map<number, SarcoNetworkConfig>([
-      [1, mainnetNetworkConfig(providerUrl, initParams.etherscanApiKey)],
-      [5, goerliNetworkConfig(providerUrl, initParams.etherscanApiKey)],
-      [11155111, sepoliaNetworkConfig(providerUrl, initParams.etherscanApiKey)],
+      [1, mainnetNetworkConfig(providerUrl, params.etherscanApiKey)],
+      [5, goerliNetworkConfig(providerUrl, params.etherscanApiKey)],
+      [11155111, sepoliaNetworkConfig(providerUrl, params.etherscanApiKey)],
     ]);
 
     const networkConfig = networkConfigByChainId.get(params.chainId);
@@ -57,14 +57,45 @@ export class WebSarcoClient {
     // TODO: Allow client to choose when to start/stop libp2p node
     await this.startLibp2pNode();
 
+    // Custom provider for bundlr that uses a Sarcophagus DAO server-provided public key to sign transactions to sponsor
+    // upload costs for embalmers.
+    const bundlrProvider = {
+      getPublicKey: async () => params.bundlrPublicKey,
+      getSigner: () => {
+        return {
+          getAddress: () => params.bundlrPublicKey, // pubkey is address for TypedEthereumSigner
+          _signTypedData: async (
+            _domain: never,
+            _types: never,
+            message: { address: string; 'Transaction hash': Uint8Array }
+          ) => {
+            let convertedMsg = Buffer.from(message['Transaction hash']).toString('hex');
+            const res = await fetch('https://api.encryptafile.com/bundlr/signData', {
+              method: 'POST',
+              body: JSON.stringify({ signatureData: convertedMsg }),
+            });
+            const { signature } = await res.json();
+            const bSig = Buffer.from(signature, 'hex');
+            // pad & convert so it's in the format the signer expects to have to convert from.
+            const pad = Buffer.concat([Buffer.from([0]), Buffer.from(bSig)]).toString('hex');
+            return pad;
+          },
+        };
+      },
+
+      _ready: () => {},
+    };
+
+    const bundlrConfig = {
+      timeout: 100000,
+      providerUrl: networkConfig.bundlr.providerUrl,
+    };
+
     this._bundlr = new SarcoWebBundlr(
       this.networkConfig.bundlr.nodeUrl,
       this.networkConfig.bundlr.currencyName,
-      new ethers.providers.Web3Provider(this.provider as any),
-      {
-        timeout: 100000,
-        providerUrl: networkConfig.bundlr.providerUrl,
-      }
+      bundlrProvider as unknown as ethers.providers.Web3Provider,
+      bundlrConfig
     );
     this.utils = new Utils(networkConfig, this.signer);
     this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig, this._bundlr);
