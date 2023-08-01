@@ -36,6 +36,7 @@ import {
 import Bundlr from '@bundlr-network/client/build/esm/common/bundlr';
 import { ChunkingUploader } from '@bundlr-network/client/build/esm/common/chunkingUploader';
 import { SarcoWebBundlr } from './SarcoWebBundlr';
+import Arweave from "arweave";
 
 export class Api {
   private embalmerFacet: ethers.Contract;
@@ -45,12 +46,14 @@ export class Api {
   private utils: Utils;
   private networkConfig: SarcoNetworkConfig;
   private bundlr: SarcoWebBundlr | Bundlr;
+  private arweave: Arweave;
 
   constructor(
     diamondDeployAddress: string,
     signer: ethers.Signer,
     networkConfig: SarcoNetworkConfig,
-    bundlr: SarcoWebBundlr | Bundlr
+    bundlr: SarcoWebBundlr | Bundlr,
+    arweave: Arweave
   ) {
     this.embalmerFacet = new ethers.Contract(diamondDeployAddress, EmbalmerFacet__factory.abi, signer);
     this.viewStateFacet = new ethers.Contract(diamondDeployAddress, ViewStateFacet__factory.abi, signer);
@@ -59,6 +62,7 @@ export class Api {
     this.networkConfig = networkConfig;
     this.bundlr = bundlr;
     this.utils = new Utils(networkConfig, signer);
+    this.arweave = arweave;
   }
 
   /**
@@ -183,11 +187,11 @@ export class Api {
 
       // In case the sarcophagus has no tx id. This should never happen but, just in case.
       if (!payloadTxId) {
-        throw new Error(`The Arwevae tx id for the payload is missing on sarcophagus ${sarcoId}`);
+        throw new Error(`The Arweave tx id for the payload is missing on sarcophagus ${sarcoId}`);
       }
 
       // Load the payload from arweave using the txId
-      const arweaveFile = await fetchArweaveFile(payloadTxId, this.networkConfig, onDownloadProgress);
+      const arweaveFile = await fetchArweaveFile(payloadTxId, this.networkConfig, onDownloadProgress, this.arweave);
 
       if (!arweaveFile) throw Error('Failed to download file from arweave');
 
@@ -244,7 +248,7 @@ export class Api {
       return decryptedResult;
     } catch (error) {
       console.error(`Error resurrecting sarcophagus: ${error}`);
-      throw new Error('Could not claim Sarcophagus. Please make sure you have the right private key.');
+      throw new Error(`Could not claim Sarcophagus. Please make sure you have the right private key. ${error}`);
     }
   }
 
@@ -434,14 +438,13 @@ export class Api {
   async getSarcophagusPayload(sarcoId: string, onDownloadProgress: OnDownloadProgress): Promise<ArweaveResponse> {
     const sarcophagus = (await getSubgraphSarcophagi(this.subgraphUrl, [sarcoId]))[0];
     const payloadTxId = sarcophagus.arweaveTxId;
-    const arweaveFile = await fetchArweaveFile(payloadTxId, this.networkConfig, onDownloadProgress);
+    const arweaveFile = await fetchArweaveFile(payloadTxId, this.networkConfig, onDownloadProgress, this.arweave);
     if (!arweaveFile) throw Error('Failed to download file from arweave');
     return arweaveFile;
   }
 
   /**
    * Returns the number of sarcophagi in the contract.
-   * @param options - Options for the contract method call
    * @returns The number of sarcophagi
    * */
   async getSarcophagiCount(): Promise<SarcoCounts> {
@@ -452,7 +455,11 @@ export class Api {
     address: string,
     options: CallOptions & { filter: SarcophagusFilter }
   ): Promise<SarcophagusData[]> {
-    const filter = this.embalmerFacet.filters.CreateSarcophagus(null, null, null, null, address);
+    // If filter is embalmer, return embalmer create events, otherwise recipient
+    const filter = options.filter === SarcophagusFilter.embalmer ?
+      this.embalmerFacet.filters.CreateSarcophagus(null, null, null, null, address) :
+      this.embalmerFacet.filters.CreateSarcophagus(null, null, null, null, null, address);
+
     const logs =
       (await this.signer.provider?.getLogs({
         fromBlock: 0,
