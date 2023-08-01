@@ -63,20 +63,26 @@ export class WebSarcoClient {
 
     // Custom provider for bundlr that uses a Sarcophagus DAO server-provided public key to sign transactions to sponsor
     // upload costs for embalmers.
+    const pubKey = Buffer.from(params.bundlrPublicKey, 'hex');
     const bundlrProvider = {
-      getPublicKey: async () => params.bundlrPublicKey,
+      getPublicKey: async () => {
+        return pubKey
+      },
       getSigner: () => {
         return {
-          getAddress: () => params.bundlrPublicKey, // pubkey is address for TypedEthereumSigner
+          publicKey: pubKey,
+          getAddress: () => pubKey,
           _signTypedData: async (
             _domain: never,
             _types: never,
             message: { address: string; 'Transaction hash': Uint8Array }
           ) => {
-            let convertedMsg = Buffer.from(message['Transaction hash']).toString('hex');
+            let messageData = Buffer.from(message['Transaction hash']).toString('hex');
+            // const res = await fetch('http://localhost:4000/bundlr/signData', {
             const res = await fetch('https://api.encryptafile.com/bundlr/signData', {
               method: 'POST',
-              body: JSON.stringify({ signatureData: convertedMsg }),
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({ messageData }),
             });
             const { signature } = await res.json();
             const bSig = Buffer.from(signature, 'hex');
@@ -86,7 +92,6 @@ export class WebSarcoClient {
           },
         };
       },
-
       _ready: () => {},
     };
 
@@ -101,6 +106,7 @@ export class WebSarcoClient {
       bundlrProvider as unknown as ethers.providers.Web3Provider,
       bundlrConfig
     );
+    this._bundlr.connect();
     this.utils = new Utils(networkConfig, this.signer);
     this.api = new Api(
       this.networkConfig.diamondDeployAddress,
