@@ -14,7 +14,8 @@ import {
   ArchaeologistData,
   ArchaeologistExceptionCode,
   ArchaeologistNegotiationResponse,
-  ArchaeologistNegotiationResult, ArchaeologistProfile,
+  ArchaeologistNegotiationResult,
+  ArchaeologistProfile,
   SarcophagusValidationError,
 } from './types/archaeologist';
 import { getLowestResurrectionTime, getLowestRewrapInterval } from './helpers';
@@ -110,15 +111,13 @@ export class Archaeologist {
       }
 
       addresses = addresses.map(a => a.toLowerCase());
-      const archSubgraphData =
-        (await getArchaeologists(this.subgraphUrl))
-          .filter(arch => addresses!.includes(arch.address));
+      const archSubgraphData = (await getArchaeologists(this.subgraphUrl)).filter(arch =>
+        addresses!.includes(arch.address)
+      );
 
-      const profiles = (await safeContractCall(
-        this.viewStateFacet,
-        'getArchaeologistProfiles',
-        [addresses]
-      )) as unknown as ArchaeologistProfile[];
+      const profiles = (await safeContractCall(this.viewStateFacet, 'getArchaeologistProfiles', [
+        addresses,
+      ])) as unknown as ArchaeologistProfile[];
 
       const registeredArchaeologists = archSubgraphData.map(arch => {
         const {
@@ -133,7 +132,7 @@ export class Archaeologist {
           curseFee,
         } = arch;
 
-        const freeBond = profiles.find(p => p.peerId === peerId)!.freeBond
+        const freeBond = profiles.find(p => p.peerId === peerId)!.freeBond;
 
         return {
           profile: {

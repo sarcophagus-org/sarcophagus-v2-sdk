@@ -204,9 +204,7 @@ export class Utils {
     const getParameters = 'module=account&action=txlist&startblock=0&endblock=99999999&page=1&offset=1000&sort=asc';
 
     try {
-      const response = await axios.get(
-        `${this.networkConfig.etherscanApiUrl}?${getParameters}&address=${address}`
-      );
+      const response = await axios.get(`${this.networkConfig.etherscanApiUrl}?${getParameters}&address=${address}`);
 
       if (response.status !== 200) {
         console.log('recoverPublicKey error:', response.data.message);
