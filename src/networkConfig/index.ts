@@ -20,7 +20,6 @@ export const goerliNetworkConfig = (providerUrl: string, etherscanApiKey = ''): 
   bundlr: {
     currencyName: 'ethereum',
     nodeUrl: 'https://devnet.bundlr.network',
-    providerUrl,
   },
   arweaveConfig,
   providerUrl,
@@ -39,7 +38,6 @@ export const mainnetNetworkConfig = (providerUrl: string, etherscanApiKey = ''):
   bundlr: {
     currencyName: 'ethereum',
     nodeUrl: 'https://node1.bundlr.network',
-    providerUrl,
   },
   providerUrl,
   arweaveConfig,
@@ -58,7 +56,6 @@ export const sepoliaNetworkConfig = (providerUrl: string, etherscanApiKey: strin
   bundlr: {
     currencyName: 'ethereum',
     nodeUrl: 'https://devnet.bundlr.network',
-    providerUrl,
   },
   providerUrl,
   arweaveConfig,

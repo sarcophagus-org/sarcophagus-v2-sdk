@@ -92,7 +92,7 @@ export class WebSarcoClient {
 
     const bundlrConfig = {
       timeout: 100000,
-      providerUrl: networkConfig.bundlr.providerUrl,
+      providerUrl: networkConfig.providerUrl,
     };
 
     this._bundlr = new SarcoWebBundlr(

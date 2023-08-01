@@ -37,8 +37,10 @@ export class NodeSarcoClient {
 
     this.signer = wallet.connect(customProvider);
 
+    // TODO: figure out how to inject the public key from server into the bundlr instance.
+    // potential hint - `config.privateKey` is passed into param `wallet: any` in the constructor of the bundlr instance
     this.bundlr = new Bundlr(networkConfig.bundlr.nodeUrl, networkConfig.bundlr.currencyName, config.privateKey, {
-      providerUrl: networkConfig.bundlr.providerUrl,
+      providerUrl: networkConfig.providerUrl,
     });
     this.api = new Api(networkConfig.diamondDeployAddress, this.signer, networkConfig, this.bundlr, this.arweave);
     this.token = new Token(networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);

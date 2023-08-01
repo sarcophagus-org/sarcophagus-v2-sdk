@@ -11,7 +11,6 @@ export interface CallOptions {
 export interface SarcoBundlrConfig {
   currencyName: string;
   nodeUrl: string;
-  providerUrl: string;
 }
 
 /**
