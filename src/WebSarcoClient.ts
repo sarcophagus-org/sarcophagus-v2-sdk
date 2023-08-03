@@ -40,6 +40,14 @@ export class WebSarcoClient {
     this.signer = new ethers.providers.Web3Provider(this.provider as any).getSigner();
   }
 
+  /**
+   * Initialises the WebSarcoClient instance. Must be called before any other methods are called.
+   * This can be called at any time after initialisation to re-initialise the client with different parameters.
+   *
+   * @param initParams - The parameters to initialise the WebSarcoClient instance with
+   * @param onInit - A callback function that is called after the WebSarcoClient instance is initialised
+   * @returns void
+   * */
   async init(initParams: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<void> {
     const params = await sarcoClientInitSchema.validate(initParams);
 
@@ -61,39 +69,45 @@ export class WebSarcoClient {
     // TODO: Allow client to choose when to start/stop libp2p node
     await this.startLibp2pNode();
 
-    // Custom provider for bundlr that uses a Sarcophagus DAO server-provided public key to sign transactions to sponsor
-    // upload costs for embalmers.
-    const pubKey = Buffer.from(params.bundlrPublicKey, 'hex');
-    const bundlrProvider = {
-      getPublicKey: async () => {
-        return pubKey
-      },
-      getSigner: () => {
-        return {
-          publicKey: pubKey,
-          getAddress: () => pubKey,
-          _signTypedData: async (
-            _domain: never,
-            _types: never,
-            message: { address: string; 'Transaction hash': Uint8Array }
-          ) => {
-            let messageData = Buffer.from(message['Transaction hash']).toString('hex');
-            // const res = await fetch('http://localhost:4000/bundlr/signData', {
-            const res = await fetch('https://api.encryptafile.com/bundlr/signData', {
-              method: 'POST',
-              headers: { 'content-type': 'application/json' },
-              body: JSON.stringify({ messageData }),
-            });
-            const { signature } = await res.json();
-            const bSig = Buffer.from(signature, 'hex');
-            // pad & convert so it's in the format the signer expects to have to convert from.
-            const pad = Buffer.concat([Buffer.from([0]), Buffer.from(bSig)]).toString('hex');
-            return pad;
-          },
-        };
-      },
-      _ready: () => {},
-    };
+    let bundlrProvider: ethers.providers.Web3Provider;
+
+    if (params.bundlrPublicKey) {
+      // Custom provider for bundlr that uses a Sarcophagus DAO server-provided public key to sign transactions to sponsor
+      // upload costs for embalmers.
+      const pubKey = Buffer.from(params.bundlrPublicKey, 'hex');
+      bundlrProvider = {
+        getPublicKey: async () => {
+          return pubKey;
+        },
+        getSigner: () => {
+          return {
+            publicKey: pubKey,
+            getAddress: () => pubKey,
+            _signTypedData: async (
+              _domain: never,
+              _types: never,
+              message: { address: string; 'Transaction hash': Uint8Array }
+            ) => {
+              let messageData = Buffer.from(message['Transaction hash']).toString('hex');
+              // const res = await fetch('http://localhost:4000/bundlr/signData', {
+              const res = await fetch('https://api.encryptafile.com/bundlr/signData', {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ messageData }),
+              });
+              const { signature } = await res.json();
+              const bSig = Buffer.from(signature, 'hex');
+              // pad & convert so it's in the format the signer expects to have to convert from.
+              const pad = Buffer.concat([Buffer.from([0]), Buffer.from(bSig)]).toString('hex');
+              return pad;
+            },
+          };
+        },
+        _ready: () => {},
+      } as unknown as ethers.providers.Web3Provider;
+    } else {
+      bundlrProvider = new ethers.providers.Web3Provider(this.provider as any);
+    }
 
     const bundlrConfig = {
       timeout: 100000,
@@ -103,11 +117,10 @@ export class WebSarcoClient {
     this._bundlr = new SarcoWebBundlr(
       this.networkConfig.bundlr.nodeUrl,
       this.networkConfig.bundlr.currencyName,
-      bundlrProvider as unknown as ethers.providers.Web3Provider,
+      bundlrProvider,
       bundlrConfig
     );
     this._bundlr.connect();
-    this.utils = new Utils(networkConfig, this.signer);
     this.api = new Api(
       this.networkConfig.diamondDeployAddress,
       this.signer,
@@ -115,7 +128,6 @@ export class WebSarcoClient {
       this._bundlr,
       this.arweave
     );
-    this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
     this.archaeologist = new Archaeologist(
       this.networkConfig.diamondDeployAddress,
       this.signer,
@@ -123,6 +135,9 @@ export class WebSarcoClient {
       this.p2pNode,
       this.utils
     );
+
+    this.utils = new Utils(networkConfig, this.signer);
+    this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
 
     this.isInitialised = true;
     onInit(this.p2pNode);
