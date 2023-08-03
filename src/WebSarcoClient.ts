@@ -120,7 +120,7 @@ export class WebSarcoClient {
       bundlrProvider,
       bundlrConfig
     );
-    this._bundlr.connect();
+    if (params.bundlrPublicKey) this._bundlr.connect();
     this.api = new Api(
       this.networkConfig.diamondDeployAddress,
       this.signer,
