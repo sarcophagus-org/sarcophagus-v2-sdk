@@ -46,9 +46,27 @@ export class WebSarcoClient {
     const providerUrl = new ethers.providers.Web3Provider(this.provider as any).connection.url;
 
     const networkConfigByChainId = new Map<number, SarcoNetworkConfig>([
-      [1, mainnetNetworkConfig(providerUrl, initParams.etherscanApiKey)],
-      [5, goerliNetworkConfig(providerUrl, initParams.etherscanApiKey)],
-      [11155111, sepoliaNetworkConfig(providerUrl, initParams.etherscanApiKey)],
+      [
+        1,
+        mainnetNetworkConfig(providerUrl, {
+          etherscanApiKey: initParams.etherscanApiKey,
+          zeroExApiKey: initParams.zeroExApiKey,
+        }),
+      ],
+      [
+        5,
+        goerliNetworkConfig(providerUrl, {
+          etherscanApiKey: initParams.etherscanApiKey,
+          zeroExApiKey: initParams.zeroExApiKey,
+        }),
+      ],
+      [
+        11155111,
+        sepoliaNetworkConfig(providerUrl, {
+          etherscanApiKey: initParams.etherscanApiKey,
+          zeroExApiKey: initParams.zeroExApiKey,
+        }),
+      ],
     ]);
 
     const networkConfig = networkConfigByChainId.get(params.chainId);

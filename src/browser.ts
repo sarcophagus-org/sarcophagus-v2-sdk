@@ -52,3 +52,5 @@ export type {
 export { SarcophagusState } from './types/sarcophagi';
 export type { SarcophagusData, SarcophagusDetails } from './types/sarcophagi';
 export { ChunkingUploader } from '@bundlr-network/client/build/esm/common/chunkingUploader';
+import { ZeroExQuote } from './helpers/zeroEx';
+export type { ZeroExQuote };

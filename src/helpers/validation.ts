@@ -6,11 +6,13 @@ export const nodeSarcoClientSchema = object({
   providerUrl: string().required(),
   chainId: number().required(),
   etherscanApiKey: string(),
+  zeroExApiKey: string(),
 });
 
 export const sarcoClientInitSchema = object({
   chainId: number().required(),
   etherscanApiKey: string(),
+  zeroExApiKey: string(),
 });
 
 export const sarcophagusSettingsSchema = object({

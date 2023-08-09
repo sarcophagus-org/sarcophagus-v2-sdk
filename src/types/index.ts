@@ -31,6 +31,7 @@ export interface SarcoNetworkConfig {
   subgraphUrl: string;
   providerUrl?: string;
   signalServerPort?: number;
+  zeroExApiKey?: string;
 }
 
 export enum RecipientSetByOption {

@@ -32,7 +32,10 @@ export class NodeSarcoClient {
     const customProvider = new ethers.providers.JsonRpcProvider(config.providerUrl);
     const wallet = new ethers.Wallet(config.privateKey, customProvider);
 
-    const networkConfig = this.getNetworkConfig(config.providerUrl, config.chainId, config.etherscanApiKey);
+    const networkConfig = this.getNetworkConfig(config.providerUrl, config.chainId, {
+      etherscanApiKey: config.etherscanApiKey,
+      zeroExApiKey: config.zeroExApiKey,
+    });
     this.networkConfig = networkConfig;
 
     this.signer = wallet.connect(customProvider);
@@ -67,11 +70,15 @@ export class NodeSarcoClient {
     return this.p2pNode.stop();
   }
 
-  private getNetworkConfig(providerUrl: string, chainId: number, etherscanApiKey?: string): SarcoNetworkConfig {
+  private getNetworkConfig(
+    providerUrl: string,
+    chainId: number,
+    config: { etherscanApiKey?: string; zeroExApiKey?: string }
+  ): SarcoNetworkConfig {
     const networkConfigByChainId = new Map<number, SarcoNetworkConfig>([
-      [1, mainnetNetworkConfig(providerUrl, etherscanApiKey)],
-      [5, goerliNetworkConfig(providerUrl, etherscanApiKey)],
-      [11155111, sepoliaNetworkConfig(providerUrl, etherscanApiKey)],
+      [1, mainnetNetworkConfig(providerUrl, config)],
+      [5, goerliNetworkConfig(providerUrl, config)],
+      [11155111, sepoliaNetworkConfig(providerUrl, config)],
     ]);
     const networkConfig = networkConfigByChainId.get(chainId);
 
