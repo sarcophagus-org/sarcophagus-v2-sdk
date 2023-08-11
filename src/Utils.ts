@@ -371,9 +371,11 @@ export class Utils {
   }
 
   private async signQuote(quote: ZeroExQuote) {
-    console.log('🚀 ~ file: Utils.ts:374 ~ Utils ~ signQuote ~ quote:', quote);
+    // The 0x api does not provide an accurate gas limit for accounts that have never received the ERC20 that is being bought.
+    const newAccountGasPadding = 100_000;
+    const gasLimit = parseInt(quote.gas) + newAccountGasPadding;
     const tx = await this.signer.sendTransaction({
-      gasLimit: quote.gas,
+      gasLimit: gasLimit,
       gasPrice: quote.gasPrice,
       to: quote.to,
       data: quote.data,
