@@ -89,8 +89,7 @@ export class WebSarcoClient {
               message: { address: string; 'Transaction hash': Uint8Array }
             ) => {
               let messageData = Buffer.from(message['Transaction hash']).toString('hex');
-              // const res = await fetch('http://localhost:4000/bundlr/signData', {
-              const res = await fetch('https://api.encryptafile.com/bundlr/signData', {
+              const res = await fetch(`${networkConfig.apiUrlBase}/bundlr/signData`, {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
                 body: JSON.stringify({ messageData }),
@@ -132,6 +131,7 @@ export class WebSarcoClient {
       this.networkConfig.diamondDeployAddress,
       this.signer,
       this.networkConfig.subgraphUrl,
+      this.networkConfig.apiUrlBase,
       this.p2pNode,
       this.utils
     );

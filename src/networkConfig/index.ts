@@ -24,6 +24,7 @@ export const goerliNetworkConfig = (providerUrl: string, etherscanApiKey = ''): 
   arweaveConfig,
   providerUrl,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarco-goerli-test/two',
+  apiUrlBase: 'https://api.encryptafile.com',
 });
 
 export const mainnetNetworkConfig = (providerUrl: string, etherscanApiKey = ''): SarcoNetworkConfig => ({
@@ -42,6 +43,7 @@ export const mainnetNetworkConfig = (providerUrl: string, etherscanApiKey = ''):
   providerUrl,
   arweaveConfig,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarcophagus-v2/v0.0.1',
+  apiUrlBase: 'https://api.encryptafile.com',
 });
 
 export const sepoliaNetworkConfig = (providerUrl: string, etherscanApiKey: string = ''): SarcoNetworkConfig => ({
@@ -60,4 +62,5 @@ export const sepoliaNetworkConfig = (providerUrl: string, etherscanApiKey: strin
   providerUrl,
   arweaveConfig,
   subgraphUrl: 'https://api.studio.thegraph.com/query/44302/sarcotest2/18',
+  apiUrlBase: 'https://api.encryptafile.com',
 });
