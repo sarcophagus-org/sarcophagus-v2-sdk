@@ -9,7 +9,7 @@ import { Archaeologist } from './Archaeologist';
 import { sarcoClientInitSchema, SarcoInitParams } from './helpers/validation';
 import { SarcoNetworkConfig } from './types';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
-import Arweave from "arweave";
+import Arweave from 'arweave';
 
 export class WebSarcoClient {
   public api!: Api;
@@ -32,12 +32,13 @@ export class WebSarcoClient {
       throw new Error('WebSarcoClient can only be used in a browser envoronment');
     }
 
-    if (!window.ethereum) {
-      throw new Error('WebSarcoClient requires window.ethereum to be defined');
-    }
+    this.provider = {} as ethers.providers.Provider;
+    this.signer = {} as Signer;
 
-    this.provider = window.ethereum;
-    this.signer = new ethers.providers.Web3Provider(this.provider as any).getSigner();
+    if (window.ethereum) {
+      this.provider = window.ethereum;
+      this.signer = new ethers.providers.Web3Provider(this.provider as any).getSigner();
+    }
   }
 
   async init(initParams: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<void> {
@@ -71,7 +72,13 @@ export class WebSarcoClient {
       }
     );
     this.utils = new Utils(networkConfig, this.signer);
-    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig, this._bundlr, this.arweave);
+    this.api = new Api(
+      this.networkConfig.diamondDeployAddress,
+      this.signer,
+      this.networkConfig,
+      this._bundlr,
+      this.arweave
+    );
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
     this.archaeologist = new Archaeologist(
       this.networkConfig.diamondDeployAddress,
