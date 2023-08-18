@@ -9,7 +9,7 @@ import { Archaeologist } from './Archaeologist';
 import { sarcoClientInitSchema, SarcoInitParams } from './helpers/validation';
 import { SarcoNetworkConfig } from './types';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
-import Arweave from "arweave";
+import Arweave from 'arweave';
 
 export class WebSarcoClient {
   public api!: Api;
@@ -89,7 +89,13 @@ export class WebSarcoClient {
       }
     );
     this.utils = new Utils(networkConfig, this.signer);
-    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig, this._bundlr, this.arweave);
+    this.api = new Api(
+      this.networkConfig.diamondDeployAddress,
+      this.signer,
+      this.networkConfig,
+      this._bundlr,
+      this.arweave
+    );
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
     this.archaeologist = new Archaeologist(
       this.networkConfig.diamondDeployAddress,

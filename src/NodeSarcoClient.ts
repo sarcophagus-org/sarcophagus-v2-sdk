@@ -9,7 +9,7 @@ import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from 
 import { Token } from './Token';
 import { SarcoNetworkConfig } from './types';
 import { Utils } from './Utils';
-import Arweave from "arweave";
+import Arweave from 'arweave';
 
 export class NodeSarcoClient {
   signer: Signer;
