@@ -34,7 +34,7 @@ export class ZeroEx {
 
   constructor(networkConfig: SarcoNetworkConfig) {
     this.networkConfig = networkConfig;
-    this.headers = this.networkConfig.chainId === 1 ? { '0x-api-key': this.networkConfig.zeroExApiKey || '' } : {};
+    this.headers = { '0x-api-key': this.networkConfig.zeroExApiKey };
   }
 
   public async quote(params: ZeroExQuoteParams) {
