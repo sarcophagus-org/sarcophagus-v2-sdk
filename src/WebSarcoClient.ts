@@ -32,12 +32,13 @@ export class WebSarcoClient {
       throw new Error('WebSarcoClient can only be used in a browser envoronment');
     }
 
-    if (!window.ethereum) {
-      throw new Error('WebSarcoClient requires window.ethereum to be defined');
-    }
+    this.provider = {} as ethers.providers.Provider;
+    this.signer = {} as Signer;
 
-    this.provider = window.ethereum;
-    this.signer = new ethers.providers.Web3Provider(this.provider as any).getSigner();
+    if (window.ethereum) {
+      this.provider = window.ethereum;
+      this.signer = new ethers.providers.Web3Provider(this.provider as any).getSigner();
+    }
   }
 
   /**
