@@ -41,7 +41,7 @@ export class NodeSarcoClient {
     this.signer = wallet.connect(customProvider);
 
     this.bundlr = new Bundlr(networkConfig.bundlr.nodeUrl, networkConfig.bundlr.currencyName, config.privateKey, {
-      providerUrl: networkConfig.bundlr.providerUrl,
+      providerUrl: networkConfig.providerUrl,
     });
     this.api = new Api(networkConfig.diamondDeployAddress, this.signer, networkConfig, this.bundlr, this.arweave);
     this.token = new Token(networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
@@ -54,6 +54,7 @@ export class NodeSarcoClient {
       this.networkConfig.diamondDeployAddress,
       this.signer,
       this.networkConfig.subgraphUrl,
+      this.networkConfig.apiUrlBase,
       this.p2pNode,
       this.utils
     );

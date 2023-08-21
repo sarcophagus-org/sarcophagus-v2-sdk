@@ -1,8 +1,8 @@
 {
   "name": "@sarcophagus-org/sarcophagus-v2-sdk",
-  "version": "0.2.5",
-  "main": "dist/browser.js",
-  "browser": "dist/server.js",
+  "version": "0.2.6",
+  "main": "dist/server.js",
+  "browser": "dist/browser.js",
   "type": "module",
   "sideEffects": false,
   "license": "UNLICENSED",

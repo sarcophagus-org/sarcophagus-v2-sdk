@@ -27,12 +27,14 @@ import { getLowestResurrectionTime, getLowestRewrapInterval } from './helpers';
 export class Archaeologist {
   private readonly viewStateFacet: ethers.Contract;
   private subgraphUrl: string;
+  private apiUrlBase: string;
   private p2pNode: Libp2p;
   private signer: ethers.Signer;
   private utils: Utils;
 
-  constructor(diamondDeployAddress: string, signer: ethers.Signer, subgraphUrl: string, p2pNode: Libp2p, utils: Utils) {
+  constructor(diamondDeployAddress: string, signer: ethers.Signer, subgraphUrl: string, apiUrlBase: string, p2pNode: Libp2p, utils: Utils) {
     this.subgraphUrl = subgraphUrl;
+    this.apiUrlBase = apiUrlBase;
     this.viewStateFacet = new ethers.Contract(diamondDeployAddress, ViewStateFacet__factory.abi, signer);
     this.p2pNode = p2pNode;
     this.signer = signer;
@@ -74,7 +76,7 @@ export class Archaeologist {
    */
   private async getOnlineArchPeerIds(): Promise<string[]> {
     let response: Response;
-    const onlineArchsUrl = 'https://api.encryptafile.com/online-archaeologists';
+    const onlineArchsUrl = `${this.apiUrlBase}/online-archaeologists`;
     const fetchOptions = {
       method: 'GET',
       headers: { 'content-type': 'application/json' },

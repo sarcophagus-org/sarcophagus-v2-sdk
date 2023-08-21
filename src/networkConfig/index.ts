@@ -23,12 +23,12 @@ export const goerliNetworkConfig = (
   bundlr: {
     currencyName: 'ethereum',
     nodeUrl: 'https://devnet.bundlr.network',
-    providerUrl,
   },
   arweaveConfig,
   providerUrl,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarco-goerli-test/two',
   zeroExApiKey: config?.zeroExApiKey ?? '',
+  apiUrlBase: 'https://api.encryptafile.com',
 });
 
 export const mainnetNetworkConfig = (
@@ -46,12 +46,12 @@ export const mainnetNetworkConfig = (
   bundlr: {
     currencyName: 'ethereum',
     nodeUrl: 'https://node1.bundlr.network',
-    providerUrl,
   },
   providerUrl,
   arweaveConfig,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarcophagus-v2/v0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
+  apiUrlBase: 'https://api.encryptafile.com',
 });
 
 export const sepoliaNetworkConfig = (
@@ -69,10 +69,10 @@ export const sepoliaNetworkConfig = (
   bundlr: {
     currencyName: 'ethereum',
     nodeUrl: 'https://devnet.bundlr.network',
-    providerUrl,
   },
   providerUrl,
   arweaveConfig,
   subgraphUrl: 'https://api.studio.thegraph.com/query/44302/sarcotest2/18',
   zeroExApiKey: config?.zeroExApiKey ?? '',
+  apiUrlBase: 'https://api.encryptafile.com',
 });
