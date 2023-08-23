@@ -72,7 +72,7 @@ export const sepoliaNetworkConfig = (
   },
   providerUrl,
   arweaveConfig,
-  subgraphUrl: 'https://api.studio.thegraph.com/query/44302/sarcotest2/18',
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarco-goerli-test/two',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   apiUrlBase: 'https://api.encryptafile.com',
 });
