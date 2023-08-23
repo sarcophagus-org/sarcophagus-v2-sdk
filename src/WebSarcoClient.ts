@@ -88,57 +88,8 @@ export class WebSarcoClient {
     // TODO: Allow client to choose when to start/stop libp2p node
     await this.startLibp2pNode();
 
-    let bundlrProvider: ethers.providers.Web3Provider;
+    await this.initBundlr(params.bundlrPublicKey);
 
-    if (params.bundlrPublicKey) {
-      // Custom provider for bundlr that uses a Sarcophagus DAO server-provided public key to sign transactions to sponsor
-      // upload costs for embalmers.
-      const pubKey = Buffer.from(params.bundlrPublicKey, 'hex');
-      bundlrProvider = {
-        getPublicKey: async () => {
-          return pubKey;
-        },
-        getSigner: () => {
-          return {
-            publicKey: pubKey,
-            getAddress: () => pubKey,
-            _signTypedData: async (
-              _domain: never,
-              _types: never,
-              message: { address: string; 'Transaction hash': Uint8Array }
-            ) => {
-              let messageData = Buffer.from(message['Transaction hash']).toString('hex');
-              const res = await fetch(`${networkConfig.apiUrlBase}/bundlr/signData`, {
-                method: 'POST',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ messageData }),
-              });
-              const { signature } = await res.json();
-              const bSig = Buffer.from(signature, 'hex');
-              // pad & convert so it's in the format the signer expects to have to convert from.
-              const pad = Buffer.concat([Buffer.from([0]), Buffer.from(bSig)]).toString('hex');
-              return pad;
-            },
-          };
-        },
-        _ready: () => {},
-      } as unknown as ethers.providers.Web3Provider;
-    } else {
-      bundlrProvider = new ethers.providers.Web3Provider(this.provider as any);
-    }
-
-    const bundlrConfig = {
-      timeout: 100000,
-      providerUrl: networkConfig.providerUrl,
-    };
-
-    this._bundlr = new SarcoWebBundlr(
-      this.networkConfig.bundlr.nodeUrl,
-      this.networkConfig.bundlr.currencyName,
-      bundlrProvider,
-      bundlrConfig
-    );
-    if (params.bundlrPublicKey) this._bundlr.connect();
     this.api = new Api(
       this.networkConfig.diamondDeployAddress,
       this.signer,
@@ -169,6 +120,69 @@ export class WebSarcoClient {
 
     this.isInitialised = true;
     onInit(this.p2pNode);
+  }
+
+  /**
+   * Initialises the bundlr instance. Can be called at any time after initialisation to re-initialise the bundlr instance,
+   * for example to inject a new gassless upload public key.
+   *
+   * @param gasslessUploadPublicKey - The public key provided by a server offering gassless upload.
+   * If not provided, the bundlr instance will be initialised without gasless upload functionality.
+   */
+  async initBundlr(gasslessUploadPublicKey?: string) {
+    let bundlrProvider: ethers.providers.Web3Provider;
+
+    if (gasslessUploadPublicKey) {
+      // Custom provider for bundlr that uses a Sarcophagus DAO server-provided public key to sign transactions to sponsor
+      // upload costs for embalmers.
+      // TODO: It does seem like `pubKey` is not used at all when signing transactions. Might need to have the server check if provided public key matches its private key, before signing.
+      const pubKey = Buffer.from(gasslessUploadPublicKey, 'hex');
+      bundlrProvider = {
+        getPublicKey: async () => {
+          return pubKey;
+        },
+        getSigner: () => {
+          return {
+            publicKey: pubKey,
+            getAddress: () => pubKey,
+            _signTypedData: async (
+              _domain: never,
+              _types: never,
+              message: { address: string; 'Transaction hash': Uint8Array }
+            ) => {
+              let messageData = Buffer.from(message['Transaction hash']).toString('hex');
+              const res = await fetch(`${this.networkConfig.apiUrlBase}/bundlr/signData`, {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ messageData }),
+              });
+              const { signature } = await res.json();
+              const bSig = Buffer.from(signature, 'hex');
+              // pad & convert so it's in the format the signer expects to have to convert from.
+              const pad = Buffer.concat([Buffer.from([0]), Buffer.from(bSig)]).toString('hex');
+              return pad;
+            },
+          };
+        },
+        _ready: () => {},
+      } as unknown as ethers.providers.Web3Provider;
+    } else {
+      bundlrProvider = new ethers.providers.Web3Provider(this.provider as any);
+    }
+
+    const bundlrConfig = {
+      timeout: 100000,
+      providerUrl: this.networkConfig.providerUrl,
+    };
+
+    this._bundlr = new SarcoWebBundlr(
+      this.networkConfig.bundlr.nodeUrl,
+      this.networkConfig.bundlr.currencyName,
+      bundlrProvider,
+      bundlrConfig
+    );
+
+    if (gasslessUploadPublicKey) this._bundlr.connect();
   }
 
   async startLibp2pNode() {

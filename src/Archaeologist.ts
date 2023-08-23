@@ -32,7 +32,14 @@ export class Archaeologist {
   private signer: ethers.Signer;
   private utils: Utils;
 
-  constructor(diamondDeployAddress: string, signer: ethers.Signer, subgraphUrl: string, apiUrlBase: string, p2pNode: Libp2p, utils: Utils) {
+  constructor(
+    diamondDeployAddress: string,
+    signer: ethers.Signer,
+    subgraphUrl: string,
+    apiUrlBase: string,
+    p2pNode: Libp2p,
+    utils: Utils
+  ) {
     this.subgraphUrl = subgraphUrl;
     this.apiUrlBase = apiUrlBase;
     this.viewStateFacet = new ethers.Contract(diamondDeployAddress, ViewStateFacet__factory.abi, signer);
