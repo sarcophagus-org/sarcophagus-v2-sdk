@@ -39,13 +39,14 @@ import { SarcoWebBundlr } from './SarcoWebBundlr';
 import Arweave from 'arweave';
 
 export class Api {
+  public bundlr: SarcoWebBundlr | Bundlr;
+
   private embalmerFacet: ethers.Contract;
   private subgraphUrl: string;
   private viewStateFacet: ethers.Contract;
   private signer: ethers.Signer;
   private utils: Utils;
   private networkConfig: SarcoNetworkConfig;
-  private bundlr: SarcoWebBundlr | Bundlr;
   private arweave: Arweave;
 
   constructor(
@@ -63,6 +64,15 @@ export class Api {
     this.bundlr = bundlr;
     this.utils = new Utils(networkConfig, signer);
     this.arweave = arweave;
+    this.setBundlr = this.setBundlr.bind(this);
+  }
+
+  /**
+   * Set Bundlr instance
+   */
+
+  setBundlr = (bundlr: SarcoWebBundlr | Bundlr) => {
+    this.bundlr = bundlr;
   }
 
   /**

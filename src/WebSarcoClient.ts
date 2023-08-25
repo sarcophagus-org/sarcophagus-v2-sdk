@@ -10,11 +10,11 @@ import { sarcoClientInitSchema, SarcoInitParams } from './helpers/validation';
 import { SarcoNetworkConfig } from './types';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
 import Arweave from 'arweave';
+import {sponsoredBundlrProvider} from "./helpers/bundlr";
 
 export class WebSarcoClient {
   public api!: Api;
   public token!: Token;
-  private _bundlr!: SarcoWebBundlr;
   public archaeologist!: Archaeologist;
   public utils!: Utils;
   public isInitialised: boolean = false;
@@ -29,7 +29,7 @@ export class WebSarcoClient {
 
   constructor() {
     if (typeof window === 'undefined') {
-      throw new Error('WebSarcoClient can only be used in a browser envoronment');
+      throw new Error('WebSarcoClient can only be used in a browser environment');
     }
 
     this.provider = {} as ethers.providers.Provider;
@@ -88,23 +88,17 @@ export class WebSarcoClient {
     // TODO: Allow client to choose when to start/stop libp2p node
     await this.startLibp2pNode();
 
-    await this.initBundlr(params.bundlrPublicKey);
+    const bundlr = this.getBundlr(params.bundlrPublicKey);
 
     this.api = new Api(
       this.networkConfig.diamondDeployAddress,
       this.signer,
       this.networkConfig,
-      this._bundlr,
+      bundlr,
       this.arweave
     );
+
     this.utils = new Utils(networkConfig, this.signer);
-    this.api = new Api(
-      this.networkConfig.diamondDeployAddress,
-      this.signer,
-      this.networkConfig,
-      this._bundlr,
-      this.arweave
-    );
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
     this.archaeologist = new Archaeologist(
       this.networkConfig.diamondDeployAddress,
@@ -115,74 +109,45 @@ export class WebSarcoClient {
       this.utils
     );
 
-    this.utils = new Utils(networkConfig, this.signer);
-    this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
-
     this.isInitialised = true;
     onInit(this.p2pNode);
   }
 
   /**
-   * Initialises the bundlr instance. Can be called at any time after initialisation to re-initialise the bundlr instance,
-   * for example to inject a new gassless upload public key.
-   *
-   * @param gasslessUploadPublicKey - The public key provided by a server offering gassless upload.
-   * If not provided, the bundlr instance will be initialised without gasless upload functionality.
+   * Gets bundlr provider, either sponsored or user-provided
    */
-  async initBundlr(gasslessUploadPublicKey?: string) {
-    let bundlrProvider: ethers.providers.Web3Provider;
-
-    if (gasslessUploadPublicKey) {
-      // Custom provider for bundlr that uses a Sarcophagus DAO server-provided public key to sign transactions to sponsor
-      // upload costs for embalmers.
-      // TODO: It does seem like `pubKey` is not used at all when signing transactions. Might need to have the server check if provided public key matches its private key, before signing.
-      const pubKey = Buffer.from(gasslessUploadPublicKey, 'hex');
-      bundlrProvider = {
-        getPublicKey: async () => {
-          return pubKey;
-        },
-        getSigner: () => {
-          return {
-            publicKey: pubKey,
-            getAddress: () => pubKey,
-            _signTypedData: async (
-              _domain: never,
-              _types: never,
-              message: { address: string; 'Transaction hash': Uint8Array }
-            ) => {
-              let messageData = Buffer.from(message['Transaction hash']).toString('hex');
-              const res = await fetch(`${this.networkConfig.apiUrlBase}/bundlr/signData`, {
-                method: 'POST',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ messageData }),
-              });
-              const { signature } = await res.json();
-              const bSig = Buffer.from(signature, 'hex');
-              // pad & convert so it's in the format the signer expects to have to convert from.
-              const pad = Buffer.concat([Buffer.from([0]), Buffer.from(bSig)]).toString('hex');
-              return pad;
-            },
-          };
-        },
-        _ready: () => {},
-      } as unknown as ethers.providers.Web3Provider;
-    } else {
-      bundlrProvider = new ethers.providers.Web3Provider(this.provider as any);
-    }
+  getBundlr(signerPublicKey?: string, signerEndpoint?: string) {
+    // If signingPublicKey is provided, use sponsoring provider
+    const bundlrProvider: ethers.providers.Web3Provider = signerPublicKey ?
+      sponsoredBundlrProvider(signerPublicKey, signerEndpoint!) :
+      new ethers.providers.Web3Provider(this.provider as any);
 
     const bundlrConfig = {
       timeout: 100000,
       providerUrl: this.networkConfig.providerUrl,
     };
 
-    this._bundlr = new SarcoWebBundlr(
+    return new SarcoWebBundlr(
       this.networkConfig.bundlr.nodeUrl,
       this.networkConfig.bundlr.currencyName,
       bundlrProvider,
       bundlrConfig
     );
+  }
 
-    if (gasslessUploadPublicKey) this._bundlr.connect();
+  /**
+   * Initialises the bundlr instance, used to upload the arweave file
+   */
+  public async connectBundlr() {
+    return this.bundlr.connect();
+  }
+
+  /**
+   * Set sponsored bundlr instance
+   */
+  public setSponsoredBundlr = (signerPublicKey: string, signerEndpoint: string) => {
+    const bundlr = this.getBundlr(signerPublicKey, signerEndpoint);
+    this.api.setBundlr(bundlr)
   }
 
   async startLibp2pNode() {
@@ -200,6 +165,6 @@ export class WebSarcoClient {
       throw new Error('WebSarcoClient is not initialised');
     }
 
-    return this._bundlr;
+    return this.api.bundlr as SarcoWebBundlr;
   }
 }
