@@ -34,11 +34,6 @@ export class WebSarcoClient {
 
     this.provider = {} as ethers.providers.Provider;
     this.signer = {} as Signer;
-
-    if (window.ethereum) {
-      this.provider = window.ethereum;
-      this.signer = new ethers.providers.Web3Provider(this.provider as any).getSigner();
-    }
   }
 
   /**
@@ -50,6 +45,11 @@ export class WebSarcoClient {
    * @returns void
    * */
   async init(initParams: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<void> {
+    if (window.ethereum) {
+      this.provider = window.ethereum;
+      this.signer = new ethers.providers.Web3Provider(this.provider as any).getSigner();
+    }
+
     const params = await sarcoClientInitSchema.validate(initParams);
 
     const providerUrl = new ethers.providers.Web3Provider(this.provider as any).connection.url;
