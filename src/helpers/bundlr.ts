@@ -12,7 +12,7 @@ export const sponsoredBundlrProvider = (
     getSigner: () => {
       return {
         publicKey: signerPublicKeyHex,
-        getAddress: () => signerPublicKeyHex,
+        getAddress: () => signerPublicKeyHex.toString(),
         _signTypedData: async (
           _domain: never,
           _types: never,
