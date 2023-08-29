@@ -9,7 +9,7 @@ import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from 
 import { Token } from './Token';
 import { SarcoNetworkConfig } from './types';
 import { Utils } from './Utils';
-import Arweave from "arweave";
+import Arweave from 'arweave';
 
 export class NodeSarcoClient {
   signer: Signer;
@@ -32,13 +32,16 @@ export class NodeSarcoClient {
     const customProvider = new ethers.providers.JsonRpcProvider(config.providerUrl);
     const wallet = new ethers.Wallet(config.privateKey, customProvider);
 
-    const networkConfig = this.getNetworkConfig(config.providerUrl, config.chainId, config.etherscanApiKey);
+    const networkConfig = this.getNetworkConfig(config.providerUrl, config.chainId, {
+      etherscanApiKey: config.etherscanApiKey,
+      zeroExApiKey: config.zeroExApiKey,
+    });
     this.networkConfig = networkConfig;
 
     this.signer = wallet.connect(customProvider);
 
     this.bundlr = new Bundlr(networkConfig.bundlr.nodeUrl, networkConfig.bundlr.currencyName, config.privateKey, {
-      providerUrl: networkConfig.bundlr.providerUrl,
+      providerUrl: networkConfig.providerUrl,
     });
     this.api = new Api(networkConfig.diamondDeployAddress, this.signer, networkConfig, this.bundlr, this.arweave);
     this.token = new Token(networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
@@ -51,6 +54,7 @@ export class NodeSarcoClient {
       this.networkConfig.diamondDeployAddress,
       this.signer,
       this.networkConfig.subgraphUrl,
+      this.networkConfig.apiUrlBase,
       this.p2pNode,
       this.utils
     );
@@ -67,11 +71,15 @@ export class NodeSarcoClient {
     return this.p2pNode.stop();
   }
 
-  private getNetworkConfig(providerUrl: string, chainId: number, etherscanApiKey?: string): SarcoNetworkConfig {
+  private getNetworkConfig(
+    providerUrl: string,
+    chainId: number,
+    config: { etherscanApiKey?: string; zeroExApiKey?: string }
+  ): SarcoNetworkConfig {
     const networkConfigByChainId = new Map<number, SarcoNetworkConfig>([
-      [1, mainnetNetworkConfig(providerUrl, etherscanApiKey)],
-      [5, goerliNetworkConfig(providerUrl, etherscanApiKey)],
-      [11155111, sepoliaNetworkConfig(providerUrl, etherscanApiKey)],
+      [1, mainnetNetworkConfig(providerUrl, config)],
+      [5, goerliNetworkConfig(providerUrl, config)],
+      [11155111, sepoliaNetworkConfig(providerUrl, config)],
     ]);
     const networkConfig = networkConfigByChainId.get(chainId);
 

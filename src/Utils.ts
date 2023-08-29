@@ -1,5 +1,5 @@
 import { BigNumber, ethers, utils } from 'ethers';
-import { UnsignedTransaction, computeAddress, formatEther } from 'ethers/lib/utils.js';
+import { UnsignedTransaction, computeAddress, formatEther, parseEther } from 'ethers/lib/utils.js';
 import moment from 'moment';
 import { SarcophagusData, SarcophagusResponseContract, SarcophagusState } from './types/sarcophagi';
 import { safeContractCall } from './helpers/safeContractCall';
@@ -16,6 +16,7 @@ import { TransactionResponse } from '@ethersproject/abstract-provider';
 import axios, { AxiosResponse } from 'axios';
 import { ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
 import { getLowestResurrectionTime, getLowestRewrapInterval } from './helpers';
+import { ZeroEx, ZeroExQuote } from './helpers/zeroEx';
 
 export class Utils {
   private networkConfig: SarcoNetworkConfig;
@@ -204,9 +205,7 @@ export class Utils {
     const getParameters = 'module=account&action=txlist&startblock=0&endblock=99999999&page=1&offset=1000&sort=asc';
 
     try {
-      const response = await axios.get(
-        `${this.networkConfig.etherscanApiUrl}?${getParameters}&address=${address}`
-      );
+      const response = await axios.get(`${this.networkConfig.etherscanApiUrl}?${getParameters}&address=${address}`);
 
       if (response.status !== 200) {
         console.log('recoverPublicKey error:', response.data.message);
@@ -350,6 +349,47 @@ export class Utils {
     ];
 
     return { submitSarcophagusArgs };
+  }
+
+  async getSarcoQuote(amount: BigNumber): Promise<ZeroExQuote> {
+    const zeroEx = new ZeroEx(this.networkConfig);
+    const quote = await zeroEx.quote({
+      sellToken: 'ETH',
+      buyToken: this.networkConfig.sarcoTokenAddress,
+      buyAmount: amount.toString(),
+    });
+    return quote;
+  }
+
+  async swapEthForSarco(amount: BigNumber): Promise<void> {
+    try {
+      const quote = await this.getSarcoQuote(amount);
+      await this.signQuote(quote);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private async signQuote(quote: ZeroExQuote) {
+    // The 0x api does not provide an accurate gas limit for accounts that have never received the ERC20 that is being bought.
+    const newAccountGasPadding = 100_000;
+    const gasLimit = parseInt(quote.gas) + newAccountGasPadding;
+    const tx = await this.signer.sendTransaction({
+      gasLimit: gasLimit,
+      gasPrice: quote.gasPrice,
+      to: quote.to,
+      data: quote.data,
+      value: quote.value,
+      chainId: quote.chainId,
+    });
+
+    const receipt = await tx.wait();
+
+    if (receipt.status === 0) {
+      throw new Error('Failed to sign quote');
+    } else {
+      return receipt;
+    }
   }
 
   private wait(ms: number) {

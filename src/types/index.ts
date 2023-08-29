@@ -11,7 +11,6 @@ export interface CallOptions {
 export interface SarcoBundlrConfig {
   currencyName: string;
   nodeUrl: string;
-  providerUrl: string;
 }
 
 /**
@@ -31,6 +30,8 @@ export interface SarcoNetworkConfig {
   subgraphUrl: string;
   providerUrl?: string;
   signalServerPort?: number;
+  zeroExApiKey?: string;
+  apiUrlBase: string;
 }
 
 export enum RecipientSetByOption {

@@ -36,16 +36,17 @@ import {
 import Bundlr from '@bundlr-network/client/build/esm/common/bundlr';
 import { ChunkingUploader } from '@bundlr-network/client/build/esm/common/chunkingUploader';
 import { SarcoWebBundlr } from './SarcoWebBundlr';
-import Arweave from "arweave";
+import Arweave from 'arweave';
 
 export class Api {
+  public bundlr: SarcoWebBundlr | Bundlr;
+
   private embalmerFacet: ethers.Contract;
   private subgraphUrl: string;
   private viewStateFacet: ethers.Contract;
   private signer: ethers.Signer;
   private utils: Utils;
   private networkConfig: SarcoNetworkConfig;
-  private bundlr: SarcoWebBundlr | Bundlr;
   private arweave: Arweave;
 
   constructor(
@@ -63,6 +64,15 @@ export class Api {
     this.bundlr = bundlr;
     this.utils = new Utils(networkConfig, signer);
     this.arweave = arweave;
+    this.setBundlr = this.setBundlr.bind(this);
+  }
+
+  /**
+   * Set Bundlr instance
+   */
+
+  setBundlr = (bundlr: SarcoWebBundlr | Bundlr) => {
+    this.bundlr = bundlr;
   }
 
   /**
@@ -456,9 +466,10 @@ export class Api {
     options: CallOptions & { filter: SarcophagusFilter }
   ): Promise<SarcophagusData[]> {
     // If filter is embalmer, return embalmer create events, otherwise recipient
-    const filter = options.filter === SarcophagusFilter.embalmer ?
-      this.embalmerFacet.filters.CreateSarcophagus(null, null, null, null, address) :
-      this.embalmerFacet.filters.CreateSarcophagus(null, null, null, null, null, address);
+    const filter =
+      options.filter === SarcophagusFilter.embalmer
+        ? this.embalmerFacet.filters.CreateSarcophagus(null, null, null, null, address)
+        : this.embalmerFacet.filters.CreateSarcophagus(null, null, null, null, null, address);
 
     const logs =
       (await this.signer.provider?.getLogs({

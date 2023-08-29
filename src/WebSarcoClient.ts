@@ -9,12 +9,12 @@ import { Archaeologist } from './Archaeologist';
 import { sarcoClientInitSchema, SarcoInitParams } from './helpers/validation';
 import { SarcoNetworkConfig } from './types';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
-import Arweave from "arweave";
+import Arweave from 'arweave';
+import {sponsoredBundlrProvider} from "./helpers/bundlr";
 
 export class WebSarcoClient {
   public api!: Api;
   public token!: Token;
-  private _bundlr!: SarcoWebBundlr;
   public archaeologist!: Archaeologist;
   public utils!: Utils;
   public isInitialised: boolean = false;
@@ -29,26 +29,53 @@ export class WebSarcoClient {
 
   constructor() {
     if (typeof window === 'undefined') {
-      throw new Error('WebSarcoClient can only be used in a browser envoronment');
+      throw new Error('WebSarcoClient can only be used in a browser environment');
     }
 
-    if (!window.ethereum) {
-      throw new Error('WebSarcoClient requires window.ethereum to be defined');
-    }
-
-    this.provider = window.ethereum;
-    this.signer = new ethers.providers.Web3Provider(this.provider as any).getSigner();
+    this.provider = {} as ethers.providers.Provider;
+    this.signer = {} as Signer;
   }
 
+  /**
+   * Initialises the WebSarcoClient instance. Must be called before any other methods are called.
+   * This can be called at any time after initialisation to re-initialise the client with different parameters.
+   *
+   * @param initParams - The parameters to initialise the WebSarcoClient instance with
+   * @param onInit - A callback function that is called after the WebSarcoClient instance is initialised
+   * @returns void
+   * */
   async init(initParams: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<void> {
+    if (window.ethereum) {
+      this.provider = window.ethereum;
+      this.signer = new ethers.providers.Web3Provider(this.provider as any).getSigner();
+    }
+
     const params = await sarcoClientInitSchema.validate(initParams);
 
     const providerUrl = new ethers.providers.Web3Provider(this.provider as any).connection.url;
 
     const networkConfigByChainId = new Map<number, SarcoNetworkConfig>([
-      [1, mainnetNetworkConfig(providerUrl, initParams.etherscanApiKey)],
-      [5, goerliNetworkConfig(providerUrl, initParams.etherscanApiKey)],
-      [11155111, sepoliaNetworkConfig(providerUrl, initParams.etherscanApiKey)],
+      [
+        1,
+        mainnetNetworkConfig(providerUrl, {
+          etherscanApiKey: initParams.etherscanApiKey,
+          zeroExApiKey: initParams.zeroExApiKey,
+        }),
+      ],
+      [
+        5,
+        goerliNetworkConfig(providerUrl, {
+          etherscanApiKey: initParams.etherscanApiKey,
+          zeroExApiKey: initParams.zeroExApiKey,
+        }),
+      ],
+      [
+        11155111,
+        sepoliaNetworkConfig(providerUrl, {
+          etherscanApiKey: initParams.etherscanApiKey,
+          zeroExApiKey: initParams.zeroExApiKey,
+        }),
+      ],
     ]);
 
     const networkConfig = networkConfigByChainId.get(params.chainId);
@@ -61,28 +88,66 @@ export class WebSarcoClient {
     // TODO: Allow client to choose when to start/stop libp2p node
     await this.startLibp2pNode();
 
-    this._bundlr = new SarcoWebBundlr(
-      this.networkConfig.bundlr.nodeUrl,
-      this.networkConfig.bundlr.currencyName,
-      new ethers.providers.Web3Provider(this.provider as any),
-      {
-        timeout: 100000,
-        providerUrl: networkConfig.bundlr.providerUrl,
-      }
+    const bundlr = this.getBundlr(params.bundlrPublicKey);
+
+    this.api = new Api(
+      this.networkConfig.diamondDeployAddress,
+      this.signer,
+      this.networkConfig,
+      bundlr,
+      this.arweave
     );
+
     this.utils = new Utils(networkConfig, this.signer);
-    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig, this._bundlr, this.arweave);
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
     this.archaeologist = new Archaeologist(
       this.networkConfig.diamondDeployAddress,
       this.signer,
       this.networkConfig.subgraphUrl,
+      this.networkConfig.apiUrlBase,
       this.p2pNode,
       this.utils
     );
 
     this.isInitialised = true;
     onInit(this.p2pNode);
+  }
+
+  /**
+   * Gets bundlr provider, either sponsored or user-provided
+   */
+  getBundlr(signerPublicKey?: string, signerEndpoint?: string) {
+    // If signingPublicKey is provided, use sponsoring provider
+    const bundlrProvider: ethers.providers.Web3Provider = signerPublicKey ?
+      sponsoredBundlrProvider(signerPublicKey, signerEndpoint!) :
+      new ethers.providers.Web3Provider(this.provider as any);
+
+    const bundlrConfig = {
+      timeout: 100000,
+      providerUrl: this.networkConfig.providerUrl,
+    };
+
+    return new SarcoWebBundlr(
+      this.networkConfig.bundlr.nodeUrl,
+      this.networkConfig.bundlr.currencyName,
+      bundlrProvider,
+      bundlrConfig
+    );
+  }
+
+  /**
+   * Initialises the bundlr instance, used to upload the arweave file
+   */
+  public async connectBundlr() {
+    return this.bundlr.connect();
+  }
+
+  /**
+   * Set sponsored bundlr instance
+   */
+  public setSponsoredBundlr = (signerPublicKey: string, signerEndpoint: string) => {
+    const bundlr = this.getBundlr(signerPublicKey, signerEndpoint);
+    this.api.setBundlr(bundlr)
   }
 
   async startLibp2pNode() {
@@ -100,6 +165,6 @@ export class WebSarcoClient {
       throw new Error('WebSarcoClient is not initialised');
     }
 
-    return this._bundlr;
+    return this.api.bundlr as SarcoWebBundlr;
   }
 }
