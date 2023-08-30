@@ -145,9 +145,10 @@ export class WebSarcoClient {
   /**
    * Set sponsored bundlr instance
    */
-  public setSponsoredBundlr = (signerPublicKey: string, signerEndpoint: string) => {
+  public setSponsoredBundlr = async (signerPublicKey: string, signerEndpoint: string) => {
     const bundlr = this.getBundlr(signerPublicKey, signerEndpoint);
-    this.api.setBundlr(bundlr)
+    this.api.setBundlr(bundlr);
+    await this.connectBundlr();
   }
 
   async startLibp2pNode() {
