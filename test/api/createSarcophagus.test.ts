@@ -2,7 +2,6 @@ import { ethers } from 'ethers';
 import { ValidationError } from 'yup';
 import { Api } from '../../src/Api';
 import { ArchaeologistSettings } from '../../src/helpers/validation';
-import { mockSarcoClient } from '../mocks';
 import { arweaveTxId, defaultArchaeologists, defaultSarcophagusSettings, sarcoId } from './test-data';
 import { mockSafeContractCall } from './test-utils';
 import { SarcoWebBundlr } from '../../src/SarcoWebBundlr';

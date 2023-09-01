@@ -17,7 +17,7 @@ describe('Api', () => {
         signer,
         { subgraphUrl: 'subgraph/url/test' } as SarcoNetworkConfig,
         {} as SarcoWebBundlr,
-        {} as Arweave,
+        {} as Arweave
       );
       expect(api).toBeDefined();
     });
@@ -28,7 +28,7 @@ describe('Api', () => {
         signer,
         { subgraphUrl: 'subgraph/url/test' } as SarcoNetworkConfig,
         {} as SarcoWebBundlr,
-        {} as Arweave,
+        {} as Arweave
       );
       expect(api['embalmerFacet']).toBeDefined();
     });
@@ -39,7 +39,7 @@ describe('Api', () => {
         signer,
         { subgraphUrl: 'subgraph/url/test' } as SarcoNetworkConfig,
         {} as SarcoWebBundlr,
-        {} as Arweave,
+        {} as Arweave
       );
       expect(api['subgraphUrl']).toEqual('subgraph/url/test');
     });
