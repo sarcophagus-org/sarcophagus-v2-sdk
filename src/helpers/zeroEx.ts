@@ -26,19 +26,22 @@ export interface ZeroExQuote {
 }
 
 export class ZeroEx {
-  mainnetHost = 'https://api.0x.org';
-  goerliHost = 'https://goerli.api.0x.org';
-
   networkConfig: SarcoNetworkConfig;
   headers: { '0x-api-key'?: string };
-
+  
   constructor(networkConfig: SarcoNetworkConfig) {
     this.networkConfig = networkConfig;
     this.headers = { '0x-api-key': this.networkConfig.zeroExApiKey };
   }
-
+  
   public async quote(params: ZeroExQuoteParams) {
-    const host = this.networkConfig.chainId === 1 ? this.mainnetHost : this.goerliHost;
+    const chainIdToHost = new Map<number, string>([
+      [1, 'https://api.0x.org',],
+      [5, 'https://goerli.api.0x.org'],
+      [11155111, 'https://sepolia.api.0x.org'],
+    ]);
+
+    const host = chainIdToHost.get(this.networkConfig.chainId);
     const response = await axios
       .get(`${host}/swap/v1/quote?${qs.stringify(params)}`, {
         headers: this.headers,
