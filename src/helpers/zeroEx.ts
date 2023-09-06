@@ -28,15 +28,15 @@ export interface ZeroExQuote {
 export class ZeroEx {
   networkConfig: SarcoNetworkConfig;
   headers: { '0x-api-key'?: string };
-  
+
   constructor(networkConfig: SarcoNetworkConfig) {
     this.networkConfig = networkConfig;
     this.headers = { '0x-api-key': this.networkConfig.zeroExApiKey };
   }
-  
+
   public async quote(params: ZeroExQuoteParams) {
     const chainIdToHost = new Map<number, string>([
-      [1, 'https://api.0x.org',],
+      [1, 'https://api.0x.org'],
       [5, 'https://goerli.api.0x.org'],
       [11155111, 'https://sepolia.api.0x.org'],
     ]);
