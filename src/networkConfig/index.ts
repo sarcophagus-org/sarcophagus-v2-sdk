@@ -17,7 +17,7 @@ export const polygonMumbaiNetworkConfig = (
   networkShortName: 'PolygonMumbai',
   sarcoTokenAddress: '0x2BC9019e6d9e6a26D7D8d8CDDa4e5dE9B787D7bb',
   diamondDeployAddress: '0x42F2C41e0285B3CBED8084b2c7476F11730935Bc',
-  etherscanApiUrl: 'https://api-testnet.polygonscan.com/api​',
+  etherscanApiUrl: 'https://api-testnet.polygonscan.com/api',
   etherscanApiKey: config?.polygonMumbaiApiKey ?? '',
   explorerUrl: 'https://mumbai.polygonscan.com/',
   bundlr: {
