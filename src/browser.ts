@@ -5,9 +5,13 @@ export { sarco };
 export { WebSarcoClient };
 
 import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
-import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig, 
+import {
+  goerliNetworkConfig,
+  mainnetNetworkConfig,
+  sepoliaNetworkConfig,
   baseGoerliNetworkConfig,
-  polygonMumbaiNetworkConfig, } from './networkConfig';
+  polygonMumbaiNetworkConfig,
+} from './networkConfig';
 import {
   CallOptions,
   RecoverPublicKeyErrorStatus,

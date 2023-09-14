@@ -109,7 +109,9 @@ export class Archaeologist {
    *
    * @returns The full profiles of the given archaeologists.
    */
-  async getFullArchProfiles(args: { addresses?: string[]; filterOffline?: boolean } = {}): Promise<ArchaeologistData[]> {
+  async getFullArchProfiles(
+    args: { addresses?: string[]; filterOffline?: boolean } = {}
+  ): Promise<ArchaeologistData[]> {
     try {
       // - Use provided addresses, or default to get all registered archaeologists if no addresses are provided
       // - filterOffline defaults to false

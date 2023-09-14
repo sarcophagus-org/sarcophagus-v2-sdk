@@ -3,7 +3,13 @@ import { NodeSarcoClient } from './NodeSarcoClient';
 export { NodeSarcoClient };
 
 import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
-import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig, baseGoerliNetworkConfig, polygonMumbaiNetworkConfig } from './networkConfig';
+import {
+  goerliNetworkConfig,
+  mainnetNetworkConfig,
+  sepoliaNetworkConfig,
+  baseGoerliNetworkConfig,
+  polygonMumbaiNetworkConfig,
+} from './networkConfig';
 import {
   CallOptions,
   RecoverPublicKeyErrorStatus,

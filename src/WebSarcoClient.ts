@@ -8,9 +8,13 @@ import { Utils } from './Utils';
 import { Archaeologist } from './Archaeologist';
 import { sarcoClientInitSchema, SarcoInitParams } from './helpers/validation';
 import { SarcoNetworkConfig } from './types';
-import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig,
+import {
+  goerliNetworkConfig,
+  mainnetNetworkConfig,
+  sepoliaNetworkConfig,
   baseGoerliNetworkConfig,
-  polygonMumbaiNetworkConfig, } from './networkConfig';
+  polygonMumbaiNetworkConfig,
+} from './networkConfig';
 import Arweave from 'arweave';
 import { sponsoredBundlrProvider } from './helpers/bundlr';
 
@@ -88,7 +92,7 @@ export class WebSarcoClient {
       [
         84531,
         baseGoerliNetworkConfig(providerUrl, {
-           basescanApiKey: initParams.basescanApiKey,
+          basescanApiKey: initParams.basescanApiKey,
           zeroExApiKey: initParams.zeroExApiKey,
         }),
       ],
