@@ -5,7 +5,9 @@ export { sarco };
 export { WebSarcoClient };
 
 import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
-import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
+import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig, 
+  baseGoerliNetworkConfig,
+  polygonMumbaiNetworkConfig, } from './networkConfig';
 import {
   CallOptions,
   RecoverPublicKeyErrorStatus,
@@ -37,6 +39,8 @@ export {
   goerliNetworkConfig,
   mainnetNetworkConfig,
   sepoliaNetworkConfig,
+  baseGoerliNetworkConfig,
+  polygonMumbaiNetworkConfig,
 };
 export type {
   ArchaeologistCurseNegotiationParams,
