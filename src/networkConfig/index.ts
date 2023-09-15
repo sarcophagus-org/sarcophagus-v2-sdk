@@ -62,7 +62,7 @@ export const sepoliaNetworkConfig = (
   networkName: 'Sepolia Testnet',
   networkShortName: 'Sepolia',
   sarcoTokenAddress: '0xfa1FA4d51FB2babf59e402c83327Ab5087441289',
-  diamondDeployAddress: '0x478aDb74347AC204e1b382FC6B944621B97E8D98',
+  diamondDeployAddress: '0x46395641cf7814d51b1688dA19129343E04279C6',
   etherscanApiUrl: 'https://api-sepolia.etherscan.io/api',
   etherscanApiKey: config?.etherscanApiKey ?? '',
   explorerUrl: 'https://sepolia.etherscan.io/',

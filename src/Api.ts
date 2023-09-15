@@ -73,7 +73,7 @@ export class Api {
 
   setBundlr = (bundlr: SarcoWebBundlr | Bundlr) => {
     this.bundlr = bundlr;
-  }
+  };
 
   /**
    * Creates a new sarcophagus.

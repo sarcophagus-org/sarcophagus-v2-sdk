@@ -2,18 +2,18 @@ import { ethers } from 'ethers';
 import { ValidationError } from 'yup';
 import { Api } from '../../src/Api';
 import { ArchaeologistSettings } from '../../src/helpers/validation';
-import { mockSarcoClient } from '../mocks';
 import { arweaveTxId, defaultArchaeologists, defaultSarcophagusSettings, sarcoId } from './test-data';
 import { mockSafeContractCall } from './test-utils';
 import { SarcoWebBundlr } from '../../src/SarcoWebBundlr';
 import { SarcoNetworkConfig } from '../../src/types';
+import Arweave from 'arweave';
 
 jest.spyOn(ethers, 'Contract').mockImplementation();
 jest.mock('@sarcophagus-org/sarcophagus-v2-contracts');
 jest.mock('../../src/SarcoWebBundlr');
 
 const signer = ethers.Wallet.createRandom({});
-const api = new Api('0x0', signer, {} as SarcoNetworkConfig, {} as SarcoWebBundlr);
+const api = new Api('0x0', signer, {} as SarcoNetworkConfig, {} as SarcoWebBundlr, {} as Arweave);
 
 beforeEach(() => {
   mockSafeContractCall.mockClear();

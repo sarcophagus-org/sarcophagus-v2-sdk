@@ -10,7 +10,7 @@ import { sarcoClientInitSchema, SarcoInitParams } from './helpers/validation';
 import { SarcoNetworkConfig } from './types';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
 import Arweave from 'arweave';
-import {sponsoredBundlrProvider} from "./helpers/bundlr";
+import { sponsoredBundlrProvider } from './helpers/bundlr';
 
 export class WebSarcoClient {
   public api!: Api;
@@ -90,13 +90,7 @@ export class WebSarcoClient {
 
     const bundlr = this.getBundlr(params.bundlrPublicKey);
 
-    this.api = new Api(
-      this.networkConfig.diamondDeployAddress,
-      this.signer,
-      this.networkConfig,
-      bundlr,
-      this.arweave
-    );
+    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig, bundlr, this.arweave);
 
     this.utils = new Utils(networkConfig, this.signer);
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
@@ -118,9 +112,9 @@ export class WebSarcoClient {
    */
   getBundlr(signerPublicKey?: string, signerEndpoint?: string) {
     // If signingPublicKey is provided, use sponsoring provider
-    const bundlrProvider: ethers.providers.Web3Provider = signerPublicKey ?
-      sponsoredBundlrProvider(signerPublicKey, signerEndpoint!) :
-      new ethers.providers.Web3Provider(this.provider as any);
+    const bundlrProvider: ethers.providers.Web3Provider = signerPublicKey
+      ? sponsoredBundlrProvider(signerPublicKey, signerEndpoint!)
+      : new ethers.providers.Web3Provider(this.provider as any);
 
     const bundlrConfig = {
       timeout: 100000,
@@ -149,7 +143,7 @@ export class WebSarcoClient {
     const bundlr = this.getBundlr(signerPublicKey, signerEndpoint);
     this.api.setBundlr(bundlr);
     await this.connectBundlr();
-  }
+  };
 
   async startLibp2pNode() {
     console.log(`LibP2P node starting with peerID: ${this.p2pNode.peerId.toString()}`);
