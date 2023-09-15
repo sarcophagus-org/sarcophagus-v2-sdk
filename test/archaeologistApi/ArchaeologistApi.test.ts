@@ -2,7 +2,6 @@ import { ethers } from 'ethers';
 // import { ArchaeologistApi } from '../../src/ArchaeologistApi';
 import { Libp2p } from 'libp2p';
 
-
 const signer = ethers.Wallet.createRandom({});
 
 describe('ArchaeologistApi', () => {
@@ -13,24 +12,24 @@ describe('ArchaeologistApi', () => {
     //   expect(archApi).toBeDefined();
     // });
 
-    // test('should have an viewStateFacet instance', () => {	
+    // test('should have an viewStateFacet instance', () => {
     //   const archApi = new ArchaeologistApi(signer.address, signer, 'subgraph/url/test', {} as Libp2p);
-    //   expect(archApi['viewStateFacet']).toBeDefined();	
+    //   expect(archApi['viewStateFacet']).toBeDefined();
     // });
 
-    // test('should have a libp2p instance', () => {	
+    // test('should have a libp2p instance', () => {
     //   const archApi = new ArchaeologistApi(signer.address, signer, 'subgraph/url/test', {} as Libp2p);
-    //   expect(archApi['p2pNode']).toBeDefined();	
+    //   expect(archApi['p2pNode']).toBeDefined();
     // });
 
-    // test('should set its subgraph url', () => {	
+    // test('should set its subgraph url', () => {
     //   const archApi = new ArchaeologistApi(signer.address, signer, 'subgraph/url/test', {} as Libp2p);
-    //   expect(archApi['subgraphUrl']).toEqual('subgraph/url/test');	
+    //   expect(archApi['subgraphUrl']).toEqual('subgraph/url/test');
     // });
 
-    // test('should set its signer', () => {	
+    // test('should set its signer', () => {
     //   const archApi = new ArchaeologistApi(signer.address, signer, 'subgraph/url/test', {} as Libp2p);
-    //   expect(archApi['signer']).toStrictEqual(signer);	
+    //   expect(archApi['signer']).toStrictEqual(signer);
     // });
   });
 });

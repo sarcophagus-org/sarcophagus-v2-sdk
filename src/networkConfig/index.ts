@@ -8,6 +8,52 @@ const arweaveConfig = {
   logging: false,
 };
 
+export const polygonMumbaiNetworkConfig = (
+  providerUrl: string,
+  config?: { polygonMumbaiApiKey?: string; zeroExApiKey?: string }
+): SarcoNetworkConfig => ({
+  chainId: 80001,
+  networkName: 'PolygonMumbai Testnet',
+  networkShortName: 'PolygonMumbai',
+  sarcoTokenAddress: '0x2BC9019e6d9e6a26D7D8d8CDDa4e5dE9B787D7bb',
+  diamondDeployAddress: '0x42F2C41e0285B3CBED8084b2c7476F11730935Bc',
+  etherscanApiUrl: 'https://api-testnet.polygonscan.com/api',
+  etherscanApiKey: config?.polygonMumbaiApiKey ?? '',
+  explorerUrl: 'https://mumbai.polygonscan.com/',
+  bundlr: {
+    currencyName: 'ethereum',
+    nodeUrl: 'https://devnet.bundlr.network',
+  },
+  arweaveConfig,
+  providerUrl,
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon-mumbai/v0.0.1',
+  zeroExApiKey: config?.zeroExApiKey ?? '',
+  apiUrlBase: 'https://api.encryptafile.com',
+});
+
+export const baseGoerliNetworkConfig = (
+  providerUrl: string,
+  config?: { basescanApiKey?: string; zeroExApiKey?: string }
+): SarcoNetworkConfig => ({
+  chainId: 84531,
+  networkName: 'BaseGoerli Testnet',
+  networkShortName: 'BaseGoerli',
+  sarcoTokenAddress: '0x2BC9019e6d9e6a26D7D8d8CDDa4e5dE9B787D7bb',
+  diamondDeployAddress: '0xB933926f50b33797d0fa1DaEe65D5830224E53E1',
+  etherscanApiUrl: 'https://api-goerli.basescan.org/api',
+  etherscanApiKey: config?.basescanApiKey ?? '',
+  explorerUrl: 'https://goerli.basescan.org',
+  bundlr: {
+    currencyName: 'ethereum',
+    nodeUrl: 'https://devnet.bundlr.network',
+  },
+  arweaveConfig,
+  providerUrl,
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/base-goerli/v0.0.1',
+  zeroExApiKey: config?.zeroExApiKey ?? '',
+  apiUrlBase: 'https://api.encryptafile.com',
+});
+
 export const goerliNetworkConfig = (
   providerUrl: string,
   config?: { etherscanApiKey?: string; zeroExApiKey?: string }
