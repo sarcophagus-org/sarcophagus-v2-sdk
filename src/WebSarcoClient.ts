@@ -14,6 +14,11 @@ import {
   sepoliaNetworkConfig,
   baseGoerliNetworkConfig,
   polygonMumbaiNetworkConfig,
+  MAINNET_CHAIN_ID,
+  GOERLI_CHAIN_ID,
+  SEPOLIA_CHAIN_ID,
+  POLYGON_MUMBAI_CHAIN_ID,
+  BASE_GOERLI_CHAIN_ID,
 } from './networkConfig';
 import Arweave from 'arweave';
 import { sponsoredBundlrProvider } from './helpers/bundlr';
@@ -62,35 +67,35 @@ export class WebSarcoClient {
 
     const networkConfigByChainId = new Map<number, SarcoNetworkConfig>([
       [
-        1,
+        MAINNET_CHAIN_ID,
         mainnetNetworkConfig(providerUrl, {
           etherscanApiKey: initParams.etherscanApiKey,
           zeroExApiKey: initParams.zeroExApiKey,
         }),
       ],
       [
-        5,
+        GOERLI_CHAIN_ID,
         goerliNetworkConfig(providerUrl, {
           etherscanApiKey: initParams.etherscanApiKey,
           zeroExApiKey: initParams.zeroExApiKey,
         }),
       ],
       [
-        11155111,
+        SEPOLIA_CHAIN_ID,
         sepoliaNetworkConfig(providerUrl, {
           etherscanApiKey: initParams.etherscanApiKey,
           zeroExApiKey: initParams.zeroExApiKey,
         }),
       ],
       [
-        80001,
+        POLYGON_MUMBAI_CHAIN_ID,
         polygonMumbaiNetworkConfig(providerUrl, {
           polygonMumbaiApiKey: initParams.polygonMumbaiApiKey,
           zeroExApiKey: initParams.zeroExApiKey,
         }),
       ],
       [
-        84531,
+        BASE_GOERLI_CHAIN_ID,
         baseGoerliNetworkConfig(providerUrl, {
           basescanApiKey: initParams.basescanApiKey,
           zeroExApiKey: initParams.zeroExApiKey,

@@ -8,6 +8,13 @@ const arweaveConfig = {
   logging: false,
 };
 
+export const MAINNET_CHAIN_ID = 1;
+export const GOERLI_CHAIN_ID = 5;
+export const SEPOLIA_CHAIN_ID = 11155111;
+export const BASE_GOERLI_CHAIN_ID = 84531;
+export const POLYGON_MUMBAI_CHAIN_ID = 80001;
+export const HARDHAT_CHAIN_ID = 31337;
+
 export const hardhatNetworkConfig = (
   override?: {
     providerUrl?: string,
@@ -15,7 +22,7 @@ export const hardhatNetworkConfig = (
     diamondDeployAddress?: string;
   }
 ): SarcoNetworkConfig => ({
-  chainId: 31337,
+  chainId: HARDHAT_CHAIN_ID,
   networkName: "Hardhat Local Network",
   networkShortName: "HardHat",
   sarcoTokenAddress: override?.sarcoTokenAddress ?? "0x5FbDB2315678afecb367f032d93F642f64180aa3",
@@ -38,7 +45,7 @@ export const polygonMumbaiNetworkConfig = (
   providerUrl: string,
   config?: { polygonMumbaiApiKey?: string; zeroExApiKey?: string }
 ): SarcoNetworkConfig => ({
-  chainId: 80001,
+  chainId: POLYGON_MUMBAI_CHAIN_ID,
   networkName: 'PolygonMumbai Testnet',
   networkShortName: 'PolygonMumbai',
   sarcoTokenAddress: '0x2BC9019e6d9e6a26D7D8d8CDDa4e5dE9B787D7bb',
@@ -61,7 +68,7 @@ export const baseGoerliNetworkConfig = (
   providerUrl: string,
   config?: { basescanApiKey?: string; zeroExApiKey?: string }
 ): SarcoNetworkConfig => ({
-  chainId: 84531,
+  chainId: BASE_GOERLI_CHAIN_ID,
   networkName: 'BaseGoerli Testnet',
   networkShortName: 'BaseGoerli',
   sarcoTokenAddress: '0x2BC9019e6d9e6a26D7D8d8CDDa4e5dE9B787D7bb',
@@ -84,7 +91,7 @@ export const goerliNetworkConfig = (
   providerUrl: string,
   config?: { etherscanApiKey?: string; zeroExApiKey?: string }
 ): SarcoNetworkConfig => ({
-  chainId: 5,
+  chainId: GOERLI_CHAIN_ID,
   networkName: 'Goerli Testnet',
   networkShortName: 'Goerli',
   sarcoTokenAddress: '0x4633b43990b41B57b3678c6F3Ac35bA75C3D8436',
@@ -107,7 +114,7 @@ export const mainnetNetworkConfig = (
   providerUrl: string,
   config?: { etherscanApiKey?: string; zeroExApiKey?: string }
 ): SarcoNetworkConfig => ({
-  chainId: 1,
+  chainId: MAINNET_CHAIN_ID,
   networkName: 'Etherum Mainnet',
   networkShortName: 'Mainnet',
   sarcoTokenAddress: '0x7697b462a7c4ff5f8b55bdbc2f4076c2af9cf51a',
@@ -130,7 +137,7 @@ export const sepoliaNetworkConfig = (
   providerUrl: string,
   config?: { etherscanApiKey?: string; zeroExApiKey?: string }
 ): SarcoNetworkConfig => ({
-  chainId: 11155111,
+  chainId: SEPOLIA_CHAIN_ID,
   networkName: 'Sepolia Testnet',
   networkShortName: 'Sepolia',
   sarcoTokenAddress: '0xfa1FA4d51FB2babf59e402c83327Ab5087441289',
