@@ -1,6 +1,7 @@
 import { ApiConfig as ArweaveConfig } from 'arweave/node/lib/api';
 import { ArchaeologistData } from './archaeologist';
 import { BigNumber } from 'ethers';
+import { IERC20 } from '@sarcophagus-org/sarcophagus-v2-contracts';
 
 export { RecoverPublicKeyErrorStatus } from './utils';
 export type { RecoverPublicKeyResponse } from './utils';
@@ -21,6 +22,7 @@ export interface SarcoNetworkConfig {
   networkName: string;
   networkShortName: string;
   sarcoTokenAddress: string;
+  sarcoToken?: IERC20;
   diamondDeployAddress: string;
   etherscanApiUrl: string;
   explorerUrl: string;
@@ -29,7 +31,6 @@ export interface SarcoNetworkConfig {
   arweaveConfig: ArweaveConfig;
   subgraphUrl: string;
   providerUrl?: string;
-  signalServerPort?: number;
   zeroExApiKey?: string;
   apiUrlBase: string;
 }
