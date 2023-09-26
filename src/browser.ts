@@ -11,6 +11,14 @@ import {
   sepoliaNetworkConfig,
   baseGoerliNetworkConfig,
   polygonMumbaiNetworkConfig,
+  BASE_GOERLI_CHAIN_ID,
+  GOERLI_CHAIN_ID,
+  HARDHAT_CHAIN_ID,
+  POLYGON_MUMBAI_CHAIN_ID,
+  MAINNET_CHAIN_ID,
+  SEPOLIA_CHAIN_ID,
+  hardhatNetworkConfig,
+  SarcoSupportedNetwork,
 } from './networkConfig';
 import {
   CallOptions,
@@ -45,8 +53,16 @@ export {
   sepoliaNetworkConfig,
   baseGoerliNetworkConfig,
   polygonMumbaiNetworkConfig,
+  BASE_GOERLI_CHAIN_ID,
+  GOERLI_CHAIN_ID,
+  HARDHAT_CHAIN_ID,
+  POLYGON_MUMBAI_CHAIN_ID,
+  MAINNET_CHAIN_ID,
+  SEPOLIA_CHAIN_ID,
+  hardhatNetworkConfig,
 };
 export type {
+  SarcoSupportedNetwork,
   ArchaeologistCurseNegotiationParams,
   ArchaeologistData,
   ArchaeologistEncryptedShard,

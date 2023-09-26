@@ -15,18 +15,29 @@ export const BASE_GOERLI_CHAIN_ID = 84531;
 export const POLYGON_MUMBAI_CHAIN_ID = 80001;
 export const HARDHAT_CHAIN_ID = 31337;
 
-export const hardhatNetworkConfig = (
-  override?: {
-    providerUrl?: string,
-    sarcoTokenAddress?: string;
-    diamondDeployAddress?: string;
-  }
-): SarcoNetworkConfig => ({
+export type SarcoSupportedNetwork =
+  | 'mainnet'
+  | 'goerli'
+  | 'sepolia'
+  | 'baseGoerli'
+  | 'polygonMumbai'
+  | typeof MAINNET_CHAIN_ID
+  | typeof GOERLI_CHAIN_ID
+  | typeof SEPOLIA_CHAIN_ID
+  | typeof BASE_GOERLI_CHAIN_ID
+  | typeof POLYGON_MUMBAI_CHAIN_ID;
+
+export const hardhatNetworkConfig = (override?: {
+  providerUrl?: string;
+  sarcoTokenAddress?: string;
+  diamondDeployAddress?: string;
+}): SarcoNetworkConfig => ({
   chainId: HARDHAT_CHAIN_ID,
-  networkName: "Hardhat Local Network",
-  networkShortName: "HardHat",
-  sarcoTokenAddress: override?.sarcoTokenAddress ?? "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-  diamondDeployAddress: override?.diamondDeployAddress ?? "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
+  networkName: 'Hardhat Local Network',
+  networkShortName: 'HardHat',
+  tokenSymbol: 'ETH',
+  sarcoTokenAddress: override?.sarcoTokenAddress ?? '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+  diamondDeployAddress: override?.diamondDeployAddress ?? '0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0',
   etherscanApiUrl: '',
   etherscanApiKey: '',
   explorerUrl: '',
@@ -48,6 +59,7 @@ export const polygonMumbaiNetworkConfig = (
   chainId: POLYGON_MUMBAI_CHAIN_ID,
   networkName: 'PolygonMumbai Testnet',
   networkShortName: 'PolygonMumbai',
+  tokenSymbol: 'MATIC',
   sarcoTokenAddress: '0x2BC9019e6d9e6a26D7D8d8CDDa4e5dE9B787D7bb',
   diamondDeployAddress: '0x42F2C41e0285B3CBED8084b2c7476F11730935Bc',
   etherscanApiUrl: 'https://api-testnet.polygonscan.com/api',
@@ -71,6 +83,7 @@ export const baseGoerliNetworkConfig = (
   chainId: BASE_GOERLI_CHAIN_ID,
   networkName: 'BaseGoerli Testnet',
   networkShortName: 'BaseGoerli',
+  tokenSymbol: 'ETH',
   sarcoTokenAddress: '0x2BC9019e6d9e6a26D7D8d8CDDa4e5dE9B787D7bb',
   diamondDeployAddress: '0xB933926f50b33797d0fa1DaEe65D5830224E53E1',
   etherscanApiUrl: 'https://api-goerli.basescan.org/api',
@@ -94,6 +107,7 @@ export const goerliNetworkConfig = (
   chainId: GOERLI_CHAIN_ID,
   networkName: 'Goerli Testnet',
   networkShortName: 'Goerli',
+  tokenSymbol: 'ETH',
   sarcoTokenAddress: '0x4633b43990b41B57b3678c6F3Ac35bA75C3D8436',
   diamondDeployAddress: '0x23205431DAa31e9b54d0EBF40e45CC03aC759a22',
   etherscanApiUrl: 'https://api-goerli.etherscan.io/api',
@@ -117,6 +131,7 @@ export const mainnetNetworkConfig = (
   chainId: MAINNET_CHAIN_ID,
   networkName: 'Etherum Mainnet',
   networkShortName: 'Mainnet',
+  tokenSymbol: 'ETH',
   sarcoTokenAddress: '0x7697b462a7c4ff5f8b55bdbc2f4076c2af9cf51a',
   diamondDeployAddress: '0x0Ec977D1863Eb919a2Ecd65d17Cc3f2CFdaCe3Ab',
   etherscanApiUrl: 'https://api.etherscan.io/api',
@@ -140,6 +155,7 @@ export const sepoliaNetworkConfig = (
   chainId: SEPOLIA_CHAIN_ID,
   networkName: 'Sepolia Testnet',
   networkShortName: 'Sepolia',
+  tokenSymbol: 'ETH',
   sarcoTokenAddress: '0xfa1FA4d51FB2babf59e402c83327Ab5087441289',
   diamondDeployAddress: '0x46395641cf7814d51b1688dA19129343E04279C6',
   etherscanApiUrl: 'https://api-sepolia.etherscan.io/api',

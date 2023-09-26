@@ -21,6 +21,7 @@ export interface SarcoNetworkConfig {
   chainId: number;
   networkName: string;
   networkShortName: string;
+  tokenSymbol: string;
   sarcoTokenAddress: string;
   sarcoToken?: IERC20;
   diamondDeployAddress: string;
