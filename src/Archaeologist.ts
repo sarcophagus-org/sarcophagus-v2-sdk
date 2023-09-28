@@ -309,7 +309,8 @@ export class Archaeologist {
         const outboundMsg = JSON.stringify(negotiationParams);
 
         try {
-          const stream = await arch.connection.newStream(NEGOTIATION_SIGNATURE_STREAM);
+          const contextChainId = (await this.signer.provider?.getNetwork())?.chainId;
+          const stream = await arch.connection.newStream(`${NEGOTIATION_SIGNATURE_STREAM}${contextChainId && `-${contextChainId}`}`);
 
           await pipe([new TextEncoder().encode(outboundMsg)], stream, async (source: any) => {
             for await (const data of source) {
