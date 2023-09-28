@@ -6,7 +6,7 @@ import { webSockets } from '@libp2p/websockets';
 // protocol names used to set up communication with archaeologist nodes
 // these values must be the same for webapp's and archaeologist's node config
 export const NEGOTIATION_SIGNATURE_STREAM = '/archaeologist-negotiation-signature';
-const DHT_PROTOCOL_PREFIX = '/archaeologist-service';
+export const DHT_PROTOCOL_PREFIX = '/archaeologist-service';
 
 const dht = kadDHT({
   protocolPrefix: DHT_PROTOCOL_PREFIX,

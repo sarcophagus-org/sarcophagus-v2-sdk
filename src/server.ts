@@ -2,7 +2,7 @@ import { NodeSarcoClient } from './NodeSarcoClient';
 
 export { NodeSarcoClient };
 
-import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
+import { NEGOTIATION_SIGNATURE_STREAM, DHT_PROTOCOL_PREFIX } from './libp2p_node/p2pNodeConfig';
 import {
   goerliNetworkConfig,
   mainnetNetworkConfig,
@@ -45,6 +45,7 @@ export { RecoverPublicKeyErrorStatus };
 export {
   ArchaeologistExceptionCode,
   NEGOTIATION_SIGNATURE_STREAM,
+  DHT_PROTOCOL_PREFIX,
   SarcophagusValidationError,
   goerliNetworkConfig,
   mainnetNetworkConfig,
