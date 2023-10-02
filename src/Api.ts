@@ -13,6 +13,8 @@ import {
   getSubgraphSarcoCounts,
   getSubgraphSarcophagi,
   getSubgraphSarcophagusWithRewraps,
+  getEmbalmerSarcophagi,
+  getRecipientSarcophagi,
 } from './helpers/subgraph';
 import {
   SarcoCounts,
@@ -465,22 +467,12 @@ export class Api {
     address: string,
     options: CallOptions & { filter: SarcophagusFilter }
   ): Promise<SarcophagusData[]> {
-    // If filter is embalmer, return embalmer create events, otherwise recipient
-    const filter =
+    const sarcophagiSubgraph =
       options.filter === SarcophagusFilter.embalmer
-        ? this.embalmerFacet.filters.CreateSarcophagus(null, null, null, null, address)
-        : this.embalmerFacet.filters.CreateSarcophagus(null, null, null, null, null, address);
+        ? await getEmbalmerSarcophagi(this.subgraphUrl, address)
+        : await getRecipientSarcophagi(this.subgraphUrl, address);
 
-    const logs =
-      (await this.signer.provider?.getLogs({
-        fromBlock: 0,
-        toBlock: 'latest',
-        address: this.embalmerFacet.address,
-        topics: filter.topics,
-      })) ?? [];
-
-    const events = logs.map(log => this.embalmerFacet.interface.parseLog(log)).map(event => event.args);
-    const sarcoIds: string[] = events.map(s => s.sarcoId);
+    const sarcoIds: string[] = sarcophagiSubgraph.map(s => s.sarcoId);
 
     const gracePeriod = (await safeContractCall(
       this.viewStateFacet,
