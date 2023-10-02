@@ -103,7 +103,7 @@ const getSarcosQuery = (sarcoIds: string[]) => `query {
 }`;
 
 const getEmbalmerOrRecipientSarcosQuery = (address: string, isRecipient: boolean) => `query {
-  sarcophagusDatas (where: ${isRecipient ? 'recipient' : 'embalmer'}: "${address}"}) {
+  sarcophagusDatas (where: {${isRecipient ? 'recipient' : 'embalmer'}: "${address}"}) {
       sarcoId
       resurrectionTime
       embalmer
