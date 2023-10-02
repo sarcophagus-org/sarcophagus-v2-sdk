@@ -102,6 +102,22 @@ const getSarcosQuery = (sarcoIds: string[]) => `query {
   }
 }`;
 
+const getEmbalmerOrRecipientSarcosQuery = (address: string, isRecipient: boolean) => `query {
+  sarcophagusDatas (where: {${isRecipient ? 'recipient' : 'embalmer'}: "${address}"}) {
+      sarcoId
+      resurrectionTime
+      embalmer
+      previousRewrapTime
+      publishes
+      recipient
+      threshold
+      cursedArchaeologists
+      accusalCount
+      arweaveTxId
+      blockTimestamp
+  }
+}`;
+
 const getPrivateKeyPublishesQuery = (sarcoId: string) => `query {
   publishPrivateKeys (where:{sarcoId: "${sarcoId}"}) {
       privateKey
@@ -131,6 +147,38 @@ export const getArchaeologists = async (subgraphUrl: string): Promise<ArchDataSu
 export const getSubgraphSarcophagi = async (subgraphUrl: string, sarcoIds: string[]): Promise<SarcoDataSubgraph[]> => {
   try {
     const { sarcophagusDatas } = (await queryGraphQl(subgraphUrl, getSarcosQuery(sarcoIds))) as {
+      sarcophagusDatas: SarcoDataSubgraph[];
+    };
+
+    return sarcophagusDatas;
+  } catch (e) {
+    console.error(e);
+    throw new Error('Failed to get sarcophagi from subgraph');
+  }
+};
+
+export const getEmbalmerSarcophagi = async (subgraphUrl: string, address: string): Promise<SarcoDataSubgraph[]> => {
+  try {
+    const { sarcophagusDatas } = (await queryGraphQl(
+      subgraphUrl,
+      getEmbalmerOrRecipientSarcosQuery(address, false)
+    )) as {
+      sarcophagusDatas: SarcoDataSubgraph[];
+    };
+
+    return sarcophagusDatas;
+  } catch (e) {
+    console.error(e);
+    throw new Error('Failed to get sarcophagi from subgraph');
+  }
+};
+
+export const getRecipientSarcophagi = async (subgraphUrl: string, address: string): Promise<SarcoDataSubgraph[]> => {
+  try {
+    const { sarcophagusDatas } = (await queryGraphQl(
+      subgraphUrl,
+      getEmbalmerOrRecipientSarcosQuery(address, true)
+    )) as {
       sarcophagusDatas: SarcoDataSubgraph[];
     };
 
