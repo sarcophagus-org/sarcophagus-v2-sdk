@@ -1,4 +1,4 @@
-import { Connection } from '@libp2p/interface-connection';
+import { Connection, Stream } from '@libp2p/interface-connection';
 import { Multiaddr, multiaddr } from '@multiformats/multiaddr';
 import { ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
 import { BigNumber, ethers } from 'ethers';
@@ -310,13 +310,18 @@ export class Archaeologist {
 
         try {
           const contextChainId = (await this.signer.provider?.getNetwork())?.chainId;
-          console.log("Arch negotiation setup from sdk");
-          console.log("contextChainId", contextChainId);
-          console.log("protocol:", `${NEGOTIATION_SIGNATURE_STREAM}${contextChainId && `-${contextChainId}`}`);
-          
-          const stream = await arch.connection.newStream(
-            `${NEGOTIATION_SIGNATURE_STREAM}${contextChainId && `-${contextChainId}`}`
-          );
+          console.log('Arch negotiation setup from sdk');
+          console.log('contextChainId', contextChainId);
+          console.log('protocol:', `${NEGOTIATION_SIGNATURE_STREAM}${contextChainId && `-${contextChainId}`}`);
+
+          let stream: Stream;
+          try {
+            stream = await arch.connection.newStream(
+              `${NEGOTIATION_SIGNATURE_STREAM}${contextChainId && `-${contextChainId}`}`
+            );
+          } catch (_) {
+            stream = await arch.connection.newStream(NEGOTIATION_SIGNATURE_STREAM);
+          }
 
           await pipe([new TextEncoder().encode(outboundMsg)], stream, async (source: any) => {
             for await (const data of source) {
