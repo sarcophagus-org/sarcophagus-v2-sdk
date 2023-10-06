@@ -1,4 +1,10 @@
 import axios from 'axios';
+import {
+  GOERLI_CHAIN_ID,
+  MAINNET_CHAIN_ID,
+  POLYGON_MUMBAI_CHAIN_ID,
+  SEPOLIA_CHAIN_ID,
+} from 'networkConfig';
 import qs from 'qs';
 import { SarcoNetworkConfig } from 'types';
 
@@ -36,12 +42,18 @@ export class ZeroEx {
 
   public async quote(params: ZeroExQuoteParams) {
     const chainIdToHost = new Map<number, string>([
-      [1, 'https://api.0x.org'],
-      [5, 'https://goerli.api.0x.org'],
-      [11155111, 'https://sepolia.api.0x.org'],
+      [MAINNET_CHAIN_ID, 'https://api.0x.org'],
+      [GOERLI_CHAIN_ID, 'https://goerli.api.0x.org'],
+      [SEPOLIA_CHAIN_ID, 'https://sepolia.api.0x.org'],
+      [POLYGON_MUMBAI_CHAIN_ID, 'https://mumbai.api.0x.org'],
     ]);
 
     const host = chainIdToHost.get(this.networkConfig.chainId);
+
+    if (!host) {
+      throw new Error(`0x API is unsupported on chain id: ${this.networkConfig.chainId}`);
+    }
+
     const response = await axios
       .get(`${host}/swap/v1/quote?${qs.stringify(params)}`, {
         headers: this.headers,
