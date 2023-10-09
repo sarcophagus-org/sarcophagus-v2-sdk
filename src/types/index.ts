@@ -33,6 +33,7 @@ export interface SarcoNetworkConfig {
   subgraphUrl: string;
   providerUrl?: string;
   zeroExApiKey?: string;
+  zeroExApiUrl: string;
   apiUrlBase: string;
 }
 

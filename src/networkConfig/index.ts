@@ -49,6 +49,7 @@ export const hardhatNetworkConfig = (override?: {
   providerUrl: override?.providerUrl ?? '',
   subgraphUrl: '',
   zeroExApiKey: '',
+  zeroExApiUrl: '',
   apiUrlBase: '',
 });
 
@@ -73,6 +74,32 @@ export const polygonMumbaiNetworkConfig = (
   providerUrl,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon-mumbai/v0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
+  zeroExApiUrl: 'https://mumbai.api.0x.org',
+  apiUrlBase: 'https://api.encryptafile.com',
+});
+
+export const polygonMainnetNetworkConfig = (
+  providerUrl: string,
+  config?: { polygonMainnetApiKey?: string; zeroExApiKey?: string }
+): SarcoNetworkConfig => ({
+  chainId: POLYGON_MUMBAI_CHAIN_ID,
+  networkName: 'Polygon Mainnet',
+  networkShortName: 'Polygon',
+  tokenSymbol: 'MATIC',
+  sarcoTokenAddress: '',
+  diamondDeployAddress: '',
+  etherscanApiUrl: 'https://api.polygonscan.com/api',
+  etherscanApiKey: config?.polygonMainnetApiKey ?? '',
+  explorerUrl: 'https://polygonscan.com/',
+  bundlr: {
+    currencyName: 'ethereum',
+    nodeUrl: 'https://devnet.bundlr.network',
+  },
+  arweaveConfig,
+  providerUrl,
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon-mainnet/v0.0.1',
+  zeroExApiKey: config?.zeroExApiKey ?? '',
+  zeroExApiUrl: 'https://polygon.api.0x.org',
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
@@ -97,6 +124,7 @@ export const baseGoerliNetworkConfig = (
   providerUrl,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/base-goerli/v0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
+  zeroExApiUrl: '',
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
@@ -121,6 +149,7 @@ export const goerliNetworkConfig = (
   providerUrl,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarco-goerli-test/two',
   zeroExApiKey: config?.zeroExApiKey ?? '',
+  zeroExApiUrl: 'https://goerli.api.0x.org',
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
@@ -145,6 +174,7 @@ export const mainnetNetworkConfig = (
   arweaveConfig,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarcophagus-v2/v0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
+  zeroExApiUrl: 'https://api.0x.org',
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
@@ -169,5 +199,6 @@ export const sepoliaNetworkConfig = (
   arweaveConfig,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sepolia/v0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
+  zeroExApiUrl: '',
   apiUrlBase: 'https://api.encryptafile.com',
 });

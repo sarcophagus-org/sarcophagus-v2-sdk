@@ -41,17 +41,10 @@ export class ZeroEx {
   }
 
   public async quote(params: ZeroExQuoteParams) {
-    const chainIdToHost = new Map<number, string>([
-      [MAINNET_CHAIN_ID, 'https://api.0x.org'],
-      [GOERLI_CHAIN_ID, 'https://goerli.api.0x.org'],
-      [SEPOLIA_CHAIN_ID, 'https://sepolia.api.0x.org'],
-      [POLYGON_MUMBAI_CHAIN_ID, 'https://mumbai.api.0x.org'],
-    ]);
-
-    const host = chainIdToHost.get(this.networkConfig.chainId);
+    const host = this.networkConfig.zeroExApiUrl;
 
     if (!host) {
-      throw new Error(`0x API is unsupported on chain id: ${this.networkConfig.chainId}`);
+      throw new Error(`0x API is unsupported on ${this.networkConfig.networkShortName}`);
     }
 
     const response = await axios
