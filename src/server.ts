@@ -17,6 +17,7 @@ import {
   SEPOLIA_CHAIN_ID,
   hardhatNetworkConfig,
   SarcoSupportedNetwork,
+  polygonMainnetNetworkConfig,
 } from './networkConfig';
 import {
   CallOptions,
@@ -52,6 +53,7 @@ export {
   sepoliaNetworkConfig,
   baseGoerliNetworkConfig,
   polygonMumbaiNetworkConfig,
+  polygonMainnetNetworkConfig,
   BASE_GOERLI_CHAIN_ID,
   GOERLI_CHAIN_ID,
   HARDHAT_CHAIN_ID,

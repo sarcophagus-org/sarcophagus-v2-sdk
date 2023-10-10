@@ -14,6 +14,7 @@ import {
   sepoliaNetworkConfig,
   baseGoerliNetworkConfig,
   polygonMumbaiNetworkConfig,
+  polygonMainnetNetworkConfig,
   MAINNET_CHAIN_ID,
   GOERLI_CHAIN_ID,
   SEPOLIA_CHAIN_ID,
@@ -90,7 +91,14 @@ export class WebSarcoClient {
       [
         POLYGON_MUMBAI_CHAIN_ID,
         polygonMumbaiNetworkConfig(providerUrl, {
-          polygonMumbaiApiKey: initParams.polygonMumbaiApiKey,
+          polygonApiKey: initParams.polygonApiKey,
+          zeroExApiKey: initParams.zeroExApiKey,
+        }),
+      ],
+      [
+        POLYGON_MUMBAI_CHAIN_ID,
+        polygonMainnetNetworkConfig(providerUrl, {
+          polygonMainnetApiKey: initParams.polygonApiKey,
           zeroExApiKey: initParams.zeroExApiKey,
         }),
       ],

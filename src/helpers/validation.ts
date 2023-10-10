@@ -13,7 +13,7 @@ export const sarcoClientInitSchema = object({
   chainId: number().required(),
   bundlrPublicKey: string(),
   etherscanApiKey: string(),
-  polygonMumbaiApiKey: string(),
+  polygonApiKey: string(),
   basescanApiKey: string(),
   zeroExApiKey: string(),
 });
