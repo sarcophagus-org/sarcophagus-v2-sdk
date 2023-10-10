@@ -1,10 +1,4 @@
 import axios from 'axios';
-import {
-  GOERLI_CHAIN_ID,
-  MAINNET_CHAIN_ID,
-  POLYGON_MUMBAI_CHAIN_ID,
-  SEPOLIA_CHAIN_ID,
-} from 'networkConfig';
 import qs from 'qs';
 import { SarcoNetworkConfig } from 'types';
 
