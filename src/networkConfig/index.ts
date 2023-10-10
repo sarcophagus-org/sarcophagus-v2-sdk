@@ -13,6 +13,7 @@ export const GOERLI_CHAIN_ID = 5;
 export const SEPOLIA_CHAIN_ID = 11155111;
 export const BASE_GOERLI_CHAIN_ID = 84531;
 export const POLYGON_MUMBAI_CHAIN_ID = 80001;
+export const POLYGON_MAINNET_CHAIN_ID = 137;
 export const HARDHAT_CHAIN_ID = 31337;
 
 export type SarcoSupportedNetwork =
@@ -21,11 +22,13 @@ export type SarcoSupportedNetwork =
   | 'sepolia'
   | 'baseGoerli'
   | 'polygonMumbai'
+  | 'polygonMainnet'
   | typeof MAINNET_CHAIN_ID
   | typeof GOERLI_CHAIN_ID
   | typeof SEPOLIA_CHAIN_ID
   | typeof BASE_GOERLI_CHAIN_ID
-  | typeof POLYGON_MUMBAI_CHAIN_ID;
+  | typeof POLYGON_MUMBAI_CHAIN_ID
+  | typeof POLYGON_MAINNET_CHAIN_ID;
 
 export const hardhatNetworkConfig = (override?: {
   providerUrl?: string;
@@ -82,7 +85,7 @@ export const polygonMainnetNetworkConfig = (
   providerUrl: string,
   config?: { polygonMainnetApiKey?: string; zeroExApiKey?: string }
 ): SarcoNetworkConfig => ({
-  chainId: POLYGON_MUMBAI_CHAIN_ID,
+  chainId: POLYGON_MAINNET_CHAIN_ID,
   networkName: 'Polygon Mainnet',
   networkShortName: 'Polygon',
   tokenSymbol: 'MATIC',
