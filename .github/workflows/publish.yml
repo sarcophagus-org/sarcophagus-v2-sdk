@@ -1,0 +1,35 @@
+name: Publish Package to npmjs
+on:
+  release:
+    types: [published]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - run: cp package.json package.json.bak  # Backup original package.json
+      - name: Modify package.json for node version
+        run: |
+          node -e "let pkg=require('./package.json'); pkg.name='@sarcophagus-org/sarcophagus-v2-sdk'; pkg.main='dist/server.js'; pkg.browser='dist/browser.js'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
+      - run: npm run build
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: mv package.json.bak package.json  # Restore original package.json
+      - name: Modify package.json for client version
+        run: |
+          node -e "let pkg=require('./package.json'); pkg.name='@sarcophagus-org/sarcophagus-v2-sdk-client'; pkg.main='dist/browser.js'; pkg.browser='dist/browser.js'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
+      - run: npm run build
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+
+
+
+
