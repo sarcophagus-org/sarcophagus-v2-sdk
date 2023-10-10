@@ -91,14 +91,14 @@ export class WebSarcoClient {
       [
         POLYGON_MUMBAI_CHAIN_ID,
         polygonMumbaiNetworkConfig(providerUrl, {
-          polygonApiKey: initParams.polygonApiKey,
+          polygonScanApiKey: initParams.polygonScanApiKey,
           zeroExApiKey: initParams.zeroExApiKey,
         }),
       ],
       [
         POLYGON_MUMBAI_CHAIN_ID,
         polygonMainnetNetworkConfig(providerUrl, {
-          polygonMainnetApiKey: initParams.polygonApiKey,
+          polygonScanApiKey: initParams.polygonScanApiKey,
           zeroExApiKey: initParams.zeroExApiKey,
         }),
       ],

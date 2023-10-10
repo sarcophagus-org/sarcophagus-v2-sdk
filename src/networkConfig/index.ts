@@ -58,7 +58,7 @@ export const hardhatNetworkConfig = (override?: {
 
 export const polygonMumbaiNetworkConfig = (
   providerUrl: string,
-  config?: { polygonApiKey?: string; zeroExApiKey?: string }
+  config?: { polygonScanApiKey?: string; zeroExApiKey?: string }
 ): SarcoNetworkConfig => ({
   chainId: POLYGON_MUMBAI_CHAIN_ID,
   networkName: 'PolygonMumbai Testnet',
@@ -67,7 +67,7 @@ export const polygonMumbaiNetworkConfig = (
   sarcoTokenAddress: '0x2BC9019e6d9e6a26D7D8d8CDDa4e5dE9B787D7bb',
   diamondDeployAddress: '0x42F2C41e0285B3CBED8084b2c7476F11730935Bc',
   etherscanApiUrl: 'https://api-testnet.polygonscan.com/api',
-  etherscanApiKey: config?.polygonApiKey ?? '',
+  etherscanApiKey: config?.polygonScanApiKey ?? '',
   explorerUrl: 'https://mumbai.polygonscan.com/',
   bundlr: {
     currencyName: 'ethereum',
@@ -83,7 +83,7 @@ export const polygonMumbaiNetworkConfig = (
 
 export const polygonMainnetNetworkConfig = (
   providerUrl: string,
-  config?: { polygonMainnetApiKey?: string; zeroExApiKey?: string }
+  config?: { polygonScanApiKey?: string; zeroExApiKey?: string }
 ): SarcoNetworkConfig => ({
   chainId: POLYGON_MAINNET_CHAIN_ID,
   networkName: 'Polygon Mainnet',
@@ -92,7 +92,7 @@ export const polygonMainnetNetworkConfig = (
   sarcoTokenAddress: '0x80ae3b3847e4e8bd27a389f7686486cac9c3f3e8',
   diamondDeployAddress: '',
   etherscanApiUrl: 'https://api.polygonscan.com/api',
-  etherscanApiKey: config?.polygonMainnetApiKey ?? '',
+  etherscanApiKey: config?.polygonScanApiKey ?? '',
   explorerUrl: 'https://polygonscan.com/',
   bundlr: {
     currencyName: 'ethereum',
