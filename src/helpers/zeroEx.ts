@@ -35,13 +35,12 @@ export class ZeroEx {
   }
 
   public async quote(params: ZeroExQuoteParams) {
-    const chainIdToHost = new Map<number, string>([
-      [1, 'https://api.0x.org'],
-      [5, 'https://goerli.api.0x.org'],
-      [11155111, 'https://sepolia.api.0x.org'],
-    ]);
+    const host = this.networkConfig.zeroExApiUrl;
 
-    const host = chainIdToHost.get(this.networkConfig.chainId);
+    if (!host) {
+      throw new Error(`0x API is unsupported on ${this.networkConfig.networkShortName}`);
+    }
+
     const response = await axios
       .get(`${host}/swap/v1/quote?${qs.stringify(params)}`, {
         headers: this.headers,
