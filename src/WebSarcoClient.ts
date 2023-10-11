@@ -14,11 +14,13 @@ import {
   sepoliaNetworkConfig,
   baseGoerliNetworkConfig,
   polygonMumbaiNetworkConfig,
+  polygonMainnetNetworkConfig,
   MAINNET_CHAIN_ID,
   GOERLI_CHAIN_ID,
   SEPOLIA_CHAIN_ID,
   POLYGON_MUMBAI_CHAIN_ID,
   BASE_GOERLI_CHAIN_ID,
+  POLYGON_MAINNET_CHAIN_ID,
 } from './networkConfig';
 import Arweave from 'arweave';
 import { sponsoredBundlrProvider } from './helpers/bundlr';
@@ -90,7 +92,14 @@ export class WebSarcoClient {
       [
         POLYGON_MUMBAI_CHAIN_ID,
         polygonMumbaiNetworkConfig(providerUrl, {
-          polygonMumbaiApiKey: initParams.polygonMumbaiApiKey,
+          polygonScanApiKey: initParams.polygonScanApiKey,
+          zeroExApiKey: initParams.zeroExApiKey,
+        }),
+      ],
+      [
+        POLYGON_MAINNET_CHAIN_ID,
+        polygonMainnetNetworkConfig(providerUrl, {
+          polygonScanApiKey: initParams.polygonScanApiKey,
           zeroExApiKey: initParams.zeroExApiKey,
         }),
       ],

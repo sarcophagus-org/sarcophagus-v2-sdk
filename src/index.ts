@@ -8,6 +8,7 @@ import {
   sepoliaNetworkConfig,
   baseGoerliNetworkConfig,
   polygonMumbaiNetworkConfig,
+  polygonMainnetNetworkConfig,
 } from './networkConfig';
 import {
   CallOptions,
@@ -42,6 +43,7 @@ export {
   sepoliaNetworkConfig,
   baseGoerliNetworkConfig,
   polygonMumbaiNetworkConfig,
+  polygonMainnetNetworkConfig,
 };
 export type {
   ArchaeologistCurseNegotiationParams,

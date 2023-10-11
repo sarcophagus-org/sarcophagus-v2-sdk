@@ -13,6 +13,7 @@ export const GOERLI_CHAIN_ID = 5;
 export const SEPOLIA_CHAIN_ID = 11155111;
 export const BASE_GOERLI_CHAIN_ID = 84531;
 export const POLYGON_MUMBAI_CHAIN_ID = 80001;
+export const POLYGON_MAINNET_CHAIN_ID = 137;
 export const HARDHAT_CHAIN_ID = 31337;
 
 export type SarcoSupportedNetwork =
@@ -21,11 +22,13 @@ export type SarcoSupportedNetwork =
   | 'sepolia'
   | 'baseGoerli'
   | 'polygonMumbai'
+  | 'polygonMainnet'
   | typeof MAINNET_CHAIN_ID
   | typeof GOERLI_CHAIN_ID
   | typeof SEPOLIA_CHAIN_ID
   | typeof BASE_GOERLI_CHAIN_ID
-  | typeof POLYGON_MUMBAI_CHAIN_ID;
+  | typeof POLYGON_MUMBAI_CHAIN_ID
+  | typeof POLYGON_MAINNET_CHAIN_ID;
 
 export const hardhatNetworkConfig = (override?: {
   providerUrl?: string;
@@ -55,7 +58,7 @@ export const hardhatNetworkConfig = (override?: {
 
 export const polygonMumbaiNetworkConfig = (
   providerUrl: string,
-  config?: { polygonMumbaiApiKey?: string; zeroExApiKey?: string }
+  config?: { polygonScanApiKey?: string; zeroExApiKey?: string }
 ): SarcoNetworkConfig => ({
   chainId: POLYGON_MUMBAI_CHAIN_ID,
   networkName: 'PolygonMumbai Testnet',
@@ -64,7 +67,7 @@ export const polygonMumbaiNetworkConfig = (
   sarcoTokenAddress: '0x2BC9019e6d9e6a26D7D8d8CDDa4e5dE9B787D7bb',
   diamondDeployAddress: '0x42F2C41e0285B3CBED8084b2c7476F11730935Bc',
   etherscanApiUrl: 'https://api-testnet.polygonscan.com/api',
-  etherscanApiKey: config?.polygonMumbaiApiKey ?? '',
+  etherscanApiKey: config?.polygonScanApiKey ?? '',
   explorerUrl: 'https://mumbai.polygonscan.com/',
   bundlr: {
     currencyName: 'ethereum',
@@ -80,16 +83,16 @@ export const polygonMumbaiNetworkConfig = (
 
 export const polygonMainnetNetworkConfig = (
   providerUrl: string,
-  config?: { polygonMainnetApiKey?: string; zeroExApiKey?: string }
+  config?: { polygonScanApiKey?: string; zeroExApiKey?: string }
 ): SarcoNetworkConfig => ({
-  chainId: POLYGON_MUMBAI_CHAIN_ID,
+  chainId: POLYGON_MAINNET_CHAIN_ID,
   networkName: 'Polygon Mainnet',
   networkShortName: 'Polygon',
   tokenSymbol: 'MATIC',
   sarcoTokenAddress: '0x80ae3b3847e4e8bd27a389f7686486cac9c3f3e8',
-  diamondDeployAddress: '',
+  diamondDeployAddress: '0xc1984df3e3ddc1DC24d54179CCD5537e290C7E9c',
   etherscanApiUrl: 'https://api.polygonscan.com/api',
-  etherscanApiKey: config?.polygonMainnetApiKey ?? '',
+  etherscanApiKey: config?.polygonScanApiKey ?? '',
   explorerUrl: 'https://polygonscan.com/',
   bundlr: {
     currencyName: 'ethereum',
@@ -97,7 +100,7 @@ export const polygonMainnetNetworkConfig = (
   },
   arweaveConfig,
   providerUrl,
-  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon-mainnet/v0.0.1',
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon/v.0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: 'https://polygon.api.0x.org',
   apiUrlBase: 'https://api.encryptafile.com',
