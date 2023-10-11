@@ -64,6 +64,7 @@ export interface SubmitSarcophagusProps {
   selectedArchaeologists: ArchaeologistData[];
   requiredArchaeologists: number;
   negotiationTimestamp: number;
+  /** The archaeologists' public keys. Used to encrypt the outer layer of the split key shares. */
   archaeologistPublicKeys: Map<string, string>;
   archaeologistSignatures: Map<string, string>;
   arweaveTxId: string;
@@ -83,6 +84,7 @@ export interface SubmitSarcophagusSettings {
   name: string;
   recipientAddress: string;
   resurrectionTime: number;
+  /** The threshold value for Shamir's Secret Sharing. */
   threshold: number;
   creationTime: number;
   maximumRewrapInterval: number;

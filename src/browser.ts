@@ -1,5 +1,8 @@
 import { WebSarcoClient } from './WebSarcoClient';
 
+/**
+ * The singleton sarco client. To be used in a web environment.
+ */
 let sarco: WebSarcoClient = new WebSarcoClient();
 export { sarco };
 export { WebSarcoClient };
