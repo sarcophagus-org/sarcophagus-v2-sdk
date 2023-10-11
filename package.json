@@ -13,7 +13,7 @@
     "test": "jest",
     "build": "rm -rf dist && tsc && npx babel src --out-dir dist --extensions \".ts\" --copy-files",
     "prettier": "npx prettier --write src/** test/**",
-    "docs": "typedoc --out docs --readme README.md src"
+    "docs": "typedoc"
   },
   "jest": {
     "preset": "ts-jest",

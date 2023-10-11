@@ -1,5 +1,40 @@
 import { ApiConfig as ArweaveConfig } from 'arweave/node/lib/api';
 import { ArchaeologistData } from './archaeologist';
+
+export type {
+  ArchaeologistData,
+  ArchaeologistCurseNegotiationParams,
+  ArchaeologistEncryptedShard,
+  ArchaeologistException,
+  ArchaeologistExceptionCode,
+  ArchaeologistNegotiationError,
+  ArchaeologistNegotiationResponse,
+  ArchaeologistNegotiationResult,
+  ArchaeologistProfile,
+  SarcophagusArchaeologist,
+  SarcophagusValidationError,
+} from './archaeologist';
+
+export type {
+  PrivateKeyPublish,
+  SarcoCounts,
+  SarcophagusData,
+  SarcophagusDetails,
+  SarcophagusFilter,
+  SarcophagusResponseContract,
+  SarcophagusRewrap,
+  SarcophagusState,
+} from './sarcophagi';
+
+export type {
+  ArweaveFileMetadata,
+  ArweaveResponse,
+  ArweaveTxStatus,
+  OnDownloadProgress,
+  PayloadData,
+  UploadArweaveFileOptions,
+} from './arweave';
+
 import { BigNumber } from 'ethers';
 import { IERC20 } from '@sarcophagus-org/sarcophagus-v2-contracts';
 

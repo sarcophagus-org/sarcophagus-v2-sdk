@@ -1,5 +1,7 @@
 import { ArchaeologistData } from 'types/archaeologist';
 
+export * from "./zeroEx";;
+
 /**
  * Returns the smallest maximumRewrapInterval value
  * from the profiles of the archaeologists provided
