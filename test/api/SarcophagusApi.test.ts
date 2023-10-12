@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { Api } from '../../src/Api';
+import { SarcophagusApi } from '../../src/SarcophagusApi';
 import { SarcoWebBundlr } from '../../src/SarcoWebBundlr';
 import { SarcoNetworkConfig } from '../../src/types';
 import Arweave from 'arweave';
@@ -12,7 +12,7 @@ jest.mock('../../src/SarcoWebBundlr');
 describe('Api', () => {
   describe('Api Constructor', () => {
     test('should initialize with a contract address, signer, and url string', () => {
-      const api = new Api(
+      const api = new SarcophagusApi(
         '0x0',
         signer,
         { subgraphUrl: 'subgraph/url/test' } as SarcoNetworkConfig,
@@ -23,7 +23,7 @@ describe('Api', () => {
     });
 
     test('should have an embalmerFacet instance', () => {
-      const api = new Api(
+      const api = new SarcophagusApi(
         '0x0',
         signer,
         { subgraphUrl: 'subgraph/url/test' } as SarcoNetworkConfig,
@@ -34,7 +34,7 @@ describe('Api', () => {
     });
 
     test('should set its subgraph url', () => {
-      const api = new Api(
+      const api = new SarcophagusApi(
         '0x0',
         signer,
         { subgraphUrl: 'subgraph/url/test' } as SarcoNetworkConfig,

@@ -1,5 +1,5 @@
-import { BigNumber, ethers } from 'ethers';
-import { Api } from '../../src/Api';
+import { ethers } from 'ethers';
+import { SarcophagusApi } from '../../src/SarcophagusApi';
 import { sarcoId } from './test-data';
 import { mockSafeContractCall } from './test-utils';
 import { SarcoWebBundlr } from '../../src/SarcoWebBundlr';
@@ -11,7 +11,7 @@ jest.mock('@sarcophagus-org/sarcophagus-v2-contracts');
 jest.mock('../../src/SarcoWebBundlr');
 
 const signer = ethers.Wallet.createRandom({});
-const api = new Api('0x0', signer, {} as SarcoNetworkConfig, {} as SarcoWebBundlr, {} as Arweave);
+const api = new SarcophagusApi('0x0', signer, {} as SarcoNetworkConfig, {} as SarcoWebBundlr, {} as Arweave);
 
 beforeEach(() => {
   mockSafeContractCall.mockClear();
