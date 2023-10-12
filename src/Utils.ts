@@ -8,7 +8,7 @@ import {
   ContractArchaeologist,
   SarcoNetworkConfig,
   SubmitSarcophagusArgsTuple,
-  SubmitSarcophagusProps,
+  SubmitSarcophagusParams,
   SubmitSarcophagusSettings,
 } from './types';
 import { RecoverPublicKeyErrorStatus, RecoverPublicKeyResponse } from './types/utils';
@@ -339,7 +339,7 @@ export class Utils {
     archaeologistPublicKeys,
     archaeologistSignatures,
     arweaveTxId,
-  }: SubmitSarcophagusProps) {
+  }: SubmitSarcophagusParams) {
     const getContractArchaeologists = (): ContractArchaeologist[] => {
       return selectedArchaeologists.map(arch => {
         const { v, r, s } = utils.splitSignature(archaeologistSignatures.get(arch.profile.archAddress)!);

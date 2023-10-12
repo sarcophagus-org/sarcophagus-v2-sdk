@@ -92,7 +92,7 @@ export interface RecipientState {
   generatePDFState?: GeneratePDFState;
 }
 
-export interface SubmitSarcophagusProps {
+export interface SubmitSarcophagusParams {
   name: string;
   recipientState: RecipientState;
   resurrection: number;

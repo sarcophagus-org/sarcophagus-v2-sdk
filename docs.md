@@ -166,3 +166,19 @@ const { submitSarcophagusArgs } = sarco.api.formatSubmitSarcophagusArgs({
 const tx = await sarco.api.createSarcophagus(...submitSarcophagusArgs);
 console.log('Sarcophagus created!! Transaction hash: ', tx.hash);
 ```
+
+## <br>
+
+<br>
+
+# API Reference
+
+Use the links on the left panel to navigate the API reference.
+Some tips on where to start looking:
+
+- [SarcophagusApi](./classes/SarcophagusApi.html) - The class that exposes functionality for interacting with the Sarcophagi on the Sarcophagus protocol.
+- [ArchaeologistApi](./classes/ArchaeologistApi.html) - The class that exposes functionality for interacting with registered Archaeologists on the Sarcophagus network.
+- [Token](./classes/Token.html) - The class that exposes functionality for interacting with the `$SARCO` ERC20 token.
+- [SarcoWebBundlr](./classes/SarcoWebBundlr.html) - The class that exposes functionality for interacting with the Sarcophagus Web Bundlr service
+  (The NodeJS SDK does not use this class -- it exposes `Bundlr` from `@bundlr-network/client/build/cjs/node/bundlr` directly).
+- [Utils](./classes/Utils.html) - The class that exposes a variety of useful utility functions.
