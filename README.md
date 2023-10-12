@@ -8,10 +8,6 @@ The Sarcophagus V2 SDK is a TypeScript library designed to simplify the interact
 - Supports custom signer and provider configurations
 - Provides utility functions for common tasks
 
-## Documentation
-
-Read more about how to use the Sarcophagus V2 SDK [here](https://sarcophagus-org.github.io/sarcophagus-v2-sdk/index.html).
-
 ## Installation
 
 To install the SDK, run the following command in your project directory:
@@ -28,50 +24,9 @@ For Node.js environments:
 npm install @sarcophagus-org/sarcophagus-v2-sdk
 ```
 
-## Usage
+## Documentation
 
-Here's a basic example of using the Sarcophagus V2 SDK in a NodeJS project:
-
-```typescript
-import { NodeSarcoClient } from '"@sarcophagus-org/sarcophagus-v2-sdk';
-
-// Initialize the client with a custom provider and signer
-const sarco = new NodeSarcoClient({ privateKey, providerUrl, chainId, etherscanApiKey, zeroExApiKey });
-
-// 1. Initialize the sdk
-try {
-  await sarco.init();
-} catch (error) {
-  console.error('Failed to initialize SDK');
-}
-
-// 2. Get archaeologist profiles
-const archaeologists = await sarco.archaeologist
-  .getFullArchProfiles({ addresses, filterOffline: true })
-  .catch(error => {
-    console.error('Failed to get archaeologist profiles');
-  });
-
-archaeologists.forEach((arch, i) => {
-  console.log(`  ${i + 1}. ${arch.profile.archAddress}`);
-});
-
-// 3. Dial and connect to archaeologists
-await Promise.all(
-  archaeologists.map(async arch => {
-    try {
-      const connection = await sarco.archaeologist.dialArchaeologist(arch);
-      arch.connection = connection;
-    } catch (error) {
-      console.error(`Failed to dial archaeologist ${arch.profile.archAddress}`);
-    }
-  })
-).catch(error => {
-  console.error('Failed to dial archaeologists');
-});
-
-console.log(`Successfully connected to ${archaeologists.length} archaeologists`);
-```
+Read more about how to use the Sarcophagus V2 SDK [here](https://sarcophagus-org.github.io/sarcophagus-v2-sdk/index.html).
 
 ## Local Development
 

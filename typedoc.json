@@ -1,12 +1,9 @@
 {
   "entryPoints": [
-    "src/index.ts", 
-    // "src/browser.ts",
-    // "src/server.ts",
-    // "src/types/index.ts",
-    // "src/networkConfig/index.ts",
-    // "src/helpers/index.ts",
+    "src/index.ts",
   ],
   "out": "docs",
-  "readme": "README.md",
+  "readme": "docs.md",
+  "name": "sarcophagus-sdk-index",
+  "theme": "default"
 }
