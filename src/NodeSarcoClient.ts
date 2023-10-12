@@ -60,7 +60,7 @@ export class NodeSarcoClient {
     this.utils = new Utils(networkConfig, this.signer);
   }
 
-  public async init(): Promise<void> {
+  public async init(): Promise<SarcoNetworkConfig> {
     this.p2pNode = await bootLip2p();
     this.archaeologist = new ArchaeologistApi(
       this.networkConfig.diamondDeployAddress,
@@ -72,6 +72,7 @@ export class NodeSarcoClient {
     );
 
     this.isInitialised = true;
+    return this.networkConfig;
   }
 
   public async startLibp2pNode() {
