@@ -1,7 +1,7 @@
 import Bundlr from '@bundlr-network/client/build/esm/node/bundlr';
 import { ethers, Signer } from 'ethers';
 import { Libp2p } from 'libp2p';
-import { Api } from './Api';
+import { SarcophagusApi } from './SarcophagusApi';
 import { Archaeologist } from './Archaeologist';
 import { NodeSarcoClientConfig, nodeSarcoClientSchema } from './helpers/validation';
 import { bootLip2p } from './libp2p_node';
@@ -15,7 +15,7 @@ export class NodeSarcoClient {
   signer: Signer;
   isInitialised: boolean = false;
 
-  api!: Api;
+  api!: SarcophagusApi;
   archaeologist!: Archaeologist;
   bundlr!: Bundlr;
   token!: Token;
@@ -43,7 +43,7 @@ export class NodeSarcoClient {
     this.bundlr = new Bundlr(networkConfig.bundlr.nodeUrl, networkConfig.bundlr.currencyName, config.privateKey, {
       providerUrl: networkConfig.providerUrl,
     });
-    this.api = new Api(networkConfig.diamondDeployAddress, this.signer, networkConfig, this.bundlr, this.arweave);
+    this.api = new SarcophagusApi(networkConfig.diamondDeployAddress, this.signer, networkConfig, this.bundlr, this.arweave);
     this.token = new Token(networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
     this.utils = new Utils(networkConfig, this.signer);
   }

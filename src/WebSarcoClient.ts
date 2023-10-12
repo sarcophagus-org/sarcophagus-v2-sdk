@@ -1,4 +1,4 @@
-import { Api } from './Api';
+import { SarcophagusApi } from './SarcophagusApi';
 import { bootLip2p } from './libp2p_node';
 import { Libp2p } from 'libp2p';
 import { ethers, Signer } from 'ethers';
@@ -25,7 +25,7 @@ import Arweave from 'arweave';
 import { sponsoredBundlrProvider } from './helpers/bundlr';
 
 export class WebSarcoClient {
-  public api!: Api;
+  public api!: SarcophagusApi;
   public token!: Token;
   public archaeologist!: Archaeologist;
   public utils!: Utils;
@@ -123,7 +123,7 @@ export class WebSarcoClient {
 
     const bundlr = this.getBundlr(params.bundlrPublicKey);
 
-    this.api = new Api(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig, bundlr, this.arweave);
+    this.api = new SarcophagusApi(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig, bundlr, this.arweave);
 
     this.utils = new Utils(networkConfig, this.signer);
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);

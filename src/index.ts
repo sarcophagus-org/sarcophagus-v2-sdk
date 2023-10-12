@@ -1,4 +1,4 @@
-export * from './Api';
+export * from './SarcophagusApi';
 export * from './Archaeologist';
 export * from './NodeSarcoClient';
 export * from './WebSarcoClient';

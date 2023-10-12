@@ -39,7 +39,7 @@ import Bundlr from '@bundlr-network/client/build/esm/common/bundlr';
 import { SarcoWebBundlr } from './SarcoWebBundlr';
 import Arweave from 'arweave';
 
-export class Api {
+export class SarcophagusApi {
   public bundlr: SarcoWebBundlr | Bundlr;
 
   private embalmerFacet: ethers.Contract;
