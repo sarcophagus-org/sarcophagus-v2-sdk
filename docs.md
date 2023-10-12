@@ -51,8 +51,10 @@ This will also boot up a LibP2P node that will be used to communicate with archa
 sarco
   .init({
     chainId: 1,
-    providerUrl: 'rpc/provider/url',
-    etherscanApiKey: 'etherscanApiKey',
+    etherscanApiKey: 'etherscanApiKey', // not required
+    polygonScanApiKey: 'polygonScanApiKey', // not required
+    basescanApiKey: 'basescanApiKey', // not required
+    zeroExApiKey: 'zeroExApiKey', // only required if you want to use `swapEthForSarco` or `getSarcoQuote`
   })
   .then(() => console.log('SDK initialized!'));
 

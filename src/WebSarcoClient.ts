@@ -8,20 +8,7 @@ import { Utils } from './Utils';
 import { ArchaeologistApi } from './ArchaeologistApi';
 import { sarcoClientInitSchema, SarcoInitParams } from './helpers/validation';
 import { SarcoNetworkConfig } from './types';
-import {
-  goerliNetworkConfig,
-  mainnetNetworkConfig,
-  sepoliaNetworkConfig,
-  baseGoerliNetworkConfig,
-  polygonMumbaiNetworkConfig,
-  polygonMainnetNetworkConfig,
-  MAINNET_CHAIN_ID,
-  GOERLI_CHAIN_ID,
-  SEPOLIA_CHAIN_ID,
-  POLYGON_MUMBAI_CHAIN_ID,
-  BASE_GOERLI_CHAIN_ID,
-  POLYGON_MAINNET_CHAIN_ID,
-} from './networkConfig';
+import { getNetworkConfigBuilder } from './networkConfig';
 import Arweave from 'arweave';
 import { sponsoredBundlrProvider } from './helpers/bundlr';
 
@@ -57,72 +44,38 @@ export class WebSarcoClient {
    * @param onInit - A callback function that is called after the WebSarcoClient instance is initialised
    * @returns void
    * */
-  async init(initParams: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<void> {
+  async init(initParams: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<SarcoNetworkConfig> {
     if (window.ethereum) {
       this.provider = window.ethereum;
       this.signer = new ethers.providers.Web3Provider(this.provider as any).getSigner();
+    } else {
+      throw new Error('No ethereum provider found');
     }
 
     const params = await sarcoClientInitSchema.validate(initParams);
 
     const providerUrl = new ethers.providers.Web3Provider(this.provider as any).connection.url;
 
-    const networkConfigByChainId = new Map<number, SarcoNetworkConfig>([
-      [
-        MAINNET_CHAIN_ID,
-        mainnetNetworkConfig(providerUrl, {
-          etherscanApiKey: initParams.etherscanApiKey,
-          zeroExApiKey: initParams.zeroExApiKey,
-        }),
-      ],
-      [
-        GOERLI_CHAIN_ID,
-        goerliNetworkConfig(providerUrl, {
-          etherscanApiKey: initParams.etherscanApiKey,
-          zeroExApiKey: initParams.zeroExApiKey,
-        }),
-      ],
-      [
-        SEPOLIA_CHAIN_ID,
-        sepoliaNetworkConfig(providerUrl, {
-          etherscanApiKey: initParams.etherscanApiKey,
-          zeroExApiKey: initParams.zeroExApiKey,
-        }),
-      ],
-      [
-        POLYGON_MUMBAI_CHAIN_ID,
-        polygonMumbaiNetworkConfig(providerUrl, {
-          polygonScanApiKey: initParams.polygonScanApiKey,
-          zeroExApiKey: initParams.zeroExApiKey,
-        }),
-      ],
-      [
-        POLYGON_MAINNET_CHAIN_ID,
-        polygonMainnetNetworkConfig(providerUrl, {
-          polygonScanApiKey: initParams.polygonScanApiKey,
-          zeroExApiKey: initParams.zeroExApiKey,
-        }),
-      ],
-      [
-        BASE_GOERLI_CHAIN_ID,
-        baseGoerliNetworkConfig(providerUrl, {
-          basescanApiKey: initParams.basescanApiKey,
-          zeroExApiKey: initParams.zeroExApiKey,
-        }),
-      ],
-    ]);
+    const getNetworkConfig = getNetworkConfigBuilder(params.chainId);
 
-    const networkConfig = networkConfigByChainId.get(params.chainId);
-    if (!networkConfig) {
+    if (!getNetworkConfig) {
       throw new Error(`Unsupported chainId: ${params.chainId}`);
     }
+
+    const networkConfig = getNetworkConfig({
+      etherscanApiKey: params.etherscanApiKey,
+      polygonScanApiKey: params.polygonScanApiKey,
+      basescanApiKey: params.basescanApiKey,
+      zeroExApiKey: params.zeroExApiKey,
+    });
+
     this.networkConfig = networkConfig;
 
     this.p2pNode = await bootLip2p();
     // TODO: Allow client to choose when to start/stop libp2p node
     await this.startLibp2pNode();
 
-    const bundlr = this.getBundlr(params.bundlrPublicKey);
+    const bundlr = this.getBundlr(providerUrl, params.bundlrPublicKey);
 
     this.api = new SarcophagusApi(
       this.networkConfig.diamondDeployAddress,
@@ -145,12 +98,14 @@ export class WebSarcoClient {
 
     this.isInitialised = true;
     onInit(this.p2pNode);
+
+    return networkConfig;
   }
 
   /**
    * Gets bundlr provider, either sponsored or user-provided
    */
-  getBundlr(signerPublicKey?: string, signerEndpoint?: string) {
+  getBundlr(providerUrl: string, signerPublicKey?: string, signerEndpoint?: string) {
     // If signingPublicKey is provided, use sponsoring provider
     const bundlrProvider: ethers.providers.Web3Provider = signerPublicKey
       ? sponsoredBundlrProvider(signerPublicKey, signerEndpoint!)
@@ -158,7 +113,7 @@ export class WebSarcoClient {
 
     const bundlrConfig = {
       timeout: 100000,
-      providerUrl: this.networkConfig.providerUrl,
+      providerUrl: providerUrl,
     };
 
     return new SarcoWebBundlr(

@@ -17,8 +17,9 @@ import {
   MAINNET_CHAIN_ID,
   SEPOLIA_CHAIN_ID,
   hardhatNetworkConfig,
-  SarcoSupportedNetwork,
+  SARCO_SUPPORTED_NETWORKS,
   polygonMainnetNetworkConfig,
+  getNetworkConfigBuilder,
 } from './networkConfig';
 import {
   CallOptions,
@@ -62,7 +63,9 @@ export {
   POLYGON_MAINNET_CHAIN_ID,
   MAINNET_CHAIN_ID,
   SEPOLIA_CHAIN_ID,
+  SARCO_SUPPORTED_NETWORKS,
   hardhatNetworkConfig,
+  getNetworkConfigBuilder,
 };
 export type {
   ArchaeologistCurseNegotiationParams,
@@ -73,7 +76,6 @@ export type {
   ArchaeologistNegotiationResult,
   ArchaeologistProfile,
   SarcophagusArchaeologist,
-  SarcoSupportedNetwork,
 };
 
 export { SarcophagusState } from './types/sarcophagi';

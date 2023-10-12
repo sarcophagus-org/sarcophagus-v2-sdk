@@ -66,7 +66,6 @@ export interface SarcoNetworkConfig {
   bundlr: SarcoBundlrConfig;
   arweaveConfig: ArweaveConfig;
   subgraphUrl: string;
-  providerUrl?: string;
   zeroExApiKey?: string;
   zeroExApiUrl: string;
   apiUrlBase: string;
