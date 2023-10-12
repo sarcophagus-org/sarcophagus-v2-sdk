@@ -20,6 +20,7 @@ import {
   SEPOLIA_CHAIN_ID,
   POLYGON_MUMBAI_CHAIN_ID,
   BASE_GOERLI_CHAIN_ID,
+  POLYGON_MAINNET_CHAIN_ID,
 } from './networkConfig';
 import Arweave from 'arweave';
 import { sponsoredBundlrProvider } from './helpers/bundlr';
@@ -96,7 +97,7 @@ export class WebSarcoClient {
         }),
       ],
       [
-        POLYGON_MUMBAI_CHAIN_ID,
+        POLYGON_MAINNET_CHAIN_ID,
         polygonMainnetNetworkConfig(providerUrl, {
           polygonScanApiKey: initParams.polygonScanApiKey,
           zeroExApiKey: initParams.zeroExApiKey,
@@ -123,7 +124,13 @@ export class WebSarcoClient {
 
     const bundlr = this.getBundlr(params.bundlrPublicKey);
 
-    this.api = new SarcophagusApi(this.networkConfig.diamondDeployAddress, this.signer, this.networkConfig, bundlr, this.arweave);
+    this.api = new SarcophagusApi(
+      this.networkConfig.diamondDeployAddress,
+      this.signer,
+      this.networkConfig,
+      bundlr,
+      this.arweave
+    );
 
     this.utils = new Utils(networkConfig, this.signer);
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
