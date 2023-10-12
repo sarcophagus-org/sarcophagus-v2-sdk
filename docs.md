@@ -56,7 +56,10 @@ sarco
     basescanApiKey: 'basescanApiKey', // not required
     zeroExApiKey: 'zeroExApiKey', // only required if you want to use `swapEthForSarco` or `getSarcoQuote`
   })
-  .then(() => console.log('SDK initialized!'));
+  .then(networkConfig => {
+    console.log('SDK initialized!');
+    console.log('Network:', networkConfig.networkName);
+  });
 
 // Just `sarco.init()` for `NodeSarcoClient`
 ```
