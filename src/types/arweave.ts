@@ -19,9 +19,9 @@ export interface PayloadData {
 
 export interface UploadArweaveFileOptions {
   /** The file to upload. Leave undefined if using `payloadData`. */
-  file: File | undefined;
+  file?: File | undefined;
   /** The payload data to upload. Leave undefined if using `file`. */
-  payloadData: PayloadData | undefined;
+  payloadData?: PayloadData | undefined;
   /** Callback for preparation steps during upload. `step` can be displayed to end-user. */
   onStep: (step: string) => void;
   /** The private key used to encrypt the payload. */
