@@ -8,3 +8,4 @@ export * from './Utils';
 export * from './types';
 export * from './helpers';
 export * from './networkConfig';
+export { sarco } from 'browser'
