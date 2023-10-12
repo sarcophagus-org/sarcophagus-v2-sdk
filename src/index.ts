@@ -1,5 +1,5 @@
 export * from './SarcophagusApi';
-export * from './Archaeologist';
+export * from './ArchaeologistApi';
 export * from './NodeSarcoClient';
 export * from './WebSarcoClient';
 export * from './SarcoWebBundlr';

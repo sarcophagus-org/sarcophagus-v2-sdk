@@ -2,7 +2,7 @@ import Bundlr from '@bundlr-network/client/build/esm/node/bundlr';
 import { ethers, Signer } from 'ethers';
 import { Libp2p } from 'libp2p';
 import { SarcophagusApi } from './SarcophagusApi';
-import { Archaeologist } from './Archaeologist';
+import { ArchaeologistApi } from './ArchaeologistApi';
 import { NodeSarcoClientConfig, nodeSarcoClientSchema } from './helpers/validation';
 import { bootLip2p } from './libp2p_node';
 import { goerliNetworkConfig, mainnetNetworkConfig, sepoliaNetworkConfig } from './networkConfig';
@@ -16,7 +16,7 @@ export class NodeSarcoClient {
   isInitialised: boolean = false;
 
   api!: SarcophagusApi;
-  archaeologist!: Archaeologist;
+  archaeologist!: ArchaeologistApi;
   bundlr!: Bundlr;
   token!: Token;
   utils!: Utils;
@@ -50,7 +50,7 @@ export class NodeSarcoClient {
 
   public async init(): Promise<void> {
     this.p2pNode = await bootLip2p();
-    this.archaeologist = new Archaeologist(
+    this.archaeologist = new ArchaeologistApi(
       this.networkConfig.diamondDeployAddress,
       this.signer,
       this.networkConfig.subgraphUrl,

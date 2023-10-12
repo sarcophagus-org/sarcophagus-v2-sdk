@@ -5,7 +5,7 @@ import { ethers, Signer } from 'ethers';
 import { SarcoWebBundlr } from './SarcoWebBundlr';
 import { Token } from './Token';
 import { Utils } from './Utils';
-import { Archaeologist } from './Archaeologist';
+import { ArchaeologistApi } from './ArchaeologistApi';
 import { sarcoClientInitSchema, SarcoInitParams } from './helpers/validation';
 import { SarcoNetworkConfig } from './types';
 import {
@@ -27,7 +27,7 @@ import { sponsoredBundlrProvider } from './helpers/bundlr';
 export class WebSarcoClient {
   public api!: SarcophagusApi;
   public token!: Token;
-  public archaeologist!: Archaeologist;
+  public archaeologist!: ArchaeologistApi;
   public utils!: Utils;
   public isInitialised: boolean = false;
 
@@ -127,7 +127,7 @@ export class WebSarcoClient {
 
     this.utils = new Utils(networkConfig, this.signer);
     this.token = new Token(this.networkConfig.sarcoTokenAddress, this.networkConfig.diamondDeployAddress, this.signer);
-    this.archaeologist = new Archaeologist(
+    this.archaeologist = new ArchaeologistApi(
       this.networkConfig.diamondDeployAddress,
       this.signer,
       this.networkConfig.subgraphUrl,
