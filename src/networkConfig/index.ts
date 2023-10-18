@@ -86,7 +86,7 @@ export const polygonMainnetNetworkConfig = (config?: {
   networkShortName: 'Polygon',
   tokenSymbol: 'MATIC',
   sarcoTokenAddress: '0x80ae3b3847e4e8bd27a389f7686486cac9c3f3e8',
-  diamondDeployAddress: '',
+  diamondDeployAddress: '0xc1984df3e3ddc1DC24d54179CCD5537e290C7E9c',
   etherscanApiUrl: 'https://api.polygonscan.com/api',
   etherscanApiKey: config?.polygonScanApiKey ?? '',
   explorerUrl: 'https://polygonscan.com/',
