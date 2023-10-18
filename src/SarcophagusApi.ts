@@ -24,7 +24,7 @@ import {
   SarcophagusResponseContract,
 } from './types/sarcophagi';
 import { Utils } from './Utils';
-import { ArweaveResponse, OnDownloadProgress } from './types/arweave';
+import { ArweaveResponse, OnDownloadProgress, UploadArweaveFileOptions } from './types/arweave';
 import { arweaveDataDelimiter, fetchArweaveFile, readFileDataAsBase64 } from './helpers/arweaveUtil';
 import { decrypt, encrypt } from './helpers/encryption';
 import { arrayify } from 'ethers/lib/utils.js';
@@ -36,11 +36,10 @@ import {
   encryptShardsWithRecipientPublicKey,
 } from './helpers/sarco';
 import Bundlr from '@bundlr-network/client/build/esm/common/bundlr';
-import { ChunkingUploader } from '@bundlr-network/client/build/esm/common/chunkingUploader';
 import { SarcoWebBundlr } from './SarcoWebBundlr';
 import Arweave from 'arweave';
 
-export class Api {
+export class SarcophagusApi {
   public bundlr: SarcoWebBundlr | Bundlr;
 
   private embalmerFacet: ethers.Contract;
@@ -264,20 +263,7 @@ export class Api {
     }
   }
 
-  async uploadFileToArweave(args: {
-    file?: File;
-    payloadData?: { name: string; type: string; data: Buffer };
-    onStep: Function;
-    payloadPublicKey: string;
-    payloadPrivateKey: string;
-    recipientPublicKey: string;
-    shares: number;
-    threshold: number;
-    archaeologistPublicKeys: string[];
-    onUploadChunk: (chunkedUploader: ChunkingUploader, chunkedUploadProgress: number) => void;
-    onUploadChunkError: (msg: string) => void;
-    onUploadComplete: (uploadId: string) => void;
-  }): Promise<void> {
+  async uploadFileToArweave(args: UploadArweaveFileOptions): Promise<void> {
     try {
       const {
         onStep,

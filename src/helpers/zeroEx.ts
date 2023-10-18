@@ -3,12 +3,19 @@ import qs from 'qs';
 import { SarcoNetworkConfig } from 'types';
 
 export interface ZeroExQuoteParams {
+  /** The token to exchange */
   sellToken: string;
+  /** The token to receive */
   buyToken: string;
+  /** The amount of `sellToken`s to sell */
   sellAmount?: string;
+  /** The amount of `buyToken`s to buy */
   buyAmount?: string;
 }
 
+/**
+ * ZeroEx Quote API response
+ */
 export interface ZeroExQuote {
   sellAmount: string;
   buyAmount: string;
@@ -25,6 +32,11 @@ export interface ZeroExQuote {
   chainId: number;
 }
 
+/**
+ * ZeroEx API helper
+ *
+ * @param networkConfig - Context Network configuration
+ */
 export class ZeroEx {
   networkConfig: SarcoNetworkConfig;
   headers: { '0x-api-key'?: string };
@@ -34,6 +46,11 @@ export class ZeroEx {
     this.headers = { '0x-api-key': this.networkConfig.zeroExApiKey };
   }
 
+  /**
+   * Get a quote from the 0x API
+   *
+   * @param params - Quote parameters
+   */
   public async quote(params: ZeroExQuoteParams) {
     const host = this.networkConfig.zeroExApiUrl;
 

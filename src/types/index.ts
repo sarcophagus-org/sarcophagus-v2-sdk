@@ -1,5 +1,40 @@
 import { ApiConfig as ArweaveConfig } from 'arweave/node/lib/api';
 import { ArchaeologistData } from './archaeologist';
+
+export type {
+  ArchaeologistData,
+  ArchaeologistCurseNegotiationParams,
+  ArchaeologistEncryptedShard,
+  ArchaeologistException,
+  ArchaeologistExceptionCode,
+  ArchaeologistNegotiationError,
+  ArchaeologistNegotiationResponse,
+  ArchaeologistNegotiationResult,
+  ArchaeologistProfile,
+  SarcophagusArchaeologist,
+  SarcophagusValidationError,
+} from './archaeologist';
+
+export type {
+  PrivateKeyPublish,
+  SarcoCounts,
+  SarcophagusData,
+  SarcophagusDetails,
+  SarcophagusFilter,
+  SarcophagusResponseContract,
+  SarcophagusRewrap,
+  SarcophagusState,
+} from './sarcophagi';
+
+export type {
+  ArweaveFileMetadata,
+  ArweaveResponse,
+  ArweaveTxStatus,
+  OnDownloadProgress,
+  PayloadData,
+  UploadArweaveFileOptions,
+} from './arweave';
+
 import { BigNumber } from 'ethers';
 import { IERC20 } from '@sarcophagus-org/sarcophagus-v2-contracts';
 
@@ -31,7 +66,6 @@ export interface SarcoNetworkConfig {
   bundlr: SarcoBundlrConfig;
   arweaveConfig: ArweaveConfig;
   subgraphUrl: string;
-  providerUrl?: string;
   zeroExApiKey?: string;
   zeroExApiUrl: string;
   apiUrlBase: string;
@@ -57,13 +91,14 @@ export interface RecipientState {
   generatePDFState?: GeneratePDFState;
 }
 
-export interface SubmitSarcophagusProps {
+export interface SubmitSarcophagusParams {
   name: string;
   recipientState: RecipientState;
   resurrection: number;
   selectedArchaeologists: ArchaeologistData[];
   requiredArchaeologists: number;
   negotiationTimestamp: number;
+  /** The archaeologists' public keys. Used to encrypt the outer layer of the split key shares. */
   archaeologistPublicKeys: Map<string, string>;
   archaeologistSignatures: Map<string, string>;
   arweaveTxId: string;
@@ -83,6 +118,7 @@ export interface SubmitSarcophagusSettings {
   name: string;
   recipientAddress: string;
   resurrectionTime: number;
+  /** The threshold value for Shamir's Secret Sharing. */
   threshold: number;
   creationTime: number;
   maximumRewrapInterval: number;

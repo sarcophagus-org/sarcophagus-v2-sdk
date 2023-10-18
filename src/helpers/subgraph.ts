@@ -34,21 +34,23 @@ export interface SarcoRewrapsSubgraph {
 }
 
 async function queryGraphQl(subgraphUrl: string, query: string) {
-  let response: Response;
   const fetchOptions = {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ query }),
   };
 
-  // if (window === undefined) {
-  //   let fetch = require('isomorphic-fetch');
-  //   response = await fetch(subgraphUrl, fetchOptions);
-  // } else {
-  response = await fetch(subgraphUrl, fetchOptions);
-  // }
+  const response = await fetch(subgraphUrl, fetchOptions);
+  const responseJson = await response!.json();
 
-  const { data } = (await response!.json()) as { data: any };
+  if (!responseJson.data) {
+    throw {
+      error: 'Something went wrong',
+      response: responseJson,
+    };
+  }
+
+  const { data } = responseJson as { data: any };
   return data;
 }
 

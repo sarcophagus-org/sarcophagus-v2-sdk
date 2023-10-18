@@ -1,5 +1,8 @@
 import { WebSarcoClient } from './WebSarcoClient';
 
+/**
+ * The singleton sarco client. To be used in a web environment.
+ */
 let sarco: WebSarcoClient = new WebSarcoClient();
 export { sarco };
 export { WebSarcoClient };
@@ -19,8 +22,9 @@ import {
   MAINNET_CHAIN_ID,
   SEPOLIA_CHAIN_ID,
   hardhatNetworkConfig,
-  SarcoSupportedNetwork,
   polygonMainnetNetworkConfig,
+  SARCO_SUPPORTED_NETWORKS,
+  getNetworkConfigBuilder,
 } from './networkConfig';
 import {
   CallOptions,
@@ -46,28 +50,30 @@ export type { CallOptions, RecoverPublicKeyResponse, SarcoBundlrConfig, SarcoNet
 
 export { RecoverPublicKeyErrorStatus };
 
-export {
-  ArchaeologistExceptionCode,
-  NEGOTIATION_SIGNATURE_STREAM,
-  DHT_PROTOCOL_PREFIX,
-  SarcophagusValidationError,
-  goerliNetworkConfig,
-  mainnetNetworkConfig,
-  sepoliaNetworkConfig,
-  baseGoerliNetworkConfig,
-  polygonMumbaiNetworkConfig,
-  polygonMainnetNetworkConfig,
-  BASE_GOERLI_CHAIN_ID,
-  GOERLI_CHAIN_ID,
-  HARDHAT_CHAIN_ID,
-  POLYGON_MUMBAI_CHAIN_ID,
-  POLYGON_MAINNET_CHAIN_ID,
-  MAINNET_CHAIN_ID,
-  SEPOLIA_CHAIN_ID,
-  hardhatNetworkConfig,
-};
+  export {
+    ArchaeologistExceptionCode,
+    NEGOTIATION_SIGNATURE_STREAM,
+    DHT_PROTOCOL_PREFIX,
+    SarcophagusValidationError,
+    goerliNetworkConfig,
+    mainnetNetworkConfig,
+    sepoliaNetworkConfig,
+    baseGoerliNetworkConfig,
+    polygonMumbaiNetworkConfig,
+    polygonMainnetNetworkConfig,
+    BASE_GOERLI_CHAIN_ID,
+    GOERLI_CHAIN_ID,
+    HARDHAT_CHAIN_ID,
+    POLYGON_MUMBAI_CHAIN_ID,
+    POLYGON_MAINNET_CHAIN_ID,
+    MAINNET_CHAIN_ID,
+    SEPOLIA_CHAIN_ID,
+    SARCO_SUPPORTED_NETWORKS,
+    getNetworkConfigBuilder,
+    hardhatNetworkConfig
+  };
+
 export type {
-  SarcoSupportedNetwork,
   ArchaeologistCurseNegotiationParams,
   ArchaeologistData,
   ArchaeologistEncryptedShard,

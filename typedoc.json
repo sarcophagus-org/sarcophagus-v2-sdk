@@ -1,0 +1,9 @@
+{
+  "entryPoints": [
+    "src/index.ts",
+  ],
+  "out": "docs",
+  "readme": "docs.md",
+  "name": "sarcophagus-sdk-index",
+  "theme": "default"
+}

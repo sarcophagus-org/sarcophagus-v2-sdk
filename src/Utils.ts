@@ -8,7 +8,7 @@ import {
   ContractArchaeologist,
   SarcoNetworkConfig,
   SubmitSarcophagusArgsTuple,
-  SubmitSarcophagusProps,
+  SubmitSarcophagusParams,
   SubmitSarcophagusSettings,
 } from './types';
 import { RecoverPublicKeyErrorStatus, RecoverPublicKeyResponse } from './types/utils';
@@ -18,6 +18,9 @@ import { ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contrac
 import { getLowestResurrectionTime, getLowestRewrapInterval } from './helpers';
 import { ZeroEx, ZeroExQuote } from './helpers/zeroEx';
 
+/**
+ * API of useful utility and shared functions for working with and interacting with the Sarcophagus protocol.
+ */
 export class Utils {
   private networkConfig: SarcoNetworkConfig;
   private signer: ethers.Signer;
@@ -32,6 +35,17 @@ export class Utils {
   public getLowestRewrapInterval = getLowestRewrapInterval;
   public getLowestResurrectionTime = getLowestResurrectionTime;
 
+  /**
+   * Formats a SARCO wei value to a SARCO value.
+   * @param valueInWei the value in wei to format
+   * @param precision the number of decimal places to round to
+   * @returns the formatted SARCO value
+   * @example
+   * ```typescript
+   * const sarcoValue = formatSarco("1000000000000000000");
+   * console.log(sarcoValue); // 1.00
+   * ```
+   */
   formatSarco(valueInWei: string | number, precision: number = 2): string {
     const value = formatEther(valueInWei.toString());
     const numericValue: number = Number(value);
@@ -69,15 +83,13 @@ export class Utils {
     }
   }
 
-  async getDateFromTimestamp(timestamp: number) {
-    new Date(timestamp * 1000);
-  }
-
   /**
    * Builds a resurrection date string from a BigNumber
    * Ex: 09.22.2022 7:30pm (12 Days)
-   * @param resurrectionTime
-   * @returns The resurrection string
+   * @param resurrectionTime The resurrection time in seconds
+   * @param timestampMs The current timestamp in milliseconds
+   * @param options Options for formatting the resurrection date string
+   * @returns The resurrection date string
    */
   buildResurrectionDateString(
     resurrectionTime: BigNumber | undefined,
@@ -104,12 +116,24 @@ export class Utils {
     return hideDuration ? resurrectionDateString : `${resurrectionDateString} (${timeUntilResurrection})`;
   }
 
+  /**
+   * Returns the current time in seconds, using block.timestamp
+   * @param provider
+   * @returns current time in seconds
+   */
   async getCurrentTimeSec(provider: ethers.providers.Provider | ethers.providers.Web3Provider) {
     const blockNumber = await provider.getBlockNumber();
     const block = await provider.getBlock(blockNumber);
     return block.timestamp;
   }
 
+  /**
+   * Returns the sarcophagus state from a given sarcophagus object
+   * @param sarco sarcophagus object to get state from
+   * @param gracePeriod grace period in seconds
+   * @param timestampMs current timestamp in milliseconds
+   * @returns SarcophagusState
+   */
   getSarcophagusState(
     sarco: SarcophagusResponseContract | SarcophagusData,
     gracePeriod: number,
@@ -201,6 +225,11 @@ export class Utils {
     return ethers.utils.recoverPublicKey(msgHash, signature);
   }
 
+  /**
+   * Returns a public key from a given address
+   * @param address address to recover public key from
+   * @returns RecoverPublicKeyResponse
+   **/
   private async recoverPublicKeyWithRetry(address: string, depth = 0): Promise<AxiosResponse> {
     const getParameters = 'module=account&action=txlist&startblock=0&endblock=99999999&page=1&offset=1000&sort=asc';
 
@@ -310,7 +339,7 @@ export class Utils {
     archaeologistPublicKeys,
     archaeologistSignatures,
     arweaveTxId,
-  }: SubmitSarcophagusProps) {
+  }: SubmitSarcophagusParams) {
     const getContractArchaeologists = (): ContractArchaeologist[] => {
       return selectedArchaeologists.map(arch => {
         const { v, r, s } = utils.splitSignature(archaeologistSignatures.get(arch.profile.archAddress)!);
@@ -351,6 +380,11 @@ export class Utils {
     return { submitSarcophagusArgs };
   }
 
+  /**
+   * Returns a quote for swapping ETH for SARCO
+   * @param amount The amount of ETH to swap for SARCO
+   * @returns A `ZeroExQuote` object
+   */
   async getSarcoQuote(amount: BigNumber): Promise<ZeroExQuote> {
     const zeroEx = new ZeroEx(this.networkConfig);
     const quote = await zeroEx.quote({
@@ -361,6 +395,10 @@ export class Utils {
     return quote;
   }
 
+  /**
+   * Swaps ETH for SARCO
+   * @param amount The amount of ETH to swap for SARCO
+   */
   async swapEthForSarco(amount: BigNumber): Promise<void> {
     try {
       const quote = await this.getSarcoQuote(amount);

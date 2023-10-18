@@ -16,19 +16,17 @@ export const POLYGON_MUMBAI_CHAIN_ID = 80001;
 export const POLYGON_MAINNET_CHAIN_ID = 137;
 export const HARDHAT_CHAIN_ID = 31337;
 
-export type SarcoSupportedNetwork =
-  | 'mainnet'
-  | 'goerli'
-  | 'sepolia'
-  | 'baseGoerli'
-  | 'polygonMumbai'
-  | 'polygonMainnet'
-  | typeof MAINNET_CHAIN_ID
-  | typeof GOERLI_CHAIN_ID
-  | typeof SEPOLIA_CHAIN_ID
-  | typeof BASE_GOERLI_CHAIN_ID
-  | typeof POLYGON_MUMBAI_CHAIN_ID
-  | typeof POLYGON_MAINNET_CHAIN_ID;
+/**
+ * A map of supported chain IDs to their network names
+ */
+export const SARCO_SUPPORTED_NETWORKS: Map<number, string> = new Map([
+  [MAINNET_CHAIN_ID, 'mainnet'],
+  [GOERLI_CHAIN_ID, 'goerli'],
+  [SEPOLIA_CHAIN_ID, 'sepolia'],
+  [BASE_GOERLI_CHAIN_ID, 'baseGoerli'],
+  [POLYGON_MUMBAI_CHAIN_ID, 'polygonMumbai'],
+  [POLYGON_MAINNET_CHAIN_ID, 'polygonMainnet'],
+]);
 
 export const hardhatNetworkConfig = (override?: {
   providerUrl?: string;
@@ -49,17 +47,16 @@ export const hardhatNetworkConfig = (override?: {
     nodeUrl: '',
   },
   arweaveConfig,
-  providerUrl: override?.providerUrl ?? '',
   subgraphUrl: '',
   zeroExApiKey: '',
   zeroExApiUrl: '',
   apiUrlBase: '',
 });
 
-export const polygonMumbaiNetworkConfig = (
-  providerUrl: string,
-  config?: { polygonScanApiKey?: string; zeroExApiKey?: string }
-): SarcoNetworkConfig => ({
+export const polygonMumbaiNetworkConfig = (config?: {
+  polygonScanApiKey?: string;
+  zeroExApiKey?: string;
+}): SarcoNetworkConfig => ({
   chainId: POLYGON_MUMBAI_CHAIN_ID,
   networkName: 'PolygonMumbai Testnet',
   networkShortName: 'PolygonMumbai',
@@ -74,17 +71,16 @@ export const polygonMumbaiNetworkConfig = (
     nodeUrl: 'https://devnet.bundlr.network',
   },
   arweaveConfig,
-  providerUrl,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon-mumbai/v0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: 'https://mumbai.api.0x.org',
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
-export const polygonMainnetNetworkConfig = (
-  providerUrl: string,
-  config?: { polygonScanApiKey?: string; zeroExApiKey?: string }
-): SarcoNetworkConfig => ({
+export const polygonMainnetNetworkConfig = (config?: {
+  polygonScanApiKey?: string;
+  zeroExApiKey?: string;
+}): SarcoNetworkConfig => ({
   chainId: POLYGON_MAINNET_CHAIN_ID,
   networkName: 'Polygon Mainnet',
   networkShortName: 'Polygon',
@@ -99,17 +95,16 @@ export const polygonMainnetNetworkConfig = (
     nodeUrl: 'https://devnet.bundlr.network',
   },
   arweaveConfig,
-  providerUrl,
-  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon/v.0.0.1',
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon-mainnet/v0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: 'https://polygon.api.0x.org',
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
-export const baseGoerliNetworkConfig = (
-  providerUrl: string,
-  config?: { basescanApiKey?: string; zeroExApiKey?: string }
-): SarcoNetworkConfig => ({
+export const baseGoerliNetworkConfig = (config?: {
+  basescanApiKey?: string;
+  zeroExApiKey?: string;
+}): SarcoNetworkConfig => ({
   chainId: BASE_GOERLI_CHAIN_ID,
   networkName: 'BaseGoerli Testnet',
   networkShortName: 'BaseGoerli',
@@ -124,17 +119,16 @@ export const baseGoerliNetworkConfig = (
     nodeUrl: 'https://devnet.bundlr.network',
   },
   arweaveConfig,
-  providerUrl,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/base-goerli/v0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: '',
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
-export const goerliNetworkConfig = (
-  providerUrl: string,
-  config?: { etherscanApiKey?: string; zeroExApiKey?: string }
-): SarcoNetworkConfig => ({
+export const goerliNetworkConfig = (config?: {
+  etherscanApiKey?: string;
+  zeroExApiKey?: string;
+}): SarcoNetworkConfig => ({
   chainId: GOERLI_CHAIN_ID,
   networkName: 'Goerli Testnet',
   networkShortName: 'Goerli',
@@ -149,17 +143,16 @@ export const goerliNetworkConfig = (
     nodeUrl: 'https://devnet.bundlr.network',
   },
   arweaveConfig,
-  providerUrl,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarco-goerli-test/two',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: 'https://goerli.api.0x.org',
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
-export const mainnetNetworkConfig = (
-  providerUrl: string,
-  config?: { etherscanApiKey?: string; zeroExApiKey?: string }
-): SarcoNetworkConfig => ({
+export const mainnetNetworkConfig = (config?: {
+  etherscanApiKey?: string;
+  zeroExApiKey?: string;
+}): SarcoNetworkConfig => ({
   chainId: MAINNET_CHAIN_ID,
   networkName: 'Etherum Mainnet',
   networkShortName: 'Mainnet',
@@ -173,7 +166,6 @@ export const mainnetNetworkConfig = (
     currencyName: 'ethereum',
     nodeUrl: 'https://node1.bundlr.network',
   },
-  providerUrl,
   arweaveConfig,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarcophagus-v2/v0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
@@ -181,10 +173,10 @@ export const mainnetNetworkConfig = (
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
-export const sepoliaNetworkConfig = (
-  providerUrl: string,
-  config?: { etherscanApiKey?: string; zeroExApiKey?: string }
-): SarcoNetworkConfig => ({
+export const sepoliaNetworkConfig = (config?: {
+  etherscanApiKey?: string;
+  zeroExApiKey?: string;
+}): SarcoNetworkConfig => ({
   chainId: SEPOLIA_CHAIN_ID,
   networkName: 'Sepolia Testnet',
   networkShortName: 'Sepolia',
@@ -198,10 +190,40 @@ export const sepoliaNetworkConfig = (
     currencyName: 'ethereum',
     nodeUrl: 'https://devnet.bundlr.network',
   },
-  providerUrl,
   arweaveConfig,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sepolia/v0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: '',
   apiUrlBase: 'https://api.encryptafile.com',
 });
+
+export type NetworkConfigParams = { 
+  etherscanApiKey?: string; 
+  basescanApiKey?: string; 
+  polygonScanApiKey?: string;
+  zeroExApiKey?: string 
+};
+
+export type NetworkConfigBuilder = (params?: NetworkConfigParams) => SarcoNetworkConfig;
+
+/**
+ * Returns a network config builder for the given chain ID.
+ *
+ * If the chain ID is not supported, undefined is returned.
+ *
+ * @param chainId The chain ID to setup the network config for
+ * @returns The network config builder for the given chain ID
+ */
+export function getNetworkConfigBuilder(chainId: number): NetworkConfigBuilder | undefined {
+  const chainIdToConfigBuilder: Map<number, NetworkConfigBuilder> = new Map([
+    [MAINNET_CHAIN_ID, config => mainnetNetworkConfig(config)],
+    [GOERLI_CHAIN_ID, config => goerliNetworkConfig(config)],
+    [SEPOLIA_CHAIN_ID, config => sepoliaNetworkConfig(config)],
+    [POLYGON_MUMBAI_CHAIN_ID, config => polygonMumbaiNetworkConfig(config)],
+    [POLYGON_MAINNET_CHAIN_ID, config => polygonMainnetNetworkConfig(config)],
+    [BASE_GOERLI_CHAIN_ID, config => baseGoerliNetworkConfig(config)],
+    [HARDHAT_CHAIN_ID, _ => hardhatNetworkConfig()],
+  ]);
+
+  return chainIdToConfigBuilder.get(chainId);
+}
