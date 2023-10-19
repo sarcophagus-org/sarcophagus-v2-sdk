@@ -95,7 +95,7 @@ export const polygonMainnetNetworkConfig = (config?: {
     nodeUrl: 'https://devnet.bundlr.network',
   },
   arweaveConfig,
-  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon-mainnet/v0.0.1',
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon/v0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: 'https://polygon.api.0x.org',
   apiUrlBase: 'https://api.encryptafile.com',
