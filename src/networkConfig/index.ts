@@ -83,7 +83,7 @@ export const polygonMainnetNetworkConfig = (config?: {
 }): SarcoNetworkConfig => ({
   chainId: POLYGON_MAINNET_CHAIN_ID,
   networkName: 'Polygon Mainnet',
-  networkShortName: 'Polygon',
+  networkShortName: 'polygonMainnet',
   tokenSymbol: 'MATIC',
   sarcoTokenAddress: '0x80ae3b3847e4e8bd27a389f7686486cac9c3f3e8',
   diamondDeployAddress: '0xc1984df3e3ddc1DC24d54179CCD5537e290C7E9c',
