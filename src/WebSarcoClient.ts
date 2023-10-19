@@ -105,7 +105,7 @@ export class WebSarcoClient {
   /**
    * Gets bundlr provider, either sponsored or user-provided
    */
-  getBundlr(providerUrl: string, signerPublicKey?: string, signerEndpoint?: string) {
+  getBundlr(signerPublicKey?: string, signerEndpoint?: string) {
     // If signingPublicKey is provided, use sponsoring provider
     const bundlrProvider: ethers.providers.Web3Provider = signerPublicKey
       ? sponsoredBundlrProvider(signerPublicKey, signerEndpoint!)
@@ -113,7 +113,7 @@ export class WebSarcoClient {
 
     const bundlrConfig = {
       timeout: 100000,
-      providerUrl: providerUrl,
+      providerUrl: bundlrProvider.connection ? bundlrProvider.connection.url : '',
     };
 
     return new SarcoWebBundlr(
