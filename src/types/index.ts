@@ -68,6 +68,7 @@ export interface SarcoNetworkConfig {
   subgraphUrl: string;
   zeroExApiKey?: string;
   zeroExApiUrl: string;
+  zeroExSellToken: string;
   apiUrlBase: string;
 }
 

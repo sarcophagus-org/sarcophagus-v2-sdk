@@ -46,6 +46,10 @@ export class ZeroEx {
     this.headers = { '0x-api-key': this.networkConfig.zeroExApiKey };
   }
 
+  public sellToken(): string {
+    return this.networkConfig.zeroExSellToken;
+  }
+
   /**
    * Get a quote from the 0x API
    *
