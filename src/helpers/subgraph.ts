@@ -1,4 +1,5 @@
 import { PrivateKeyPublish, SarcoCounts, SarcophagusRewrap } from '../types/sarcophagi';
+import {ApolloClient, gql, HttpLink, InMemoryCache} from "@apollo/client/core/index.js";
 
 export interface ArchDataSubgraph {
   address: string;
@@ -34,24 +35,23 @@ export interface SarcoRewrapsSubgraph {
 }
 
 async function queryGraphQl(subgraphUrl: string, query: string) {
-  const fetchOptions = {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ query }),
-  };
+  const client = new ApolloClient({
+    link: new HttpLink({
+      uri: subgraphUrl,
+    }),
+    cache: new InMemoryCache()
+  });
 
-  const response = await fetch(subgraphUrl, fetchOptions);
-  const responseJson = await response!.json();
+  // set fetch policy to avoid serving cached data
+  // @ts-ignore
+  const response = await client.query({
+    query: gql(query),
+    fetchPolicy: 'network-only'
+  })
 
-  if (!responseJson.data) {
-    throw {
-      error: 'Something went wrong',
-      response: responseJson,
-    };
-  }
+  console.log("returning from real query", response.data)
 
-  const { data } = responseJson as { data: any };
-  return data;
+  return response.data;
 }
 
 const getArchsQuery = `query {

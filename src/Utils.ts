@@ -381,14 +381,14 @@ export class Utils {
   }
 
   /**
-   * Returns a quote for swapping ETH for SARCO
-   * @param amount The amount of ETH to swap for SARCO
+   * Returns a quote for swapping L1 Token for SARCO
+   * @param amount The amount of L1 Token to swap for SARCO
    * @returns A `ZeroExQuote` object
    */
   async getSarcoQuote(amount: BigNumber): Promise<ZeroExQuote> {
     const zeroEx = new ZeroEx(this.networkConfig);
     const quote = await zeroEx.quote({
-      sellToken: 'ETH',
+      sellToken: zeroEx.sellToken(),
       buyToken: this.networkConfig.sarcoTokenAddress,
       buyAmount: amount.toString(),
     });
@@ -396,8 +396,8 @@ export class Utils {
   }
 
   /**
-   * Swaps ETH for SARCO
-   * @param amount The amount of ETH to swap for SARCO
+   * Swaps L1 Token for SARCO
+   * @param amount The amount of L1 Token to swap for SARCO
    */
   async swapEthForSarco(amount: BigNumber): Promise<void> {
     try {

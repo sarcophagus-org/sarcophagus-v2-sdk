@@ -5,7 +5,6 @@ import { BigNumber, ethers } from 'ethers';
 import { pipe } from 'it-pipe';
 import { Libp2p } from 'libp2p';
 import { getArchaeologists } from './helpers/subgraph';
-
 import { Utils } from './Utils';
 import { safeContractCall } from './helpers/safeContractCall';
 import { NEGOTIATION_SIGNATURE_STREAM } from './libp2p_node/p2pNodeConfig';
@@ -104,10 +103,8 @@ export class ArchaeologistApi {
    * Returns the full profiles of the given archaeologist addresses. If no addresses are provided,
    * returns the full profiles of all registered archaeologists.
    *
-   * @param addresses - The addresses of the archaeologists to get the full profiles of.
-   * @param filterOffline - Whether to filter out offline archaeologists.
-   *
    * @returns The full profiles of the given archaeologists.
+   * @param args
    */
   async getFullArchProfiles(
     args: { addresses?: string[]; filterOffline?: boolean } = {}
@@ -291,6 +288,7 @@ export class ArchaeologistApi {
           });
 
           if (isRetry && arch.fullPeerId) {
+            console.log(`retrying dial for archaeologist: ${arch.profile.peerId}`);
             arch.connection = await this.dialArchaeologist(arch);
             if (!arch.connection) return;
           } else {

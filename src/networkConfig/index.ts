@@ -50,6 +50,7 @@ export const hardhatNetworkConfig = (override?: {
   subgraphUrl: '',
   zeroExApiKey: '',
   zeroExApiUrl: '',
+  zeroExSellToken: '',
   apiUrlBase: '',
 });
 
@@ -74,6 +75,7 @@ export const polygonMumbaiNetworkConfig = (config?: {
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon-mumbai/v0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: 'https://mumbai.api.0x.org',
+  zeroExSellToken: 'MATIC',
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
@@ -98,6 +100,7 @@ export const polygonMainnetNetworkConfig = (config?: {
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon/v0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: 'https://polygon.api.0x.org',
+  zeroExSellToken: 'MATIC',
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
@@ -122,6 +125,7 @@ export const baseGoerliNetworkConfig = (config?: {
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/base-goerli/v0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: '',
+  zeroExSellToken: 'ETH',
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
@@ -146,6 +150,7 @@ export const goerliNetworkConfig = (config?: {
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarco-goerli-test/two',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: 'https://goerli.api.0x.org',
+  zeroExSellToken: 'ETH',
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
@@ -170,6 +175,7 @@ export const mainnetNetworkConfig = (config?: {
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarcophagus-v2/v0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: 'https://api.0x.org',
+  zeroExSellToken: 'ETH',
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
@@ -194,6 +200,7 @@ export const sepoliaNetworkConfig = (config?: {
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sepolia/v0.0.1',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: '',
+  zeroExSellToken: 'ETH',
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
