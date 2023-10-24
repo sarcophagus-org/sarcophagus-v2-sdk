@@ -1,4 +1,4 @@
-import { ChunkingUploader } from '@irys/sdk/build/esm/common/chunkingUploader';
+import { ChunkingUploader } from '@bundlr-network/client/build/esm/common/chunkingUploader';
 export enum ArweaveTxStatus {
   PENDING,
   SUCCESS,
