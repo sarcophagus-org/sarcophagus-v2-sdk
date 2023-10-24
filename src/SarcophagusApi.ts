@@ -35,12 +35,12 @@ import {
   encryptShardsWithArchaeologistPublicKeys,
   encryptShardsWithRecipientPublicKey,
 } from './helpers/sarco';
-import Bundlr from '@bundlr-network/client/build/esm/common/bundlr';
+import Irys from "@irys/sdk";
 import { SarcoWebBundlr } from './SarcoWebBundlr';
 import Arweave from 'arweave';
 
 export class SarcophagusApi {
-  public bundlr: SarcoWebBundlr | Bundlr;
+  public bundlr: SarcoWebBundlr | Irys;
 
   private embalmerFacet: ethers.Contract;
   private subgraphUrl: string;
@@ -54,7 +54,7 @@ export class SarcophagusApi {
     diamondDeployAddress: string,
     signer: ethers.Signer,
     networkConfig: SarcoNetworkConfig,
-    bundlr: SarcoWebBundlr | Bundlr,
+    bundlr: SarcoWebBundlr | Irys,
     arweave: Arweave
   ) {
     this.embalmerFacet = new ethers.Contract(diamondDeployAddress, EmbalmerFacet__factory.abi, signer);
@@ -72,7 +72,7 @@ export class SarcophagusApi {
    * Set Bundlr instance
    */
 
-  setBundlr = (bundlr: SarcoWebBundlr | Bundlr) => {
+  setBundlr = (bundlr: SarcoWebBundlr | Irys) => {
     this.bundlr = bundlr;
   };
 
@@ -360,7 +360,7 @@ export class SarcophagusApi {
 
       chunkedUploader?.on('chunkUpload', chunkInfo => {
         const chunkedUploadProgress = chunkInfo.totalUploaded / arweavePayload.length;
-        onUploadChunk(chunkedUploader, chunkedUploadProgress);
+        onUploadChunk(chunkedUploader as any, chunkedUploadProgress);
       });
 
       chunkedUploader?.on('chunkError', e => {
