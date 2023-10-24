@@ -269,6 +269,9 @@ export class SarcophagusApi {
         onStep,
         file,
         payloadData,
+        recipientInnerEncryptedkeyShares,
+        preEncryptedPayload,
+        preEncryptedPayloadMetadata,
         payloadPublicKey,
         shares,
         threshold,
@@ -283,6 +286,39 @@ export class SarcophagusApi {
 
       let payload: { type: string; data: Buffer };
       let fileName: string;
+
+      let keySharesEncryptedInner: Uint8Array[]
+      let encryptedPayload: Buffer;
+
+      let doInnerEncryption = true;
+
+      // The caller may provide pre-encrypted keyshares and a pre-encrypted payload.
+      // In this case, we skip the inner encryption step and use the provided encrypted keyshares and payload.
+      if (preEncryptedPayload && !recipientInnerEncryptedkeyShares) {
+        throw new Error('`preEncryptedPayload` provided but `recipientInnerEncryptedkeyShares` not provided');
+      }
+      if (recipientInnerEncryptedkeyShares && !preEncryptedPayload) {
+        throw new Error('`recipientInnerEncryptedkeyShares` provided but `preEncryptedPayload` not provided');
+      }
+
+      if (!recipientInnerEncryptedkeyShares && !preEncryptedPayload && !file && !payloadData) {
+        throw new Error("Can't upload file. No file, payload, or inner-encrypted data provided.");
+      }
+
+      if (recipientInnerEncryptedkeyShares && preEncryptedPayload) {
+        keySharesEncryptedInner = recipientInnerEncryptedkeyShares;
+        encryptedPayload = preEncryptedPayload;
+        doInnerEncryption = false;
+      }
+
+      if (!doInnerEncryption && !preEncryptedPayloadMetadata) {
+        throw new Error('`preEncryptedPayloadMetadata` must be provided when `recipientInnerEncryptedkeyShares` and `preEncryptedPayload` are provided');
+      }
+      
+      if ((file || payloadData) && !doInnerEncryption) {
+        throw new Error('Provide only one of `file`, `payloadData` or `recipientInnerEncryptedkeyShares` and `preEncryptedPayload`.');
+      }
+
       if (file) {
         payload = await readFileDataAsBase64(file!);
         fileName = file.name;
@@ -290,7 +326,11 @@ export class SarcophagusApi {
         payload = { type: payloadData.type, data: Buffer.from(payloadData.data) };
         fileName = payloadData.name;
       } else {
-        throw new Error("Can't upload file. No file or payload data provided.");
+        payload = {
+          type: preEncryptedPayloadMetadata!.type,
+          data: Buffer.from(""), // preEncryptedPayload is set, so this is not used
+        };
+        fileName = preEncryptedPayloadMetadata!.fileName;
       }
 
       /**
@@ -298,24 +338,29 @@ export class SarcophagusApi {
        */
       // Step 1: Encrypt the payload with the generated keypair
       onStep('Encrypting...');
-      const encryptedPayload = await encrypt(payloadPublicKey!, payload.data);
+
+      if (doInnerEncryption) {
+        encryptedPayload = await encrypt(payloadPublicKey!, payload!.data);
+      }
 
       /**
        * Double encrypted keyshares upload data
        */
       // Step 1: Split the outer layer private key using shamirs secret sharing
-      const keyShares: Uint8Array[] = split(payloadPrivateKey, {
-        shares,
-        threshold,
-      });
+      if (doInnerEncryption) {
+        const keyShares: Uint8Array[] = split(payloadPrivateKey!, {
+          shares,
+          threshold,
+        });
 
-      // Step 2: Encrypt each shard with the recipient public key
-      const keySharesEncryptedInner = await encryptShardsWithRecipientPublicKey(recipientPublicKey, keyShares);
+        // Step 2: Encrypt each shard with the recipient public key
+        keySharesEncryptedInner = await encryptShardsWithRecipientPublicKey(recipientPublicKey, keyShares);
+      }
 
       // Step 3: Encrypt each shard again with the arch public keys
       const keySharesEncryptedOuter = await encryptShardsWithArchaeologistPublicKeys(
         archaeologistPublicKeys,
-        keySharesEncryptedInner
+        keySharesEncryptedInner!
       );
 
       /**
@@ -333,8 +378,8 @@ export class SarcophagusApi {
       const encKeysBuffer = Buffer.from(JSON.stringify(doubleEncryptedKeyShares), 'binary');
 
       const encryptedMetadata = await encryptMetadataFields(recipientPublicKey, {
-        fileName: fileName,
-        type: payload.type,
+        fileName: fileName!,
+        type: payload!.type,
       });
 
       const metadataBuffer = Buffer.from(JSON.stringify(encryptedMetadata), 'binary');
@@ -348,7 +393,7 @@ export class SarcophagusApi {
         arweaveDataDelimiter,
         metadataBuffer,
         encKeysBuffer,
-        encryptedPayload,
+        encryptedPayload!,
       ]);
 
       onStep(`Uploading to Arweave...`);

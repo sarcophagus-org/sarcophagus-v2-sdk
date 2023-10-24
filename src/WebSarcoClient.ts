@@ -54,7 +54,8 @@ export class WebSarcoClient {
 
     const params = await sarcoClientInitSchema.validate(initParams);
 
-    const providerUrl = new ethers.providers.Web3Provider(this.provider as any).connection.url;
+    const web3Provider = new ethers.providers.Web3Provider(this.provider as any);
+    const providerUrl = web3Provider.connection.url;
 
     const getNetworkConfig = getNetworkConfigBuilder(params.chainId);
 
@@ -75,7 +76,7 @@ export class WebSarcoClient {
     // TODO: Allow client to choose when to start/stop libp2p node
     await this.startLibp2pNode();
 
-    const bundlr = this.getBundlr(providerUrl, params.bundlrPublicKey);
+    const bundlr = this.getBundlr();
 
     this.api = new SarcophagusApi(
       this.networkConfig.diamondDeployAddress,

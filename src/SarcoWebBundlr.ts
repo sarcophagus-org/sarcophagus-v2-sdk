@@ -19,11 +19,14 @@ export class SarcoWebBundlr extends WebBundlr {
    */
   async connect() {
     // Prompt a signature from the user to get the user's public key
-    await this.ready();
+    console.log('Connecting to bundlr...', await this.provider.getSigner().getAddress());
+    await super.ready();
+    console.log('Connected to bundlr. Get public key...');
 
     // Get the public key that was obtained from the signature and return it
     // The public key can be saved and injected into the client on future page loads
     const publicKey = this.currencyConfig.getSigner().publicKey;
+    console.log('Got public key:', publicKey);
     this.isConnected = true;
     return JSON.parse(JSON.stringify(publicKey)).data;
   }
