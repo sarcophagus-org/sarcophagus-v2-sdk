@@ -10,7 +10,7 @@ export class SarcoWebBundlr extends WebIrys {
   isConnected: boolean = false;
 
   constructor(url: string, token: string, provider: ethers.providers.Web3Provider, config: IrysConfig) {
-    super({url, token, wallet: { provider}, config});
+    super({url, token, wallet: { provider }, config});
     this.provider = provider;
   }
 

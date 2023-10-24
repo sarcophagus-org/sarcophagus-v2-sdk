@@ -75,7 +75,7 @@ export class WebSarcoClient {
     // TODO: Allow client to choose when to start/stop libp2p node
     await this.startLibp2pNode();
 
-    const bundlr = this.getBundlr(providerUrl, params.bundlrPublicKey);
+    const bundlr = this.getBundlr();
 
     this.api = new SarcophagusApi(
       this.networkConfig.diamondDeployAddress,

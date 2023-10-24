@@ -69,7 +69,7 @@ export const polygonMumbaiNetworkConfig = (config?: {
   explorerUrl: 'https://mumbai.polygonscan.com/',
   bundlr: {
     currencyName: 'ethereum',
-    nodeUrl: 'https://devnet.bundlr.network',
+    nodeUrl: 'https://devnet.irys.xyz',
   },
   arweaveConfig,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon-mumbai/v0.0.1',
@@ -94,7 +94,7 @@ export const polygonMainnetNetworkConfig = (config?: {
   explorerUrl: 'https://polygonscan.com/',
   bundlr: {
     currencyName: 'ethereum',
-    nodeUrl: 'https://devnet.bundlr.network',
+    nodeUrl: 'https://node1.irys.xyz',
   },
   arweaveConfig,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon/v0.0.1',
@@ -119,7 +119,7 @@ export const baseGoerliNetworkConfig = (config?: {
   explorerUrl: 'https://goerli.basescan.org',
   bundlr: {
     currencyName: 'ethereum',
-    nodeUrl: 'https://devnet.bundlr.network',
+    nodeUrl: 'https://devnet.irys.xyz',
   },
   arweaveConfig,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/base-goerli/v0.0.1',
@@ -144,7 +144,7 @@ export const goerliNetworkConfig = (config?: {
   explorerUrl: 'https://goerli.etherscan.io/',
   bundlr: {
     currencyName: 'ethereum',
-    nodeUrl: 'https://devnet.bundlr.network',
+    nodeUrl: 'https://devnet.irys.xyz',
   },
   arweaveConfig,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarco-goerli-test/two',
@@ -169,7 +169,7 @@ export const mainnetNetworkConfig = (config?: {
   explorerUrl: 'https://etherscan.io/',
   bundlr: {
     currencyName: 'ethereum',
-    nodeUrl: 'https://node1.bundlr.network',
+    nodeUrl: 'https://node1.irys.xyz',
   },
   arweaveConfig,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarcophagus-v2/v0.0.1',
@@ -194,7 +194,7 @@ export const sepoliaNetworkConfig = (config?: {
   explorerUrl: 'https://sepolia.etherscan.io/',
   bundlr: {
     currencyName: 'ethereum',
-    nodeUrl: 'https://devnet.bundlr.network',
+    nodeUrl: 'https://devnet.irys.xyz',
   },
   arweaveConfig,
   subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sepolia/v0.0.1',
