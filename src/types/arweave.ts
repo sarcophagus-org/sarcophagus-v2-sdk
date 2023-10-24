@@ -1,4 +1,5 @@
 import { ChunkingUploader } from '@bundlr-network/client/build/esm/common/chunkingUploader';
+
 export enum ArweaveTxStatus {
   PENDING,
   SUCCESS,
@@ -21,12 +22,32 @@ export interface UploadArweaveFileOptions {
   file?: File | undefined;
   /** The payload data to upload. Leave undefined if using `file`. */
   payloadData?: PayloadData | undefined;
+  /** 
+   * Optional recipient-public-key encrypted keyshares. 
+   * 
+   * If provided, `uploadFileToArweave` will skip the keyshare inner-encryption step and use these encrypted keyshares instead.
+   * As these are already inner-encrypted, only the outer layer encryption using the archaeologists' public keys will be performed.
+   *
+   * `preEncryptedPayload` must also be provided.
+   * */
+  recipientInnerEncryptedkeyShares?: Uint8Array[];
+  /** 
+   * Optional pre-encrypted file payload. 
+   * 
+   * If provided, `uploadFileToArweave` will skip the file encryption step and use this encrypted payload instead.
+   * As the file is already encrypted, only the inner layer encryption using the recipient public key will be performed.
+   * The responsibility of ensuring the original key used to encrypt the keyshares is safely discarded is left to the caller.
+   * 
+   * `recipientInnerEncryptedkeyShares` must also be provided.
+   * */
+  preEncryptedPayload?: Buffer;
+  preEncryptedPayloadMetadata?: ArweaveFileMetadata;
   /** Callback for preparation steps during upload. `step` can be displayed to end-user. */
   onStep: (step: string) => void;
   /** The private key used to encrypt the payload. */
-  payloadPrivateKey: string;
+  payloadPrivateKey?: string;
   /** The corresponding public key payload encryption key. */
-  payloadPublicKey: string;
+  payloadPublicKey?: string;
   /** The public key of the recipient. */
   recipientPublicKey: string;
   /** The number of shares for Shamir's Secret Sharing. */
