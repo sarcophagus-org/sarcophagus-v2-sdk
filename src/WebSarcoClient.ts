@@ -2,7 +2,7 @@ import { SarcophagusApi } from './SarcophagusApi';
 import { bootLip2p } from './libp2p_node';
 import { Libp2p } from 'libp2p';
 import { ethers, Signer } from 'ethers';
-import { SarcoWebBundlr } from './SarcoWebBundlr';
+import { SarcoWebIrys } from './SarcoWebIrys';
 import { Token } from './Token';
 import { Utils } from './Utils';
 import { ArchaeologistApi } from './ArchaeologistApi';
@@ -117,7 +117,7 @@ export class WebSarcoClient {
       providerUrl: bundlrProvider.connection ? bundlrProvider.connection.url : '',
     };
 
-    return new SarcoWebBundlr(
+    return new SarcoWebIrys(
       this.networkConfig.bundlr.nodeUrl,
       this.networkConfig.bundlr.currencyName,
       bundlrProvider,
@@ -151,11 +151,11 @@ export class WebSarcoClient {
   }
 
   // TODO: Replicate this pattern for all other properties that should only be accessed after initialisation
-  public get bundlr(): SarcoWebBundlr {
+  public get bundlr(): SarcoWebIrys {
     if (!this.isInitialised) {
       throw new Error('WebSarcoClient is not initialised');
     }
 
-    return this.api.bundlr as SarcoWebBundlr;
+    return this.api.bundlr as SarcoWebIrys;
   }
 }

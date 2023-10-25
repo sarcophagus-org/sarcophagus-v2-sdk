@@ -50,28 +50,28 @@ export type { CallOptions, RecoverPublicKeyResponse, SarcoBundlrConfig, SarcoNet
 
 export { RecoverPublicKeyErrorStatus };
 
-  export {
-    ArchaeologistExceptionCode,
-    NEGOTIATION_SIGNATURE_STREAM,
-    DHT_PROTOCOL_PREFIX,
-    SarcophagusValidationError,
-    goerliNetworkConfig,
-    mainnetNetworkConfig,
-    sepoliaNetworkConfig,
-    baseGoerliNetworkConfig,
-    polygonMumbaiNetworkConfig,
-    polygonMainnetNetworkConfig,
-    BASE_GOERLI_CHAIN_ID,
-    GOERLI_CHAIN_ID,
-    HARDHAT_CHAIN_ID,
-    POLYGON_MUMBAI_CHAIN_ID,
-    POLYGON_MAINNET_CHAIN_ID,
-    MAINNET_CHAIN_ID,
-    SEPOLIA_CHAIN_ID,
-    SARCO_SUPPORTED_NETWORKS,
-    getNetworkConfigBuilder,
-    hardhatNetworkConfig
-  };
+export {
+  ArchaeologistExceptionCode,
+  NEGOTIATION_SIGNATURE_STREAM,
+  DHT_PROTOCOL_PREFIX,
+  SarcophagusValidationError,
+  goerliNetworkConfig,
+  mainnetNetworkConfig,
+  sepoliaNetworkConfig,
+  baseGoerliNetworkConfig,
+  polygonMumbaiNetworkConfig,
+  polygonMainnetNetworkConfig,
+  BASE_GOERLI_CHAIN_ID,
+  GOERLI_CHAIN_ID,
+  HARDHAT_CHAIN_ID,
+  POLYGON_MUMBAI_CHAIN_ID,
+  POLYGON_MAINNET_CHAIN_ID,
+  MAINNET_CHAIN_ID,
+  SEPOLIA_CHAIN_ID,
+  SARCO_SUPPORTED_NETWORKS,
+  getNetworkConfigBuilder,
+  hardhatNetworkConfig,
+};
 
 export type {
   ArchaeologistCurseNegotiationParams,
@@ -86,6 +86,6 @@ export type {
 
 export { SarcophagusState } from './types/sarcophagi';
 export type { SarcophagusData, SarcophagusDetails } from './types/sarcophagi';
-export { ChunkingUploader } from '@bundlr-network/client/build/esm/common/chunkingUploader';
+export { ChunkingUploader } from '@irys/sdk/build/esm/common/chunkingUploader';
 import { ZeroExQuote } from './helpers/zeroEx';
 export type { ZeroExQuote };

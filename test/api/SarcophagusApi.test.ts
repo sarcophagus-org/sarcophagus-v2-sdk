@@ -1,13 +1,13 @@
 import { ethers } from 'ethers';
 import { SarcophagusApi } from '../../src/SarcophagusApi';
-import { SarcoWebBundlr } from '../../src/SarcoWebBundlr';
+import { SarcoWebIrys } from '../../src/SarcoWebIrys';
 import { SarcoNetworkConfig } from '../../src/types';
 import Arweave from 'arweave';
 
 const signer = ethers.Wallet.createRandom({});
 jest.mock('ethers');
 jest.mock('@sarcophagus-org/sarcophagus-v2-contracts');
-jest.mock('../../src/SarcoWebBundlr');
+jest.mock('../../src/SarcoWebIrys');
 
 describe('Api', () => {
   describe('Api Constructor', () => {
@@ -16,7 +16,7 @@ describe('Api', () => {
         '0x0',
         signer,
         { subgraphUrl: 'subgraph/url/test' } as SarcoNetworkConfig,
-        {} as SarcoWebBundlr,
+        {} as SarcoWebIrys,
         {} as Arweave
       );
       expect(api).toBeDefined();
@@ -27,7 +27,7 @@ describe('Api', () => {
         '0x0',
         signer,
         { subgraphUrl: 'subgraph/url/test' } as SarcoNetworkConfig,
-        {} as SarcoWebBundlr,
+        {} as SarcoWebIrys,
         {} as Arweave
       );
       expect(api['embalmerFacet']).toBeDefined();
@@ -38,7 +38,7 @@ describe('Api', () => {
         '0x0',
         signer,
         { subgraphUrl: 'subgraph/url/test' } as SarcoNetworkConfig,
-        {} as SarcoWebBundlr,
+        {} as SarcoWebIrys,
         {} as Arweave
       );
       expect(api['subgraphUrl']).toEqual('subgraph/url/test');
