@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
  * A custom WebIrys class for the Sarcophagus SDK that allows for the injection of a public key.
  * Only needs to be used in a browser environment.
  */
-export class SarcoWebBundlr extends WebIrys {
+export class SarcoWebIrys extends WebIrys {
   provider: ethers.providers.Web3Provider;
   isConnected: boolean = false;
 

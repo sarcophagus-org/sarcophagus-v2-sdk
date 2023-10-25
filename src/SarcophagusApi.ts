@@ -36,11 +36,11 @@ import {
   encryptShardsWithRecipientPublicKey,
 } from './helpers/sarco';
 import Irys from "@irys/sdk";
-import { SarcoWebBundlr } from './SarcoWebBundlr';
+import { SarcoWebIrys } from './SarcoWebBundlr';
 import Arweave from 'arweave';
 
 export class SarcophagusApi {
-  public bundlr: SarcoWebBundlr | Irys;
+  public bundlr: SarcoWebIrys | Irys;
 
   private embalmerFacet: ethers.Contract;
   private subgraphUrl: string;
@@ -54,7 +54,7 @@ export class SarcophagusApi {
     diamondDeployAddress: string,
     signer: ethers.Signer,
     networkConfig: SarcoNetworkConfig,
-    bundlr: SarcoWebBundlr | Irys,
+    bundlr: SarcoWebIrys | Irys,
     arweave: Arweave
   ) {
     this.embalmerFacet = new ethers.Contract(diamondDeployAddress, EmbalmerFacet__factory.abi, signer);
@@ -72,7 +72,7 @@ export class SarcophagusApi {
    * Set Bundlr instance
    */
 
-  setBundlr = (bundlr: SarcoWebBundlr | Irys) => {
+  setBundlr = (bundlr: SarcoWebIrys | Irys) => {
     this.bundlr = bundlr;
   };
 
