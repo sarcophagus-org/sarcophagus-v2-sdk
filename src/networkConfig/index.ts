@@ -68,7 +68,7 @@ export const polygonMumbaiNetworkConfig = (config?: {
   etherscanApiKey: config?.polygonScanApiKey ?? '',
   explorerUrl: 'https://mumbai.polygonscan.com/',
   bundlr: {
-    currencyName: 'ethereum',
+    currencyName: 'matic',
     nodeUrl: 'https://devnet.irys.xyz',
   },
   arweaveConfig,
@@ -93,7 +93,7 @@ export const polygonMainnetNetworkConfig = (config?: {
   etherscanApiKey: config?.polygonScanApiKey ?? '',
   explorerUrl: 'https://polygonscan.com/',
   bundlr: {
-    currencyName: 'ethereum',
+    currencyName: 'matic',
     nodeUrl: 'https://node1.irys.xyz',
   },
   arweaveConfig,
