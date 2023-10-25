@@ -1,4 +1,4 @@
-import Irys from "@irys/sdk";
+import Irys from '@irys/sdk';
 import { ethers, Signer } from 'ethers';
 import { Libp2p } from 'libp2p';
 import { SarcophagusApi } from './SarcophagusApi';
@@ -47,13 +47,13 @@ export class NodeSarcoClient {
     this.signer = wallet.connect(customProvider);
 
     this.bundlr = new Irys({
-      url: networkConfig.bundlr.nodeUrl, 
+      url: networkConfig.bundlr.nodeUrl,
       token: networkConfig.bundlr.currencyName,
       key: config.privateKey,
       config: {
         providerUrl: config.providerUrl,
-      }
-  });
+      },
+    });
     this.api = new SarcophagusApi(
       networkConfig.diamondDeployAddress,
       this.signer,

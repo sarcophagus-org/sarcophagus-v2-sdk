@@ -35,8 +35,8 @@ import {
   encryptShardsWithArchaeologistPublicKeys,
   encryptShardsWithRecipientPublicKey,
 } from './helpers/sarco';
-import Irys from "@irys/sdk";
-import { SarcoWebIrys } from './SarcoWebBundlr';
+import Irys from '@irys/sdk';
+import { SarcoWebIrys } from './SarcoWebIrys';
 import Arweave from 'arweave';
 
 export class SarcophagusApi {

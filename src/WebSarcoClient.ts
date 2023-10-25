@@ -2,7 +2,7 @@ import { SarcophagusApi } from './SarcophagusApi';
 import { bootLip2p } from './libp2p_node';
 import { Libp2p } from 'libp2p';
 import { ethers, Signer } from 'ethers';
-import { SarcoWebIrys } from './SarcoWebBundlr';
+import { SarcoWebIrys } from './SarcoWebIrys';
 import { Token } from './Token';
 import { Utils } from './Utils';
 import { ArchaeologistApi } from './ArchaeologistApi';

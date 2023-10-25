@@ -1,5 +1,5 @@
 import { IrysConfig } from '@irys/sdk/build/esm/common/types';
-import WebIrys from '@irys/sdk/build/esm/web/irys'
+import WebIrys from '@irys/sdk/build/esm/web/irys';
 import { ethers } from 'ethers';
 /**
  * A custom WebIrys class for the Sarcophagus SDK that allows for the injection of a public key.
@@ -10,7 +10,7 @@ export class SarcoWebIrys extends WebIrys {
   isConnected: boolean = false;
 
   constructor(url: string, token: string, provider: ethers.providers.Web3Provider, config: IrysConfig) {
-    super({url, token, wallet: { provider }, config});
+    super({ url, token, wallet: { provider }, config });
     this.provider = provider;
   }
 

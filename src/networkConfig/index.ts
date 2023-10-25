@@ -204,11 +204,11 @@ export const sepoliaNetworkConfig = (config?: {
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
-export type NetworkConfigParams = { 
-  etherscanApiKey?: string; 
-  basescanApiKey?: string; 
+export type NetworkConfigParams = {
+  etherscanApiKey?: string;
+  basescanApiKey?: string;
   polygonScanApiKey?: string;
-  zeroExApiKey?: string 
+  zeroExApiKey?: string;
 };
 
 export type NetworkConfigBuilder = (params?: NetworkConfigParams) => SarcoNetworkConfig;
