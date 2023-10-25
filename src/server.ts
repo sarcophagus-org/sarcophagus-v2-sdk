@@ -1,3 +1,4 @@
+export { readFileDataAsBase64 } from 'helpers';
 import { NodeSarcoClient } from './NodeSarcoClient';
 
 export { NodeSarcoClient };
