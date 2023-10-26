@@ -331,7 +331,7 @@ export class Utils {
 
   formatSubmitSarcophagusArgs({
     name,
-    recipientState,
+    recipientPublicKey,
     resurrection,
     selectedArchaeologists,
     requiredArchaeologists,
@@ -358,7 +358,7 @@ export class Utils {
     const sarcoId = ethers.utils.id(name + Date.now().toString());
     const settings: SubmitSarcophagusSettings = {
       name,
-      recipientAddress: recipientState.publicKey ? computeAddress(recipientState.publicKey) : '',
+      recipientAddress: recipientPublicKey ? computeAddress(recipientPublicKey) : '',
       resurrectionTime: Math.trunc(resurrection / 1000),
       threshold: requiredArchaeologists,
       creationTime: Math.trunc(negotiationTimestamp / 1000),

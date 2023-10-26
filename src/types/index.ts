@@ -94,7 +94,7 @@ export interface RecipientState {
 
 export interface SubmitSarcophagusParams {
   name: string;
-  recipientState: RecipientState;
+  recipientPublicKey: string;
   resurrection: number;
   selectedArchaeologists: ArchaeologistData[];
   requiredArchaeologists: number;
