@@ -1,5 +1,5 @@
 import { PrivateKeyPublish, SarcoCounts, SarcophagusRewrap } from '../types/sarcophagi';
-import {ApolloClient, gql, HttpLink, InMemoryCache} from "@apollo/client/core/index.js";
+import { ApolloClient, gql, HttpLink, InMemoryCache } from '@apollo/client/core/index.js';
 
 export interface ArchDataSubgraph {
   address: string;
@@ -39,17 +39,15 @@ async function queryGraphQl(subgraphUrl: string, query: string) {
     link: new HttpLink({
       uri: subgraphUrl,
     }),
-    cache: new InMemoryCache()
+    cache: new InMemoryCache(),
   });
 
   // set fetch policy to avoid serving cached data
   // @ts-ignore
   const response = await client.query({
     query: gql(query),
-    fetchPolicy: 'network-only'
-  })
-
-  console.log("returning from real query", response.data)
+    fetchPolicy: 'network-only',
+  });
 
   return response.data;
 }

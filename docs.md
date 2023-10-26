@@ -185,5 +185,5 @@ Some tips on where to start looking:
 - [ArchaeologistApi](./classes/ArchaeologistApi.html) - The class that exposes functionality for interacting with registered Archaeologists on the Sarcophagus network.
 - [Token](./classes/Token.html) - The class that exposes functionality for interacting with the `$SARCO` ERC20 token.
 - [SarcoWebBundlr](./classes/SarcoWebBundlr.html) - The class that exposes functionality for interacting with the Sarcophagus Web Bundlr service
-  (The NodeJS SDK does not use this class -- it exposes `Bundlr` from `@bundlr-network/client/build/cjs/node/bundlr` directly).
+  (The NodeJS SDK does not use this class -- it exposes `Bundlr` from `@irys/sdk/build/cjs/node/bundlr` directly).
 - [Utils](./classes/Utils.html) - The class that exposes a variety of useful utility functions.

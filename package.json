@@ -1,6 +1,6 @@
 {
   "name": "@sarcophagus-org/sarcophagus-v2-sdk-client",
-  "version": "0.2.34",
+  "version": "0.2.35",
   "main": "dist/browser.js",
   "browser": "dist/browser.js",
   "type": "module",
@@ -27,8 +27,8 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.10",
-    "@bundlr-network/client": "^0.11.2",
     "@chainsafe/libp2p-noise": "^12.0.0",
+    "@irys/sdk": "^0.0.4",
     "@libp2p/interface-connection": "^5.0.2",
     "@libp2p/interface-peer-id": "^2.0.2",
     "@libp2p/kad-dht": "^5.0.1",
@@ -38,6 +38,7 @@
     "@multiformats/multiaddr": "^10.0.3",
     "@sarcophagus-org/sarcophagus-v2-contracts": "^0.17.2",
     "arweave": "1.11.4",
+    "axios": "^1.5.1",
     "ecies-geth": "^1.6.11",
     "ethers": "^5.7.2",
     "isomorphic-fetch": "^3.0.0",

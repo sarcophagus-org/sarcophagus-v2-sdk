@@ -80,4 +80,4 @@ export type {
 
 export { SarcophagusState } from './types/sarcophagi';
 export type { SarcophagusData, SarcophagusDetails } from './types/sarcophagi';
-export { ChunkingUploader } from '@bundlr-network/client/build/esm/common/chunkingUploader';
+export { ChunkingUploader } from '@irys/sdk/build/esm/common/chunkingUploader';
