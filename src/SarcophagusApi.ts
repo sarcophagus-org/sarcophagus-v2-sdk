@@ -306,8 +306,8 @@ export class SarcophagusApi {
       }
 
       if (recipientInnerEncryptedkeyShares && preEncryptedPayload) {
-        keySharesEncryptedInner = recipientInnerEncryptedkeyShares;
-        encryptedPayload = preEncryptedPayload;
+        keySharesEncryptedInner = recipientInnerEncryptedkeyShares.map(arr => Buffer.from(arr));
+        encryptedPayload = Buffer.from(preEncryptedPayload);
         doInnerEncryption = false;
       }
 

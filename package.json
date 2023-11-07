@@ -1,7 +1,7 @@
 {
-  "name": "@sarcophagus-org/sarcophagus-v2-sdk-client",
-  "version": "0.2.35",
-  "main": "dist/browser.js",
+  "name": "@sarcophagus-org/sarcophagus-v2-sdk",
+  "version": "0.2.40",
+  "main": "dist/server.js",
   "browser": "dist/browser.js",
   "type": "module",
   "sideEffects": false,
