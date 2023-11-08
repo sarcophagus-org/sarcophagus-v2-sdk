@@ -506,7 +506,7 @@ export class Utils {
         arweaveDataDelimiter,
         metadataBuffer,
         encKeysBuffer,
-        encryptedPayload!,
+        Buffer.from(encryptedPayload),
       ]);
 
       return arweavePayload;

@@ -308,9 +308,6 @@ export class ArchaeologistApi {
 
         try {
           const contextChainId = (await this.signer.provider?.getNetwork())?.chainId;
-          console.log('Arch negotiation setup from sdk');
-          console.log('contextChainId', contextChainId);
-          console.log('protocol:', `${NEGOTIATION_SIGNATURE_STREAM}${contextChainId && `-${contextChainId}`}`);
 
           let stream: Stream;
           try {
