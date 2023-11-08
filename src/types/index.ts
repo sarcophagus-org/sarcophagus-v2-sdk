@@ -32,7 +32,7 @@ export type {
   ArweaveTxStatus,
   OnDownloadProgress,
   PayloadData,
-  UploadArweaveFileOptions,
+  ArweaveFilePayloadOptions,
 } from './arweave';
 
 import { BigNumber } from 'ethers';

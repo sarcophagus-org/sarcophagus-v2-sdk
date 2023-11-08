@@ -17,33 +17,24 @@ export interface PayloadData {
   data: Buffer;
 }
 
-export interface UploadArweaveFileOptions {
+export interface UploadArweavePayloadArgs {
+  /** The formatted and encrypted arweave payload to upload */
+  arweavePayload: Buffer;
+  /** Callback for preparation steps during upload. `step` can be displayed to end-user. */
+  onStep: (step: string) => void;
+  /** Callback for upload progress. */
+  onUploadChunk: (chunkedUploader: ChunkingUploader, chunkedUploadProgress: number) => void;
+  /** Callback for chunk upload errors. */
+  onUploadChunkError: (msg: string) => void;
+  /** Callback for upload completion. */
+  onUploadComplete: (uploadId: string) => void;
+}
+
+export type ArweaveFilePayloadOptions = Omit<UploadArweavePayloadArgs, 'arweavePayload'> & {
   /** The file to upload. Leave undefined if using `payloadData`. */
   file?: File | undefined;
   /** The payload data to upload. Leave undefined if using `file`. */
   payloadData?: PayloadData | undefined;
-  /** 
-   * Optional recipient-public-key encrypted keyshares. 
-   * 
-   * If provided, `uploadFileToArweave` will skip the keyshare inner-encryption step and use these encrypted keyshares instead.
-   * As these are already inner-encrypted, only the outer layer encryption using the archaeologists' public keys will be performed.
-   *
-   * `preEncryptedPayload` must also be provided.
-   * */
-  recipientInnerEncryptedkeyShares?: Uint8Array[];
-  /** 
-   * Optional pre-encrypted file payload. 
-   * 
-   * If provided, `uploadFileToArweave` will skip the file encryption step and use this encrypted payload instead.
-   * As the file is already encrypted, only the inner layer encryption using the recipient public key will be performed.
-   * The responsibility of ensuring the original key used to encrypt the keyshares is safely discarded is left to the caller.
-   * 
-   * `recipientInnerEncryptedkeyShares` must also be provided.
-   * */
-  preEncryptedPayload?: Buffer;
-  preEncryptedPayloadMetadata?: ArweaveFileMetadata;
-  /** Callback for preparation steps during upload. `step` can be displayed to end-user. */
-  onStep: (step: string) => void;
   /** The private key used to encrypt the payload. */
   payloadPrivateKey?: string;
   /** The corresponding public key payload encryption key. */
@@ -56,13 +47,33 @@ export interface UploadArweaveFileOptions {
   threshold: number;
   /** The archaeologists' public keys. Used to encrypt the outer layer of the split key shares. */
   archaeologistPublicKeys: string[];
-  /** Callback for upload progress. */
-  onUploadChunk: (chunkedUploader: ChunkingUploader, chunkedUploadProgress: number) => void;
-  /** Callback for chunk upload errors. */
-  onUploadChunkError: (msg: string) => void;
-  /** Callback for upload completion. */
-  onUploadComplete: (uploadId: string) => void;
-}
+};
+
+type filePayloadArgs = 'file' | 'payloadData' | 'payloadPrivateKey' | 'payloadPublicKey' | 'shares' | 'threshold';
+
+export type PreEncryptedPayloadOptions = Omit<ArweaveFilePayloadOptions, filePayloadArgs> & {
+  /**
+   * Recipient-public-key encrypted keyshares.
+   *
+   * As these are already inner-encrypted, only the outer layer encryption using the archaeologists' public keys will be performed.
+   * */
+  innerEncryptedkeyShares: Uint8Array[];
+  /**
+   * Pre-encrypted file payload.
+   *
+   * As the file is already encrypted, only the inner layer encryption using the recipient public key will be performed.
+   * The responsibility of ensuring the original key used to encrypt the keyshares is safely discarded is left to the caller.
+   *
+   * */
+  preEncryptedPayload: Buffer;
+  preEncryptedPayloadMetadata: ArweaveFileMetadata;
+};
+
+type onUploadCallbacks = 'onUploadChunk' | 'onUploadChunkError' | 'onUploadComplete';
+
+export type EncryptInnerLayerArgs = Omit<ArweaveFilePayloadOptions, onUploadCallbacks>;
+
+export type EncryptOuterLayerArgs = Omit<PreEncryptedPayloadOptions, onUploadCallbacks>;
 
 export interface ArweaveResponse {
   metadata: ArweaveFileMetadata;

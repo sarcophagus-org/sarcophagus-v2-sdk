@@ -24,7 +24,13 @@ import {
   SarcophagusResponseContract,
 } from './types/sarcophagi';
 import { Utils } from './Utils';
-import { ArweaveResponse, OnDownloadProgress, UploadArweaveFileOptions } from './types/arweave';
+import {
+  ArweaveResponse,
+  OnDownloadProgress,
+  ArweaveFilePayloadOptions,
+  PreEncryptedPayloadOptions,
+  UploadArweavePayloadArgs,
+} from './types/arweave';
 import { arweaveDataDelimiter, fetchArweaveFile, readFileDataAsBase64 } from './helpers/arweaveUtil';
 import { decrypt, encrypt } from './helpers/encryption';
 import { arrayify } from 'ethers/lib/utils.js';
@@ -263,138 +269,41 @@ export class SarcophagusApi {
     }
   }
 
-  async uploadFileToArweave(args: UploadArweaveFileOptions): Promise<void> {
+  async uploadFileToArweave(args: ArweaveFilePayloadOptions): Promise<void> {
     try {
       const {
-        onStep,
-        file,
-        payloadData,
-        recipientInnerEncryptedkeyShares,
+        innerEncryptedkeyShares,
+        encryptedPayload: preEncryptedPayload,
+        encryptedMetadata: preEncryptedPayloadMetadata,
+      } = await this.utils.encryptInnerLayer(args);
+
+      const arweavePayload = await this.utils.encryptOuterLayer({
+        ...args,
+        innerEncryptedkeyShares,
         preEncryptedPayload,
         preEncryptedPayloadMetadata,
-        payloadPublicKey,
-        shares,
-        threshold,
-        payloadPrivateKey,
-        recipientPublicKey,
-        archaeologistPublicKeys,
-        onUploadChunk,
-        onUploadChunkError,
-        onUploadComplete,
-      } = args;
-      onStep('Reading file...');
-
-      let payload: { type: string; data: Buffer };
-      let fileName: string;
-
-      let keySharesEncryptedInner: Uint8Array[]
-      let encryptedPayload: Buffer;
-
-      let doInnerEncryption = true;
-
-      // The caller may provide pre-encrypted keyshares and a pre-encrypted payload.
-      // In this case, we skip the inner encryption step and use the provided encrypted keyshares and payload.
-      if (preEncryptedPayload && !recipientInnerEncryptedkeyShares) {
-        throw new Error('`preEncryptedPayload` provided but `recipientInnerEncryptedkeyShares` not provided');
-      }
-      if (recipientInnerEncryptedkeyShares && !preEncryptedPayload) {
-        throw new Error('`recipientInnerEncryptedkeyShares` provided but `preEncryptedPayload` not provided');
-      }
-
-      if (!recipientInnerEncryptedkeyShares && !preEncryptedPayload && !file && !payloadData) {
-        throw new Error("Can't upload file. No file, payload, or inner-encrypted data provided.");
-      }
-
-      if (recipientInnerEncryptedkeyShares && preEncryptedPayload) {
-        keySharesEncryptedInner = recipientInnerEncryptedkeyShares.map(arr => Buffer.from(arr));
-        encryptedPayload = Buffer.from(preEncryptedPayload);
-        doInnerEncryption = false;
-      }
-
-      if (!doInnerEncryption && !preEncryptedPayloadMetadata) {
-        throw new Error('`preEncryptedPayloadMetadata` must be provided when `recipientInnerEncryptedkeyShares` and `preEncryptedPayload` are provided');
-      }
-      
-      if ((file || payloadData) && !doInnerEncryption) {
-        throw new Error('Provide only one of `file`, `payloadData` or `recipientInnerEncryptedkeyShares` and `preEncryptedPayload`.');
-      }
-
-      if (file) {
-        payload = await readFileDataAsBase64(file!);
-        fileName = file.name;
-      } else if (payloadData) {
-        payload = { type: payloadData.type, data: Buffer.from(payloadData.data) };
-        fileName = payloadData.name;
-      } else {
-        payload = {
-          type: preEncryptedPayloadMetadata!.type,
-          data: Buffer.from(""), // preEncryptedPayload is set, so this is not used
-        };
-        fileName = preEncryptedPayloadMetadata!.fileName;
-      }
-
-      /**
-       * File upload data
-       */
-      // Step 1: Encrypt the payload with the generated keypair
-      onStep('Encrypting...');
-
-      if (doInnerEncryption) {
-        encryptedPayload = await encrypt(payloadPublicKey!, payload!.data);
-      }
-
-      /**
-       * Double encrypted keyshares upload data
-       */
-      // Step 1: Split the outer layer private key using shamirs secret sharing
-      if (doInnerEncryption) {
-        const keyShares: Uint8Array[] = split(payloadPrivateKey!, {
-          shares,
-          threshold,
-        });
-
-        // Step 2: Encrypt each shard with the recipient public key
-        keySharesEncryptedInner = await encryptShardsWithRecipientPublicKey(recipientPublicKey, keyShares);
-      }
-
-      // Step 3: Encrypt each shard again with the arch public keys
-      const keySharesEncryptedOuter = await encryptShardsWithArchaeologistPublicKeys(
-        archaeologistPublicKeys,
-        keySharesEncryptedInner!
-      );
-
-      /**
-       * Format data for upload
-       */
-      const doubleEncryptedKeyShares: Record<string, string> = keySharesEncryptedOuter.reduce(
-        (acc, keyShare) => ({
-          ...acc,
-          [keyShare.publicKey]: keyShare.encryptedShard,
-        }),
-        {}
-      );
-
-      // Upload file data + keyshares data to arweave
-      const encKeysBuffer = Buffer.from(JSON.stringify(doubleEncryptedKeyShares), 'binary');
-
-      const encryptedMetadata = await encryptMetadataFields(recipientPublicKey, {
-        fileName: fileName!,
-        type: payload!.type,
       });
 
-      const metadataBuffer = Buffer.from(JSON.stringify(encryptedMetadata), 'binary');
+      return this.uploadArweavePayload({ ...args, arweavePayload });
+    } catch (error: any) {
+      console.log(error);
+      throw new Error(error.message || 'Error uploading file payload to Bundlr');
+    }
+  }
 
-      // <meta_buf_size><delimiter><keyshare_buf_size><delimiter><metatadata><keyshares><payload>
+  async uploadPreEncryptedPayloadToArweave(args: PreEncryptedPayloadOptions): Promise<void> {
+    try {
+      const arweavePayload = await this.utils.encryptOuterLayer(args);
+      return this.uploadArweavePayload({ ...args, arweavePayload });
+    } catch (error: any) {
+      console.log(error);
+      throw new Error(error.message || 'Error uploading file payload');
+    }
+  }
 
-      const arweavePayload = Buffer.concat([
-        Buffer.from(metadataBuffer.length.toString(), 'binary'),
-        arweaveDataDelimiter,
-        Buffer.from(encKeysBuffer.length.toString()),
-        arweaveDataDelimiter,
-        metadataBuffer,
-        encKeysBuffer,
-        encryptedPayload!,
-      ]);
+  async uploadArweavePayload(args: UploadArweavePayloadArgs): Promise<void> {
+    try {
+      const { onStep, onUploadChunk, onUploadChunkError, onUploadComplete, arweavePayload } = args;
 
       onStep(`Uploading to Arweave...`);
 
@@ -435,7 +344,7 @@ export class SarcophagusApi {
       return uploadPromise;
     } catch (error: any) {
       console.log(error);
-      throw new Error(error.message || 'Error uploading file payload to Bundlr');
+      throw new Error(error.message || 'Error uploading arwewave payload');
     }
   }
 
