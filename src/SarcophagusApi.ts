@@ -273,15 +273,15 @@ export class SarcophagusApi {
     try {
       const {
         innerEncryptedkeyShares,
-        encryptedPayload: preEncryptedPayload,
-        encryptedMetadata: preEncryptedPayloadMetadata,
+        encryptedPayload,
+        encryptedPayloadMetadata,
       } = await this.utils.encryptInnerLayer(args);
 
       const arweavePayload = await this.utils.encryptOuterLayer({
         ...args,
         innerEncryptedkeyShares,
-        preEncryptedPayload,
-        preEncryptedPayloadMetadata,
+        encryptedPayload,
+        encryptedPayloadMetadata,
       });
 
       return this.uploadArweavePayload({ ...args, arweavePayload });

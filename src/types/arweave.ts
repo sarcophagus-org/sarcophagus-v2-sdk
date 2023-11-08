@@ -65,13 +65,13 @@ export type PreEncryptedPayloadOptions = Omit<ArweaveFilePayloadOptions, filePay
    * The responsibility of ensuring the original key used to encrypt the keyshares is safely discarded is left to the caller.
    *
    * */
-  preEncryptedPayload: Buffer;
-  preEncryptedPayloadMetadata: ArweaveFileMetadata;
+  encryptedPayload: Buffer;
+  encryptedPayloadMetadata: ArweaveFileMetadata;
 };
 
 type onUploadCallbacks = 'onUploadChunk' | 'onUploadChunkError' | 'onUploadComplete';
 
-export type EncryptInnerLayerArgs = Omit<ArweaveFilePayloadOptions, onUploadCallbacks>;
+export type EncryptInnerLayerArgs = Omit<ArweaveFilePayloadOptions, onUploadCallbacks | 'archaeologistPublicKeys'>;
 
 export type EncryptOuterLayerArgs = Omit<PreEncryptedPayloadOptions, onUploadCallbacks>;
 

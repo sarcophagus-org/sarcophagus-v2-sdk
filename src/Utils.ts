@@ -420,7 +420,7 @@ export class Utils {
   async encryptInnerLayer(args: EncryptInnerLayerArgs): Promise<{
     innerEncryptedkeyShares: Uint8Array[];
     encryptedPayload: Buffer;
-    encryptedMetadata: { fileName: string; type: string };
+    encryptedPayloadMetadata: { fileName: string; type: string };
   }> {
     try {
       const { onStep, file, payloadData, payloadPublicKey, shares, threshold, payloadPrivateKey, recipientPublicKey } =
@@ -451,7 +451,7 @@ export class Utils {
 
       // Step 3: Encrypt each shard with the recipient public key
       const innerEncryptedkeyShares = await encryptShardsWithRecipientPublicKey(recipientPublicKey, keyShares);
-      return { innerEncryptedkeyShares, encryptedPayload, encryptedMetadata: { fileName, type: payload!.type } };
+      return { innerEncryptedkeyShares, encryptedPayload, encryptedPayloadMetadata: { fileName, type: payload!.type } };
     } catch (error: any) {
       console.log(error);
       throw new Error(error.message || 'Error encrypting file payload');
@@ -463,8 +463,8 @@ export class Utils {
       const {
         onStep,
         innerEncryptedkeyShares,
-        preEncryptedPayload,
-        preEncryptedPayloadMetadata,
+        encryptedPayload,
+        encryptedPayloadMetadata,
         recipientPublicKey,
         archaeologistPublicKeys,
       } = args;
@@ -491,8 +491,8 @@ export class Utils {
       const encKeysBuffer = Buffer.from(JSON.stringify(doubleEncryptedKeyShares), 'binary');
 
       const encryptedMetadata = await encryptMetadataFields(recipientPublicKey, {
-        fileName: preEncryptedPayloadMetadata.fileName,
-        type: preEncryptedPayloadMetadata.type,
+        fileName: encryptedPayloadMetadata.fileName,
+        type: encryptedPayloadMetadata.type,
       });
 
       const metadataBuffer = Buffer.from(JSON.stringify(encryptedMetadata), 'binary');
@@ -506,7 +506,7 @@ export class Utils {
         arweaveDataDelimiter,
         metadataBuffer,
         encKeysBuffer,
-        preEncryptedPayload!,
+        encryptedPayload!,
       ]);
 
       return arweavePayload;
