@@ -197,7 +197,7 @@ export const sepoliaNetworkConfig = (config?: {
     nodeUrl: 'https://devnet.irys.xyz',
   },
   arweaveConfig,
-  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sepolia/v0.0.1',
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sepolia/version/latest',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: '',
   zeroExSellToken: 'ETH',
