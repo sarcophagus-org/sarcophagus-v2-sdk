@@ -43,6 +43,16 @@ npm link sarcophagus-v2-sdk
 
 Then it may be imported as if it were added to the package.json.
 
+## Deployment
+To deploy a new version of the SDK:
+1. Increment the package version in package.json (i.e. `"version": "0.2.37"`)
+2. Merge code into the `main` branch
+3. Create & Publish a new release
+- The release will require a new tag, you can create the tag in the release
+- As a naming convention for the release, name the tag the SDK version (i.e. 0.3.37), and also name the release the same name (0.3.37).
+
+Once the release is published, the SDK packages will be automatically built with a github action and published to npm. 
+
 ## Contributing
 
 We welcome contributions to the SDK. If you'd like to contribute, please submit an issue or open a pull request.
