@@ -72,7 +72,7 @@ export const polygonMumbaiNetworkConfig = (config?: {
     nodeUrl: 'https://devnet.irys.xyz',
   },
   arweaveConfig,
-  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon-mumbai/v0.0.1',
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon-mumbai/version/latest',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: 'https://mumbai.api.0x.org',
   zeroExSellToken: 'MATIC',
@@ -97,13 +97,14 @@ export const polygonMainnetNetworkConfig = (config?: {
     nodeUrl: 'https://node1.irys.xyz',
   },
   arweaveConfig,
-  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon/v0.0.1',
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon/version/latest',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: 'https://polygon.api.0x.org',
   zeroExSellToken: 'MATIC',
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
+// TODO: Deprecate this goerli config, not used anymore
 export const baseGoerliNetworkConfig = (config?: {
   basescanApiKey?: string;
   zeroExApiKey?: string;
@@ -129,6 +130,7 @@ export const baseGoerliNetworkConfig = (config?: {
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
+// TODO: Deprecate this goerli config, not used anymore
 export const goerliNetworkConfig = (config?: {
   etherscanApiKey?: string;
   zeroExApiKey?: string;
@@ -172,7 +174,7 @@ export const mainnetNetworkConfig = (config?: {
     nodeUrl: 'https://node1.irys.xyz',
   },
   arweaveConfig,
-  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarcophagus-v2/v0.0.1',
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarcophagus-v2/version/latest',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: 'https://api.0x.org',
   zeroExSellToken: 'ETH',
