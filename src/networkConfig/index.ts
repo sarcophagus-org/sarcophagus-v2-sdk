@@ -97,7 +97,7 @@ export const polygonMainnetNetworkConfig = (config?: {
     nodeUrl: 'https://node1.irys.xyz',
   },
   arweaveConfig,
-  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon/version/latest',
+  subgraphUrl: 'https://subgraph.satsuma-prod.com/62645f651f37/seths-personal--297874/polygon/api',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: 'https://polygon.api.0x.org',
   zeroExSellToken: 'MATIC',
