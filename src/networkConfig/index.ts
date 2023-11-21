@@ -15,7 +15,6 @@ export const BASE_GOERLI_CHAIN_ID = 84531;
 export const POLYGON_MUMBAI_CHAIN_ID = 80001;
 export const POLYGON_MAINNET_CHAIN_ID = 137;
 export const HARDHAT_CHAIN_ID = 31337;
-
 export const ARBITRUM_CHAIN_ID = 42161;
 
 /**
@@ -258,6 +257,7 @@ export function getNetworkConfigBuilder(chainId: number): NetworkConfigBuilder |
     [SEPOLIA_CHAIN_ID, config => sepoliaNetworkConfig(config)],
     [POLYGON_MUMBAI_CHAIN_ID, config => polygonMumbaiNetworkConfig(config)],
     [POLYGON_MAINNET_CHAIN_ID, config => polygonMainnetNetworkConfig(config)],
+    [ARBITRUM_CHAIN_ID, config => arbitrumNetworkConfig(config)],
     [BASE_GOERLI_CHAIN_ID, config => baseGoerliNetworkConfig(config)],
     [HARDHAT_CHAIN_ID, _ => hardhatNetworkConfig()],
   ]);
