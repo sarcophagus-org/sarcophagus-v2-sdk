@@ -182,6 +182,44 @@ export class SarcophagusApi {
     return this.getSarcophagi(address, { ...options, filter: SarcophagusFilter.recipient });
   }
 
+  /**
+   * Returns a list of sarcophagi for a given list if sarcoIds
+   * @param sarcoIds - The list of sarcoIds to get sarcophagi for
+   * @param options - Options for the contract method call
+   * @returns The list of sarcophagi
+   * */
+  async getSarcophagiByIds(sarcoIds: string[], options: CallOptions = {}): Promise<SarcophagusData[]> {
+    const gracePeriod = (await safeContractCall(
+      this.viewStateFacet,
+      'getGracePeriod',
+      [],
+      options
+    )) as unknown as BigNumber;
+
+    const sarcophagi: SarcophagusData[] = await Promise.all(
+      sarcoIds.map(async sarcoId => {
+        try {const sarcoContract = (await safeContractCall(
+          this.viewStateFacet,
+          'getSarcophagus',
+          [sarcoId],
+          options
+        )) as unknown as SarcophagusResponseContract;
+
+        const currentTimeMs = (await this.utils.getCurrentTimeSec(this.signer.provider!)) * 1000;
+        return {
+          ...sarcoContract,
+          state: this.utils.getSarcophagusState(sarcoContract, gracePeriod.toNumber(), currentTimeMs),
+          id: sarcoId,
+        } as SarcophagusData;} catch (error) {
+          console.error(`Error getting sarcophagus ${sarcoId}: ${error}`);
+          return { id: sarcoId, name: "not found" } as SarcophagusData;
+        }
+      })
+    );
+
+    return sarcophagi;
+  }
+
   async claimSarcophagus(
     sarcoId: string,
     recipientPrivateKey: string,
@@ -414,31 +452,6 @@ export class SarcophagusApi {
 
     const sarcoIds: string[] = sarcophagiSubgraph.map(s => s.sarcoId);
 
-    const gracePeriod = (await safeContractCall(
-      this.viewStateFacet,
-      'getGracePeriod',
-      [],
-      options
-    )) as unknown as BigNumber;
-
-    const sarcophagi: SarcophagusData[] = await Promise.all(
-      sarcoIds.map(async sarcoId => {
-        const sarcoContract = (await safeContractCall(
-          this.viewStateFacet,
-          'getSarcophagus',
-          [sarcoId],
-          options
-        )) as unknown as SarcophagusResponseContract;
-
-        const currentTimeMs = (await this.utils.getCurrentTimeSec(this.signer.provider!)) * 1000;
-        return {
-          ...sarcoContract,
-          state: this.utils.getSarcophagusState(sarcoContract, gracePeriod.toNumber(), currentTimeMs),
-          id: sarcoId,
-        } as SarcophagusData;
-      })
-    );
-
-    return sarcophagi;
+    return this.getSarcophagiByIds(sarcoIds, options);
   }
 }

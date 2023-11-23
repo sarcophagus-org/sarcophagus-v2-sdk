@@ -74,7 +74,9 @@ export class WebSarcoClient {
 
     this.p2pNode = await bootLip2p();
     // TODO: Allow client to choose when to start/stop libp2p node
-    await this.startLibp2pNode();
+    if (!params.skipLibp2pNode) {
+      await this.startLibp2pNode();
+    }
 
     const bundlr = this.getBundlr();
 
@@ -141,7 +143,7 @@ export class WebSarcoClient {
     await this.connectBundlr();
   };
 
-  async startLibp2pNode() {
+  public async startLibp2pNode() {
     console.log(`LibP2P node starting with peerID: ${this.p2pNode.peerId.toString()}`);
     return this.p2pNode.start();
   }

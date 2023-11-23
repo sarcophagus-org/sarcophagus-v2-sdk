@@ -1,4 +1,4 @@
-import { object, string, number, mixed, InferType, ArraySchema } from 'yup';
+import { object, string, number, mixed, InferType, ArraySchema, boolean } from 'yup';
 import { BigNumber } from 'ethers';
 
 export const nodeSarcoClientSchema = object({
@@ -11,6 +11,7 @@ export const nodeSarcoClientSchema = object({
 
 export const sarcoClientInitSchema = object({
   chainId: number().required(),
+  skipLibp2pNode: boolean(),
   etherscanApiKey: string(),
   polygonScanApiKey: string(),
   basescanApiKey: string(),
