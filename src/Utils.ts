@@ -338,6 +338,10 @@ export class Utils {
     return { publicKey, privateKey };
   }
 
+  generateSarchophagusId(name: string) {
+    return ethers.utils.id(name + Date.now().toString())
+  }
+
   formatSubmitSarcophagusArgs({
     name,
     recipientPublicKey,
@@ -348,6 +352,7 @@ export class Utils {
     archaeologistPublicKeys,
     archaeologistSignatures,
     arweaveTxId,
+    sarcophagusId,
   }: SubmitSarcophagusParams) {
     const getContractArchaeologists = (): ContractArchaeologist[] => {
       return selectedArchaeologists.map(arch => {
@@ -364,7 +369,7 @@ export class Utils {
       });
     };
 
-    const sarcoId = ethers.utils.id(name + Date.now().toString());
+    const sarcoId = sarcophagusId ?? ethers.utils.id(name + Date.now().toString());
     const settings: SubmitSarcophagusSettings = {
       name,
       recipientAddress: recipientPublicKey ? computeAddress(recipientPublicKey) : '',

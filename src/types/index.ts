@@ -93,6 +93,7 @@ export interface RecipientState {
 }
 
 export interface SubmitSarcophagusParams {
+  sarcophagusId?: string;
   name: string;
   recipientPublicKey: string;
   resurrection: number;
