@@ -181,7 +181,10 @@ export class SarcophagusApi {
   }
 
   /**
-   * Returns a list of sarcophagi for a given list if sarcoIds
+   * Returns a list of sarcophagi for a given list if sarcoIds.
+   * 
+   * If any of the sarcoIds are not found, the returned list will contain a sarcophagus with the id and name "not found".
+   * 
    * @param sarcoIds - The list of sarcoIds to get sarcophagi for
    * @param options - Options for the contract method call
    * @returns The list of sarcophagi
@@ -196,23 +199,25 @@ export class SarcophagusApi {
 
     const sarcophagi: SarcophagusData[] = await Promise.all(
       sarcoIds.map(async sarcoId => {
-        try {const sarcoContract = (await safeContractCall(
-          this.viewStateFacet,
-          'getSarcophagus',
-          [sarcoId],
-          options
-        )) as unknown as SarcophagusResponseContract;
+        try {
+          const sarcoContract = (await safeContractCall(
+            this.viewStateFacet,
+            'getSarcophagus',
+            [sarcoId],
+            options
+          )) as unknown as SarcophagusResponseContract;
 
-        const currentTimeMs = (await this.utils.getCurrentTimeSec(this.signer.provider!)) * 1000;
-        return {
-          ...sarcoContract,
-          state: this.utils.getSarcophagusState(sarcoContract, gracePeriod.toNumber(), currentTimeMs),
-          id: sarcoId,
-        } as SarcophagusData;} catch (error) {
-          console.error(`Error getting sarcophagus ${sarcoId}: ${error}`);
-          return { id: sarcoId, name: "not found" } as SarcophagusData;
-        }
-      })
+          const currentTimeMs = (await this.utils.getCurrentTimeSec(this.signer.provider!)) * 1000;
+          return {
+            ...sarcoContract,
+            state: this.utils.getSarcophagusState(sarcoContract, gracePeriod.toNumber(), currentTimeMs),
+            id: sarcoId,
+          } as SarcophagusData;
+        } catch (error) {
+            console.error(`Error getting sarcophagus ${sarcoId}: ${error}`);
+            return { id: sarcoId, name: "not found" } as SarcophagusData;
+          }
+        })
     );
 
     return sarcophagi;
