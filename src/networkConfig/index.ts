@@ -15,6 +15,7 @@ export const BASE_GOERLI_CHAIN_ID = 84531;
 export const POLYGON_MUMBAI_CHAIN_ID = 80001;
 export const POLYGON_MAINNET_CHAIN_ID = 137;
 export const HARDHAT_CHAIN_ID = 31337;
+export const ARBITRUM_CHAIN_ID = 42161;
 
 /**
  * A map of supported chain IDs to their network names
@@ -26,6 +27,7 @@ export const SARCO_SUPPORTED_NETWORKS: Map<number, string> = new Map([
   [BASE_GOERLI_CHAIN_ID, 'baseGoerli'],
   [POLYGON_MUMBAI_CHAIN_ID, 'polygonMumbai'],
   [POLYGON_MAINNET_CHAIN_ID, 'polygonMainnet'],
+  [ARBITRUM_CHAIN_ID, 'arbitrum']
 ]);
 
 export const hardhatNetworkConfig = (override?: {
@@ -72,7 +74,7 @@ export const polygonMumbaiNetworkConfig = (config?: {
     nodeUrl: 'https://devnet.irys.xyz',
   },
   arweaveConfig,
-  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon-mumbai/v0.0.1',
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon-mumbai/version/latest',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: 'https://mumbai.api.0x.org',
   zeroExSellToken: 'MATIC',
@@ -97,13 +99,39 @@ export const polygonMainnetNetworkConfig = (config?: {
     nodeUrl: 'https://node1.irys.xyz',
   },
   arweaveConfig,
-  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/polygon/v0.0.1',
+  subgraphUrl: 'https://subgraph.satsuma-prod.com/556ca65949fe/sarcophagus/polygon/api',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: 'https://polygon.api.0x.org',
   zeroExSellToken: 'MATIC',
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
+export const arbitrumNetworkConfig = (config?: {
+  arbiscanApiKey?: string;
+  zeroExApiKey?: string;
+}): SarcoNetworkConfig => ({
+  chainId: POLYGON_MUMBAI_CHAIN_ID,
+  networkName: 'Arbitrum One',
+  networkShortName: 'arbitrum',
+  tokenSymbol: 'ETH',
+  sarcoTokenAddress: '0x82155Ab6b6c1113CFb352c7573B010a88f5974bD',
+  diamondDeployAddress: '0xc1984df3e3ddc1DC24d54179CCD5537e290C7E9c',
+  etherscanApiUrl: 'https://api.arbiscan.io/api',
+  etherscanApiKey: config?.arbiscanApiKey ?? '',
+  explorerUrl: 'https://arbiscan.io/',
+  bundlr: {
+    currencyName: 'ethereum',
+    nodeUrl: 'https://devnet.irys.xyz',
+  },
+  arweaveConfig,
+  subgraphUrl: 'https://subgraph.satsuma-prod.com/556ca65949fe/sarcophagus/arbitrum/api',
+  zeroExApiKey: config?.zeroExApiKey ?? '',
+  zeroExApiUrl: 'https://arbitrum.api.0x.org',
+  zeroExSellToken: 'ETH',
+  apiUrlBase: 'https://api.encryptafile.com',
+});
+
+// TODO: Deprecate this goerli config, not used anymore
 export const baseGoerliNetworkConfig = (config?: {
   basescanApiKey?: string;
   zeroExApiKey?: string;
@@ -129,6 +157,7 @@ export const baseGoerliNetworkConfig = (config?: {
   apiUrlBase: 'https://api.encryptafile.com',
 });
 
+// TODO: Deprecate this goerli config, not used anymore
 export const goerliNetworkConfig = (config?: {
   etherscanApiKey?: string;
   zeroExApiKey?: string;
@@ -172,7 +201,7 @@ export const mainnetNetworkConfig = (config?: {
     nodeUrl: 'https://node1.irys.xyz',
   },
   arweaveConfig,
-  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarcophagus-v2/v0.0.1',
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sarcophagus-v2/version/latest',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: 'https://api.0x.org',
   zeroExSellToken: 'ETH',
@@ -197,7 +226,7 @@ export const sepoliaNetworkConfig = (config?: {
     nodeUrl: 'https://devnet.irys.xyz',
   },
   arweaveConfig,
-  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sepolia/v0.0.1',
+  subgraphUrl: 'https://api.studio.thegraph.com/query/49076/sepolia/version/latest',
   zeroExApiKey: config?.zeroExApiKey ?? '',
   zeroExApiUrl: '',
   zeroExSellToken: 'ETH',
@@ -228,6 +257,7 @@ export function getNetworkConfigBuilder(chainId: number): NetworkConfigBuilder |
     [SEPOLIA_CHAIN_ID, config => sepoliaNetworkConfig(config)],
     [POLYGON_MUMBAI_CHAIN_ID, config => polygonMumbaiNetworkConfig(config)],
     [POLYGON_MAINNET_CHAIN_ID, config => polygonMainnetNetworkConfig(config)],
+    [ARBITRUM_CHAIN_ID, config => arbitrumNetworkConfig(config)],
     [BASE_GOERLI_CHAIN_ID, config => baseGoerliNetworkConfig(config)],
     [HARDHAT_CHAIN_ID, _ => hardhatNetworkConfig()],
   ]);
