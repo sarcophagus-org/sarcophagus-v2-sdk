@@ -32,7 +32,7 @@ export type {
   ArweaveTxStatus,
   OnDownloadProgress,
   PayloadData,
-  UploadArweaveFileOptions,
+  ArweaveFilePayloadOptions,
 } from './arweave';
 
 import { BigNumber } from 'ethers';
@@ -93,8 +93,9 @@ export interface RecipientState {
 }
 
 export interface SubmitSarcophagusParams {
+  sarcophagusId?: string;
   name: string;
-  recipientState: RecipientState;
+  recipientPublicKey: string;
   resurrection: number;
   selectedArchaeologists: ArchaeologistData[];
   requiredArchaeologists: number;

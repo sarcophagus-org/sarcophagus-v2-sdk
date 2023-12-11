@@ -1,4 +1,4 @@
-import { EmbalmerFacet__factory, ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
+import { EmbalmerFacet__factory, ThirdPartyFacet__factory, ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
 import { BigNumber, ethers } from 'ethers';
 import { safeContractCall } from './helpers/safeContractCall';
 import { CallOptions, SarcoNetworkConfig } from './types';
@@ -24,17 +24,18 @@ import {
   SarcophagusResponseContract,
 } from './types/sarcophagi';
 import { Utils } from './Utils';
-import { ArweaveResponse, OnDownloadProgress, UploadArweaveFileOptions } from './types/arweave';
-import { arweaveDataDelimiter, fetchArweaveFile, readFileDataAsBase64 } from './helpers/arweaveUtil';
-import { decrypt, encrypt } from './helpers/encryption';
-import { arrayify } from 'ethers/lib/utils.js';
-import { combine, split } from 'shamirs-secret-sharing-ts';
 import {
-  chunkedUploaderFileSize,
-  encryptMetadataFields,
-  encryptShardsWithArchaeologistPublicKeys,
-  encryptShardsWithRecipientPublicKey,
-} from './helpers/sarco';
+  ArweaveResponse,
+  OnDownloadProgress,
+  ArweaveFilePayloadOptions,
+  PreEncryptedPayloadOptions,
+  UploadArweavePayloadArgs,
+} from './types/arweave';
+import { fetchArweaveFile } from './helpers/arweaveUtil';
+import { decrypt } from './helpers/encryption';
+import { arrayify } from 'ethers/lib/utils.js';
+import { combine } from 'shamirs-secret-sharing-ts';
+import { chunkedUploaderFileSize } from './helpers/sarco';
 import Irys from '@irys/sdk';
 import { SarcoWebIrys } from './SarcoWebIrys';
 import Arweave from 'arweave';
@@ -43,6 +44,7 @@ export class SarcophagusApi {
   public bundlr: SarcoWebIrys | Irys;
 
   private embalmerFacet: ethers.Contract;
+  private thirdPartyFacet: ethers.Contract;
   private subgraphUrl: string;
   private viewStateFacet: ethers.Contract;
   private signer: ethers.Signer;
@@ -58,6 +60,7 @@ export class SarcophagusApi {
     arweave: Arweave
   ) {
     this.embalmerFacet = new ethers.Contract(diamondDeployAddress, EmbalmerFacet__factory.abi, signer);
+    this.thirdPartyFacet = new ethers.Contract(diamondDeployAddress, ThirdPartyFacet__factory.abi, signer);
     this.viewStateFacet = new ethers.Contract(diamondDeployAddress, ViewStateFacet__factory.abi, signer);
     this.subgraphUrl = networkConfig.subgraphUrl;
     this.signer = signer;
@@ -149,11 +152,12 @@ export class SarcophagusApi {
    * @returns The transaction response
    * */
   async cleanSarcophagus(sarcoId: string, options: CallOptions = {}): Promise<ethers.providers.TransactionResponse> {
-    return safeContractCall(this.embalmerFacet, 'cleanSarcophagus', [sarcoId], options);
+    return safeContractCall(this.thirdPartyFacet, 'clean', [sarcoId], options);
   }
 
   async getRewrapsOnSarcophagus(sarcoId: string) {
-    const archData = await getSubgraphSarcophagusWithRewraps(this.subgraphUrl, sarcoId);
+    const data = await getSubgraphSarcophagusWithRewraps(this.subgraphUrl, sarcoId);
+    return data.rewraps;
   }
 
   /**
@@ -174,6 +178,44 @@ export class SarcophagusApi {
    * */
   async getRecipientSarcophagi(address: string, options: CallOptions = {}): Promise<SarcophagusData[]> {
     return this.getSarcophagi(address, { ...options, filter: SarcophagusFilter.recipient });
+  }
+
+  /**
+   * Returns a list of sarcophagi for a given list if sarcoIds
+   * @param sarcoIds - The list of sarcoIds to get sarcophagi for
+   * @param options - Options for the contract method call
+   * @returns The list of sarcophagi
+   * */
+  async getSarcophagiByIds(sarcoIds: string[], options: CallOptions = {}): Promise<SarcophagusData[]> {
+    const gracePeriod = (await safeContractCall(
+      this.viewStateFacet,
+      'getGracePeriod',
+      [],
+      options
+    )) as unknown as BigNumber;
+
+    const sarcophagi: SarcophagusData[] = await Promise.all(
+      sarcoIds.map(async sarcoId => {
+        try {const sarcoContract = (await safeContractCall(
+          this.viewStateFacet,
+          'getSarcophagus',
+          [sarcoId],
+          options
+        )) as unknown as SarcophagusResponseContract;
+
+        const currentTimeMs = (await this.utils.getCurrentTimeSec(this.signer.provider!)) * 1000;
+        return {
+          ...sarcoContract,
+          state: this.utils.getSarcophagusState(sarcoContract, gracePeriod.toNumber(), currentTimeMs),
+          id: sarcoId,
+        } as SarcophagusData;} catch (error) {
+          console.error(`Error getting sarcophagus ${sarcoId}: ${error}`);
+          return { id: sarcoId, name: "not found" } as SarcophagusData;
+        }
+      })
+    );
+
+    return sarcophagi;
   }
 
   async claimSarcophagus(
@@ -263,93 +305,41 @@ export class SarcophagusApi {
     }
   }
 
-  async uploadFileToArweave(args: UploadArweaveFileOptions): Promise<void> {
+  async uploadFileToArweave(args: ArweaveFilePayloadOptions): Promise<void> {
     try {
       const {
-        onStep,
-        file,
-        payloadData,
-        payloadPublicKey,
-        shares,
-        threshold,
-        payloadPrivateKey,
-        recipientPublicKey,
-        archaeologistPublicKeys,
-        onUploadChunk,
-        onUploadChunkError,
-        onUploadComplete,
-      } = args;
-      onStep('Reading file...');
-
-      let payload: { type: string; data: Buffer };
-      let fileName: string;
-      if (file) {
-        payload = await readFileDataAsBase64(file!);
-        fileName = file.name;
-      } else if (payloadData) {
-        payload = { type: payloadData.type, data: Buffer.from(payloadData.data) };
-        fileName = payloadData.name;
-      } else {
-        throw new Error("Can't upload file. No file or payload data provided.");
-      }
-
-      /**
-       * File upload data
-       */
-      // Step 1: Encrypt the payload with the generated keypair
-      onStep('Encrypting...');
-      const encryptedPayload = await encrypt(payloadPublicKey!, payload.data);
-
-      /**
-       * Double encrypted keyshares upload data
-       */
-      // Step 1: Split the outer layer private key using shamirs secret sharing
-      const keyShares: Uint8Array[] = split(payloadPrivateKey, {
-        shares,
-        threshold,
-      });
-
-      // Step 2: Encrypt each shard with the recipient public key
-      const keySharesEncryptedInner = await encryptShardsWithRecipientPublicKey(recipientPublicKey, keyShares);
-
-      // Step 3: Encrypt each shard again with the arch public keys
-      const keySharesEncryptedOuter = await encryptShardsWithArchaeologistPublicKeys(
-        archaeologistPublicKeys,
-        keySharesEncryptedInner
-      );
-
-      /**
-       * Format data for upload
-       */
-      const doubleEncryptedKeyShares: Record<string, string> = keySharesEncryptedOuter.reduce(
-        (acc, keyShare) => ({
-          ...acc,
-          [keyShare.publicKey]: keyShare.encryptedShard,
-        }),
-        {}
-      );
-
-      // Upload file data + keyshares data to arweave
-      const encKeysBuffer = Buffer.from(JSON.stringify(doubleEncryptedKeyShares), 'binary');
-
-      const encryptedMetadata = await encryptMetadataFields(recipientPublicKey, {
-        fileName: fileName,
-        type: payload.type,
-      });
-
-      const metadataBuffer = Buffer.from(JSON.stringify(encryptedMetadata), 'binary');
-
-      // <meta_buf_size><delimiter><keyshare_buf_size><delimiter><metatadata><keyshares><payload>
-
-      const arweavePayload = Buffer.concat([
-        Buffer.from(metadataBuffer.length.toString(), 'binary'),
-        arweaveDataDelimiter,
-        Buffer.from(encKeysBuffer.length.toString()),
-        arweaveDataDelimiter,
-        metadataBuffer,
-        encKeysBuffer,
+        innerEncryptedkeyShares,
         encryptedPayload,
-      ]);
+        encryptedPayloadMetadata,
+      } = await this.utils.encryptInnerLayer(args);
+
+      const arweavePayload = await this.utils.encryptOuterLayer({
+        ...args,
+        innerEncryptedkeyShares,
+        encryptedPayload,
+        encryptedPayloadMetadata,
+      });
+
+      return this.uploadArweavePayload({ ...args, arweavePayload });
+    } catch (error: any) {
+      console.log(error);
+      throw new Error(error.message || 'Error uploading file payload to Bundlr');
+    }
+  }
+
+  async uploadPreEncryptedPayloadToArweave(args: PreEncryptedPayloadOptions): Promise<void> {
+    try {
+      const arweavePayload = await this.utils.encryptOuterLayer(args);
+      return this.uploadArweavePayload({ ...args, arweavePayload });
+    } catch (error: any) {
+      console.log(error);
+      throw new Error(error.message || 'Error uploading file payload');
+    }
+  }
+
+  async uploadArweavePayload(args: UploadArweavePayloadArgs): Promise<void> {
+    try {
+      const { onStep, onUploadChunk, onUploadChunkError, onUploadComplete, arweavePayload } = args;
 
       onStep(`Uploading to Arweave...`);
 
@@ -390,7 +380,7 @@ export class SarcophagusApi {
       return uploadPromise;
     } catch (error: any) {
       console.log(error);
-      throw new Error(error.message || 'Error uploading file payload to Bundlr');
+      throw new Error(error.message || 'Error uploading arwewave payload');
     }
   }
 
@@ -460,31 +450,6 @@ export class SarcophagusApi {
 
     const sarcoIds: string[] = sarcophagiSubgraph.map(s => s.sarcoId);
 
-    const gracePeriod = (await safeContractCall(
-      this.viewStateFacet,
-      'getGracePeriod',
-      [],
-      options
-    )) as unknown as BigNumber;
-
-    const sarcophagi: SarcophagusData[] = await Promise.all(
-      sarcoIds.map(async sarcoId => {
-        const sarcoContract = (await safeContractCall(
-          this.viewStateFacet,
-          'getSarcophagus',
-          [sarcoId],
-          options
-        )) as unknown as SarcophagusResponseContract;
-
-        const currentTimeMs = (await this.utils.getCurrentTimeSec(this.signer.provider!)) * 1000;
-        return {
-          ...sarcoContract,
-          state: this.utils.getSarcophagusState(sarcoContract, gracePeriod.toNumber(), currentTimeMs),
-          id: sarcoId,
-        } as SarcophagusData;
-      })
-    );
-
-    return sarcophagi;
+    return this.getSarcophagiByIds(sarcoIds, options);
   }
 }

@@ -1,4 +1,5 @@
 import { ArchaeologistData } from 'types/archaeologist';
+export { readFileDataAsBase64 } from './arweaveUtil';
 
 export * from './zeroEx';
 

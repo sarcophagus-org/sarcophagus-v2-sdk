@@ -1,5 +1,5 @@
-import { BigNumber, ethers, utils } from 'ethers';
 import { UnsignedTransaction, computeAddress, formatEther, parseEther } from 'ethers/lib/utils.js';
+import { BigNumber, ethers, utils } from 'ethers';
 import moment from 'moment';
 import { SarcophagusData, SarcophagusResponseContract, SarcophagusState } from './types/sarcophagi';
 import { safeContractCall } from './helpers/safeContractCall';
@@ -15,8 +15,17 @@ import { RecoverPublicKeyErrorStatus, RecoverPublicKeyResponse } from './types/u
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import axios, { AxiosResponse } from 'axios';
 import { ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
-import { getLowestResurrectionTime, getLowestRewrapInterval } from './helpers';
+import { getLowestResurrectionTime, getLowestRewrapInterval, readFileDataAsBase64 } from './helpers';
 import { ZeroEx, ZeroExQuote } from './helpers/zeroEx';
+import { encrypt } from './helpers/encryption';
+import {
+  encryptMetadataFields,
+  encryptShardsWithArchaeologistPublicKeys,
+  encryptShardsWithRecipientPublicKey,
+} from './helpers/sarco';
+import { split } from 'shamirs-secret-sharing-ts';
+import { EncryptInnerLayerArgs, EncryptOuterLayerArgs, PreEncryptedPayloadOptions } from 'types/arweave';
+import { arweaveDataDelimiter } from './helpers/arweaveUtil';
 
 /**
  * API of useful utility and shared functions for working with and interacting with the Sarcophagus protocol.
@@ -329,9 +338,13 @@ export class Utils {
     return { publicKey, privateKey };
   }
 
+  generateSarchophagusId(name: string) {
+    return ethers.utils.id(name + Date.now().toString())
+  }
+
   formatSubmitSarcophagusArgs({
     name,
-    recipientState,
+    recipientPublicKey,
     resurrection,
     selectedArchaeologists,
     requiredArchaeologists,
@@ -339,6 +352,7 @@ export class Utils {
     archaeologistPublicKeys,
     archaeologistSignatures,
     arweaveTxId,
+    sarcophagusId,
   }: SubmitSarcophagusParams) {
     const getContractArchaeologists = (): ContractArchaeologist[] => {
       return selectedArchaeologists.map(arch => {
@@ -355,10 +369,10 @@ export class Utils {
       });
     };
 
-    const sarcoId = ethers.utils.id(name + Date.now().toString());
+    const sarcoId = sarcophagusId ?? ethers.utils.id(name + Date.now().toString());
     const settings: SubmitSarcophagusSettings = {
       name,
-      recipientAddress: recipientState.publicKey ? computeAddress(recipientState.publicKey) : '',
+      recipientAddress: recipientPublicKey ? computeAddress(recipientPublicKey) : '',
       resurrectionTime: Math.trunc(resurrection / 1000),
       threshold: requiredArchaeologists,
       creationTime: Math.trunc(negotiationTimestamp / 1000),
@@ -405,6 +419,105 @@ export class Utils {
       await this.signQuote(quote);
     } catch (error) {
       throw error;
+    }
+  }
+
+  async encryptInnerLayer(args: EncryptInnerLayerArgs): Promise<{
+    innerEncryptedkeyShares: Uint8Array[];
+    encryptedPayload: Buffer;
+    encryptedPayloadMetadata: { fileName: string; type: string };
+  }> {
+    try {
+      const { onStep, file, payloadData, payloadPublicKey, shares, threshold, payloadPrivateKey, recipientPublicKey } =
+        args;
+
+      let payload: { type: string; data: Buffer };
+      let fileName = '';
+
+      if (file) {
+        onStep('Reading file...');
+        payload = await readFileDataAsBase64(file!);
+        fileName = file.name;
+      } else if (payloadData) {
+        payload = { type: payloadData.type, data: Buffer.from(payloadData.data) };
+        fileName = payloadData.name;
+      }
+
+      // Step 1: Encrypt the payload with the payload public key
+      onStep('Encrypting payload...');
+
+      const encryptedPayload = await encrypt(payloadPublicKey!, payload!.data);
+
+      // Step 2: Split the outer layer private key using shamirs secret sharing
+      const keyShares: Uint8Array[] = split(payloadPrivateKey!, {
+        shares,
+        threshold,
+      });
+
+      // Step 3: Encrypt each shard with the recipient public key
+      const innerEncryptedkeyShares = await encryptShardsWithRecipientPublicKey(recipientPublicKey, keyShares);
+      return { innerEncryptedkeyShares, encryptedPayload, encryptedPayloadMetadata: { fileName, type: payload!.type } };
+    } catch (error: any) {
+      console.log(error);
+      throw new Error(error.message || 'Error encrypting file payload');
+    }
+  }
+
+  async encryptOuterLayer(args: EncryptOuterLayerArgs): Promise<Buffer> {
+    try {
+      const {
+        onStep,
+        innerEncryptedkeyShares,
+        encryptedPayload,
+        encryptedPayloadMetadata,
+        recipientPublicKey,
+        archaeologistPublicKeys,
+      } = args;
+
+      onStep('Encrypting keyshares...');
+
+      // Step 1: Encrypt each encrypted shard with the arch public keys
+      const keySharesEncryptedOuter = await encryptShardsWithArchaeologistPublicKeys(
+        archaeologistPublicKeys,
+        innerEncryptedkeyShares
+      );
+
+      // Step 2: Format data for upload
+      onStep('Preparing data for upload...');
+      const doubleEncryptedKeyShares: Record<string, string> = keySharesEncryptedOuter.reduce(
+        (acc, keyShare) => ({
+          ...acc,
+          [keyShare.publicKey]: keyShare.encryptedShard,
+        }),
+        {}
+      );
+
+      // Upload file data + keyshares data to arweave
+      const encKeysBuffer = Buffer.from(JSON.stringify(doubleEncryptedKeyShares), 'binary');
+
+      const encryptedMetadata = await encryptMetadataFields(recipientPublicKey, {
+        fileName: encryptedPayloadMetadata.fileName,
+        type: encryptedPayloadMetadata.type,
+      });
+
+      const metadataBuffer = Buffer.from(JSON.stringify(encryptedMetadata), 'binary');
+
+      // <meta_buf_size><delimiter><keyshare_buf_size><delimiter><metatadata><keyshares><payload>
+
+      const arweavePayload = Buffer.concat([
+        Buffer.from(metadataBuffer.length.toString(), 'binary'),
+        arweaveDataDelimiter,
+        Buffer.from(encKeysBuffer.length.toString()),
+        arweaveDataDelimiter,
+        metadataBuffer,
+        encKeysBuffer,
+        Buffer.from(encryptedPayload),
+      ]);
+
+      return arweavePayload;
+    } catch (error: any) {
+      console.log(error);
+      throw new Error(error.message || 'Error encrypting outer layer');
     }
   }
 
