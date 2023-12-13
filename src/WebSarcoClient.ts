@@ -45,11 +45,11 @@ export class WebSarcoClient {
    * @returns void
    * */
   async init(initParams: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<SarcoNetworkConfig> {
-    if (window.ethereum) {
-      this.provider = window.ethereum;
+    if (window.ethereum || initParams.providerUrl) {
+      this.provider = initParams.providerUrl ? new ethers.providers.JsonRpcProvider(initParams.providerUrl) : window.ethereum;
       this.signer = new ethers.providers.Web3Provider(this.provider as any).getSigner();
     } else {
-      throw new Error('No ethereum provider found');
+      throw new Error('No ethereum provider found. Please install a wallet extension, or set `providerUrl` in `initParams`');
     }
 
     const params = await sarcoClientInitSchema.validate(initParams);
