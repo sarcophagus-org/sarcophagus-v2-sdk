@@ -339,7 +339,7 @@ export class Utils {
   }
 
   generateSarchophagusId(name: string) {
-    return ethers.utils.id(name + Date.now().toString())
+    return ethers.utils.id(name + Date.now().toString());
   }
 
   formatSubmitSarcophagusArgs({

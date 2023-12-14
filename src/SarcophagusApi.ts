@@ -1,4 +1,8 @@
-import { EmbalmerFacet__factory, ThirdPartyFacet__factory, ViewStateFacet__factory } from '@sarcophagus-org/sarcophagus-v2-contracts';
+import {
+  EmbalmerFacet__factory,
+  ThirdPartyFacet__factory,
+  ViewStateFacet__factory,
+} from '@sarcophagus-org/sarcophagus-v2-contracts';
 import { BigNumber, ethers } from 'ethers';
 import { safeContractCall } from './helpers/safeContractCall';
 import { CallOptions, SarcoNetworkConfig } from './types';
@@ -41,7 +45,7 @@ import { SarcoWebIrys } from './SarcoWebIrys';
 import Arweave from 'arweave';
 
 export class SarcophagusApi {
-  public bundlr: SarcoWebIrys | Irys;
+  public bundlr: SarcoWebIrys | Irys | undefined;
 
   private embalmerFacet: ethers.Contract;
   private thirdPartyFacet: ethers.Contract;
@@ -56,7 +60,7 @@ export class SarcophagusApi {
     diamondDeployAddress: string,
     signer: ethers.Signer,
     networkConfig: SarcoNetworkConfig,
-    bundlr: SarcoWebIrys | Irys,
+    bundlr: SarcoWebIrys | Irys | undefined,
     arweave: Arweave
   ) {
     this.embalmerFacet = new ethers.Contract(diamondDeployAddress, EmbalmerFacet__factory.abi, signer);
@@ -182,9 +186,9 @@ export class SarcophagusApi {
 
   /**
    * Returns a list of sarcophagi for a given list if sarcoIds.
-   * 
+   *
    * If any of the sarcoIds are not found, the returned list will contain a sarcophagus with the id and name "not found".
-   * 
+   *
    * @param sarcoIds - The list of sarcoIds to get sarcophagi for
    * @param options - Options for the contract method call
    * @returns The list of sarcophagi
@@ -214,10 +218,10 @@ export class SarcophagusApi {
             id: sarcoId,
           } as SarcophagusData;
         } catch (error) {
-            console.error(`Error getting sarcophagus ${sarcoId}: ${error}`);
-            return { id: sarcoId, name: "not found" } as SarcophagusData;
-          }
-        })
+          console.error(`Error getting sarcophagus ${sarcoId}: ${error}`);
+          return { id: sarcoId, name: 'not found' } as SarcophagusData;
+        }
+      })
     );
 
     return sarcophagi;
@@ -312,11 +316,8 @@ export class SarcophagusApi {
 
   async uploadFileToArweave(args: ArweaveFilePayloadOptions): Promise<void> {
     try {
-      const {
-        innerEncryptedkeyShares,
-        encryptedPayload,
-        encryptedPayloadMetadata,
-      } = await this.utils.encryptInnerLayer(args);
+      const { innerEncryptedkeyShares, encryptedPayload, encryptedPayloadMetadata } =
+        await this.utils.encryptInnerLayer(args);
 
       const arweavePayload = await this.utils.encryptOuterLayer({
         ...args,
@@ -349,7 +350,7 @@ export class SarcophagusApi {
       onStep(`Uploading to Arweave...`);
 
       // SET UP UPLOAD EVENT LISTENERS
-      const chunkedUploader = this.bundlr.uploader.chunkedUploader;
+      const chunkedUploader = this.bundlr!.uploader.chunkedUploader;
 
       chunkedUploader.setChunkSize(chunkedUploaderFileSize);
 
