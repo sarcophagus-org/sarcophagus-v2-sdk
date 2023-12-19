@@ -45,17 +45,18 @@ export class WebSarcoClient {
    * @returns void
    * */
   async init(initParams: SarcoInitParams, onInit = (_: Libp2p) => {}): Promise<SarcoNetworkConfig> {
-    if (window.ethereum) {
-      this.provider = window.ethereum;
-      this.signer = new ethers.providers.Web3Provider(this.provider as any).getSigner();
-    } else {
-      throw new Error('No ethereum provider found');
-    }
-
     const params = await sarcoClientInitSchema.validate(initParams);
 
-    const web3Provider = new ethers.providers.Web3Provider(this.provider as any);
-    const providerUrl = web3Provider.connection.url;
+    if (window.ethereum || params.providerUrl) {
+      this.provider = params.providerUrl ? new ethers.providers.JsonRpcProvider(params.providerUrl) : window.ethereum;
+      this.signer = params.providerUrl
+        ? new ethers.VoidSigner('', this.provider)
+        : new ethers.providers.Web3Provider(this.provider as any).getSigner();
+    } else {
+      throw new Error(
+        'No ethereum provider found. Please install a wallet extension, or set `providerUrl` in `initParams`'
+      );
+    }
 
     const getNetworkConfig = getNetworkConfigBuilder(params.chainId);
 
@@ -78,13 +79,11 @@ export class WebSarcoClient {
       await this.startLibp2pNode();
     }
 
-    const bundlr = this.getBundlr();
-
     this.api = new SarcophagusApi(
       this.networkConfig.diamondDeployAddress,
       this.signer,
       this.networkConfig,
-      bundlr,
+      params.providerUrl ? undefined : this.getBundlr(),
       this.arweave
     );
 

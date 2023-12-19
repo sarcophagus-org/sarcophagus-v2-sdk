@@ -11,6 +11,7 @@ export const nodeSarcoClientSchema = object({
 
 export const sarcoClientInitSchema = object({
   chainId: number().required(),
+  providerUrl: string(),
   skipLibp2pNode: boolean(),
   etherscanApiKey: string(),
   polygonScanApiKey: string(),

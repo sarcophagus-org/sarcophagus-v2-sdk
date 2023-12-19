@@ -27,7 +27,7 @@ export const SARCO_SUPPORTED_NETWORKS: Map<number, string> = new Map([
   [BASE_GOERLI_CHAIN_ID, 'baseGoerli'],
   [POLYGON_MUMBAI_CHAIN_ID, 'polygonMumbai'],
   [POLYGON_MAINNET_CHAIN_ID, 'polygonMainnet'],
-  [ARBITRUM_CHAIN_ID, 'arbitrum']
+  [ARBITRUM_CHAIN_ID, 'arbitrum'],
 ]);
 
 export const hardhatNetworkConfig = (override?: {
