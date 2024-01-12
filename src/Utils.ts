@@ -329,7 +329,6 @@ export class Utils {
 
     return this.getSarcophagusState(sarcoContract, gracePeriod.toNumber(), currentTimeMs);
   }
-
   generateKeyPair() {
     const wallet = ethers.Wallet.createRandom();
     const publicKey = wallet.publicKey;
@@ -337,11 +336,9 @@ export class Utils {
 
     return { publicKey, privateKey };
   }
-
   generateSarchophagusId(name: string) {
     return ethers.utils.id(name + Date.now().toString());
   }
-
   formatSubmitSarcophagusArgs({
     name,
     recipientPublicKey,
@@ -412,10 +409,11 @@ export class Utils {
   /**
    * Swaps L1 Token for SARCO
    * @param amount The amount of L1 Token to swap for SARCO
+   * @param zeroExQuote optional 0x quote to provide
    */
-  async swapEthForSarco(amount: BigNumber): Promise<void> {
+  async swapEthForSarco(amount: BigNumber, zeroExQuote?: ZeroExQuote): Promise<void> {
     try {
-      const quote = await this.getSarcoQuote(amount);
+      const quote = zeroExQuote ?? await this.getSarcoQuote(amount);
       await this.signQuote(quote);
     } catch (error) {
       throw error;
