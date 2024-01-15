@@ -236,14 +236,13 @@ export class Utils {
 
   /**
    * Returns a public key from a given address
-   * @param address address to recover public key from
    * @returns RecoverPublicKeyResponse
+   * @param etherscanUrl
+   * @param depth - number of retries to attempt
    **/
-  private async recoverPublicKeyWithRetry(address: string, depth = 0): Promise<AxiosResponse> {
-    const getParameters = 'module=account&action=txlist&startblock=0&endblock=99999999&page=1&offset=1000&sort=asc';
-
+  private async recoverPublicKeyWithRetry(etherscanUrl: string, depth = 0): Promise<AxiosResponse> {
     try {
-      const response = await axios.get(`${this.networkConfig.etherscanApiUrl}?${getParameters}&address=${address}`);
+      const response = await axios.get(etherscanUrl);
 
       if (response.status !== 200) {
         console.log('recoverPublicKey error:', response.data.message);
@@ -263,22 +262,30 @@ export class Utils {
 
       await this.wait(3000);
 
-      return this.recoverPublicKeyWithRetry(address, depth + 1);
+      return this.recoverPublicKeyWithRetry(etherscanUrl, depth + 1);
     }
   }
 
   /**
    * Returns a public key from a given address
    * @param address address to recover public key from
+   * @param apiKey - optional api key
    * @returns RecoverPublicKeyResponse
    **/
-  async recoverPublicKey(address: string): Promise<RecoverPublicKeyResponse> {
+  async recoverPublicKey(address: string, apiKey?: string): Promise<RecoverPublicKeyResponse> {
     try {
       if (!ethers.utils.isAddress(address.toLowerCase())) {
         return { error: RecoverPublicKeyErrorStatus.INVALID_ADDRESS };
       }
 
-      const response = await this.recoverPublicKeyWithRetry(address, 3);
+      const getParameters = 'module=account&action=txlist&startblock=0&endblock=99999999&page=1&offset=1000&sort=asc';
+      let etherscanUrl = `${this.networkConfig.etherscanApiUrl}?${getParameters}&address=${address}`
+
+      if (apiKey) {
+        etherscanUrl += `&apiKey=${apiKey}`
+      }
+
+      const response = await this.recoverPublicKeyWithRetry(etherscanUrl, 3);
 
       if (response.status !== 200) {
         console.log('recoverPublicKey error:', response.data.message);
